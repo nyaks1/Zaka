@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
+import '../../core/accounting.dart';
 import '../../core/categories.dart';
 import '../../core/dates.dart';
 import '../../core/forecast.dart';
@@ -9,6 +10,7 @@ import '../../core/money.dart';
 import '../../providers.dart';
 import '../../widgets/common.dart';
 import '../../widgets/runway_sparkline.dart';
+import '../accounts/move_money_screen.dart';
 import '../activity/activity_tile.dart';
 import '../spending/quick_log_screen.dart';
 import '../withdrawals/add_withdrawal_screen.dart';
@@ -27,6 +29,11 @@ class DashboardScreen extends ConsumerWidget {
     );
   }
 
+  void _openMove(BuildContext context) {
+    Navigator.of(context)
+        .push(MaterialPageRoute<void>(builder: (_) => const MoveMoneyScreen()));
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
@@ -37,11 +44,28 @@ class DashboardScreen extends ConsumerWidget {
         const <SpendCategory, int>{};
     final spends = ref.watch(spendsProvider).value ?? const [];
     final withdrawals = ref.watch(withdrawalsProvider).value ?? const [];
+    final transfers = ref.watch(transfersProvider).value ?? const [];
+    final accountBalances =
+        ref.watch(accountBalancesProvider).value ?? const [];
+    final accountNames = {
+      for (final balance in accountBalances)
+        balance.account.id: balance.account.name,
+    };
 
     final entries = <ActivityEntry>[
-      for (final spend in spends) ActivityEntry.spend(spend),
+      for (final spend in spends)
+        ActivityEntry.spend(spend, accountName: accountNames[spend.accountId]),
       for (final withdrawal in withdrawals)
-        ActivityEntry.withdrawal(withdrawal),
+        ActivityEntry.withdrawal(
+          withdrawal,
+          accountName: accountNames[withdrawal.accountId],
+        ),
+      for (final transfer in transfers)
+        ActivityEntry.transfer(
+          transfer,
+          accountName: accountNames[transfer.fromAccountId],
+          toAccountName: accountNames[transfer.toAccountId],
+        ),
     ]..sort((a, b) => b.date.compareTo(a.date));
 
     return Scaffold(
@@ -61,7 +85,13 @@ class DashboardScreen extends ConsumerWidget {
         ),
         actions: [
           IconButton.filledTonal(
-            tooltip: 'Add ATM withdrawal',
+            tooltip: 'Move money',
+            onPressed: () => _openMove(context),
+            icon: const Icon(Icons.swap_horiz_rounded),
+          ),
+          const SizedBox(width: 8),
+          IconButton.filledTonal(
+            tooltip: 'Add money',
             onPressed: () => _openWithdrawal(context),
             icon: const Icon(Icons.add_card_rounded),
           ),
@@ -88,7 +118,7 @@ class DashboardScreen extends ConsumerWidget {
                   color: theme.colorScheme.error,
                 ),
                 const SizedBox(height: 12),
-                const Text('Could not open your cash data'),
+                const Text('Could not open your money data'),
                 const SizedBox(height: 8),
                 Text(
                   '$error',
@@ -108,13 +138,14 @@ class DashboardScreen extends ConsumerWidget {
             children: [
               _BalanceCard(
                 summary: cash,
+                accounts: accountBalances,
                 onAddCash: () => _openWithdrawal(context),
               ),
               const SizedBox(height: 16),
               _RunwayCard(forecast: forecast),
               const SizedBox(height: 26),
               SectionHeader(
-                title: 'Where cash went',
+                title: 'Where money went',
                 trailing: Text(
                   'Last 7 days',
                   style: theme.textTheme.bodySmall?.copyWith(
@@ -138,7 +169,7 @@ class DashboardScreen extends ConsumerWidget {
                   const SizedBox(width: 6),
                   Flexible(
                     child: Text(
-                      'Your cash data stays on this device.',
+                      'Your money data stays on this device.',
                       textAlign: TextAlign.center,
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
@@ -156,17 +187,20 @@ class DashboardScreen extends ConsumerWidget {
 }
 
 class _BalanceCard extends StatelessWidget {
-  const _BalanceCard({required this.summary, required this.onAddCash});
+  const _BalanceCard({
+    required this.summary,
+    required this.accounts,
+    required this.onAddCash,
+  });
 
   final CashSummary summary;
+  final List<AccountBalance> accounts;
   final VoidCallback onAddCash;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final spentRatio = summary.withdrawnCents == 0
-        ? 0.0
-        : (summary.spentCents / summary.withdrawnCents).clamp(0.0, 1.0);
+    final noActivity = summary.moneyInCents == 0 && summary.moneyOutCents == 0;
 
     return Container(
       padding: const EdgeInsets.fromLTRB(22, 20, 22, 22),
@@ -191,7 +225,7 @@ class _BalanceCard extends StatelessWidget {
           Row(
             children: [
               Text(
-                'CASH ON HAND',
+                'TOTAL MONEY',
                 style: theme.textTheme.labelSmall?.copyWith(
                   color: Colors.white70,
                   letterSpacing: 1.4,
@@ -219,38 +253,58 @@ class _BalanceCard extends StatelessWidget {
               ),
             ),
           ),
+          const SizedBox(height: 4),
+          Text(
+            summary.accountCount == 1
+                ? 'Across 1 account'
+                : 'Across ${summary.accountCount} accounts',
+            style: theme.textTheme.bodySmall?.copyWith(color: Colors.white70),
+          ),
+          if (accounts.isNotEmpty) ...[
+            const SizedBox(height: 14),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                for (final balance in accounts.take(3))
+                  _AccountChip(
+                    name: balance.account.name,
+                    amountCents: balance.balanceCents,
+                  ),
+                if (accounts.length > 3)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    child: Text(
+                      '+${accounts.length - 3} more',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: Colors.white70,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ],
           const SizedBox(height: 18),
           Row(
             children: [
               _BalanceStat(
-                label: 'Withdrawn',
-                value: formatCents(summary.withdrawnCents),
+                label: 'Money in',
+                value: formatCents(summary.moneyInCents),
               ),
               const SizedBox(width: 28),
               _BalanceStat(
-                label: 'Spent',
-                value: formatCents(summary.spentCents),
+                label: 'Money out',
+                value: formatCents(summary.moneyOutCents),
               ),
             ],
           ),
-          const SizedBox(height: 18),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(99),
-            child: LinearProgressIndicator(
-              value: spentRatio,
-              minHeight: 6,
-              backgroundColor: Colors.white.withValues(alpha: 0.18),
-              valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
+          if (noActivity) ...[
+            const SizedBox(height: 10),
+            Text(
+              'Add the money you already have, or import a bank statement, to '
+              'start the countdown.',
+              style: theme.textTheme.bodySmall?.copyWith(color: Colors.white70),
             ),
-          ),
-          const SizedBox(height: 10),
-          Text(
-            summary.withdrawnCents == 0
-                ? 'Add the cash in your wallet to start the countdown.'
-                : '${(spentRatio * 100).round()}% of withdrawn cash spent',
-            style: theme.textTheme.bodySmall?.copyWith(color: Colors.white70),
-          ),
-          if (summary.withdrawnCents == 0) ...[
             const SizedBox(height: 6),
             TextButton.icon(
               style: TextButton.styleFrom(
@@ -260,9 +314,47 @@ class _BalanceCard extends StatelessWidget {
               ),
               onPressed: onAddCash,
               icon: const Icon(Icons.add_rounded, size: 18),
-              label: const Text('Add cash'),
+              label: const Text('Add money'),
             ),
           ],
+        ],
+      ),
+    );
+  }
+}
+
+class _AccountChip extends StatelessWidget {
+  const _AccountChip({required this.name, required this.amountCents});
+
+  final String name;
+  final int amountCents;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            name,
+            style: theme.textTheme.labelSmall?.copyWith(color: Colors.white70),
+          ),
+          const SizedBox(height: 1),
+          Text(
+            formatCents(amountCents),
+            style: theme.textTheme.labelLarge?.copyWith(
+              color: Colors.white,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
         ],
       ),
     );
@@ -321,7 +413,7 @@ class _RunwayCard extends StatelessWidget {
                   color: theme.colorScheme.primary,
                 ),
                 const SizedBox(width: 8),
-                Text('Cash runway', style: theme.textTheme.titleMedium),
+                Text('Money runway', style: theme.textTheme.titleMedium),
                 const Spacer(),
                 if (forecast != null && forecast!.hasData)
                   _Pill(
@@ -347,7 +439,7 @@ class _RunwayCard extends StatelessWidget {
                 padding: const EdgeInsets.only(bottom: 4),
                 child: Text(
                   'Log a spend or set a repeating fare and Zaka will show '
-                  'the day your cash runs out.',
+                  'the day your money runs out.',
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                     height: 1.4,
@@ -372,8 +464,8 @@ class _RunwayCard extends StatelessWidget {
                     padding: const EdgeInsets.only(bottom: 4),
                     child: Text(
                       forecast!.daysRemaining == 1
-                          ? 'day of cash left'
-                          : 'days of cash left',
+                          ? 'day of money left'
+                          : 'days of money left',
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
                       ),
@@ -424,13 +516,13 @@ class _RunwayCard extends StatelessWidget {
 
   String _runwayMessage(ForecastResult result) {
     if (result.daysRemaining == 0) {
-      return 'Your cash is finished. Add a withdrawal to keep going.';
+      return 'Your balance is finished. Add money to keep going.';
     }
     if (result.runsOutOn != null) {
-      return 'At this burn rate, cash runs out on '
+      return 'At this burn rate, money runs out on '
           '${longDate(result.runsOutOn!)}.';
     }
-    return 'At ${formatCents(result.dailyBurnCents)} a day, your cash lasts '
+    return 'At ${formatCents(result.dailyBurnCents)} a day, your money lasts '
         'beyond the ${result.horizonDays}-day forecast.';
   }
 }
@@ -507,7 +599,8 @@ class _CategoryBreakdown extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(20),
           child: Text(
-            'No spends in the last 7 days. Your first log will show up here.',
+            'No spends in the last 7 days. Logged and imported spends show '
+            'up here.',
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
               height: 1.4,
@@ -590,7 +683,8 @@ class _RecentActivity extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(20),
           child: Text(
-            'Nothing logged yet. Tap “Log cash” whenever you spend.',
+            'Nothing yet. Tap “Log cash” whenever you spend, or import a bank '
+            'statement from Accounts.',
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),

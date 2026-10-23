@@ -53,6 +53,10 @@ class RecurringScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final rules = ref.watch(recurringRulesProvider);
+    final accounts = ref.watch(accountsProvider).value ?? const [];
+    final accountNames = {
+      for (final account in accounts) account.id: account.name,
+    };
     final now = DateTime.now();
 
     return Scaffold(
@@ -120,6 +124,7 @@ class RecurringScreen extends ConsumerWidget {
                   padding: const EdgeInsets.only(bottom: 10),
                   child: _RuleCard(
                     rule: rule,
+                    accountName: accountNames[rule.accountId],
                     now: now,
                     onToggle: (active) => ref
                         .read(cashRepositoryProvider)
@@ -141,9 +146,11 @@ class _RuleCard extends StatelessWidget {
     required this.now,
     required this.onToggle,
     required this.onDelete,
+    this.accountName,
   });
 
   final RecurringRule rule;
+  final String? accountName;
   final DateTime now;
   final ValueChanged<bool> onToggle;
   final VoidCallback onDelete;
@@ -167,6 +174,7 @@ class _RuleCard extends StatelessWidget {
         : next == null
         ? 'Finished'
         : 'Next ${dayLabel(next, now: now)}';
+    final accountSuffix = accountName == null ? '' : ' · $accountName';
 
     return Card(
       child: Padding(
@@ -186,7 +194,7 @@ class _RuleCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 3),
                   Text(
-                    '${describeWeekdays(weekdays)} · $status',
+                    '${describeWeekdays(weekdays)} · $status$accountSuffix',
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: theme.colorScheme.onSurfaceVariant,
                     ),

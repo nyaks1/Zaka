@@ -34,8 +34,10 @@ void main() {
     final spends = await database.select(database.spends).get();
 
     expect(withdrawals.single.amountCents, 50000);
+    expect(withdrawals.single.accountId, isNotNull);
     expect(spends.single.amountCents, 4000);
     expect(spends.single.category, 'taxi');
+    expect(spends.single.accountId, isNotNull);
   });
 
   test('a Mon–Fri taxi posts once per weekday and never duplicates', () async {

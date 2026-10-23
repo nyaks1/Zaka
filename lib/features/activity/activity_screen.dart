@@ -7,7 +7,7 @@ import '../../widgets/common.dart';
 import '../spending/quick_log_screen.dart';
 import 'activity_tile.dart';
 
-enum ActivityFilter { all, spends, withdrawals }
+enum ActivityFilter { all, spends, moneyIn, transfers }
 
 class ActivityScreen extends ConsumerStatefulWidget {
   const ActivityScreen({super.key});
@@ -47,7 +47,9 @@ class _ActivityScreenState extends ConsumerState<ActivityScreen> {
     if (confirmed != true || !mounted) return;
 
     final repository = ref.read(cashRepositoryProvider);
-    if (entry.spend != null) {
+    if (entry.transfer != null) {
+      await repository.deleteTransfer(entry.transfer!.id);
+    } else if (entry.spend != null) {
       await repository.deleteSpend(entry.spend!.id);
     } else {
       await repository.deleteWithdrawal(entry.withdrawal!.id);
@@ -63,13 +65,34 @@ class _ActivityScreenState extends ConsumerState<ActivityScreen> {
     final theme = Theme.of(context);
     final spends = ref.watch(spendsProvider).value ?? const [];
     final withdrawals = ref.watch(withdrawalsProvider).value ?? const [];
+    final transfers = ref.watch(transfersProvider).value ?? const [];
+    final accounts = ref.watch(accountsProvider).value ?? const [];
+    final accountNames = {
+      for (final account in accounts) account.id: account.name,
+    };
 
     final entries = <ActivityEntry>[
-      if (_filter != ActivityFilter.withdrawals)
-        for (final spend in spends) ActivityEntry.spend(spend),
-      if (_filter != ActivityFilter.spends)
+      if (_filter != ActivityFilter.moneyIn &&
+          _filter != ActivityFilter.transfers)
+        for (final spend in spends)
+          ActivityEntry.spend(
+            spend,
+            accountName: accountNames[spend.accountId],
+          ),
+      if (_filter != ActivityFilter.spends &&
+          _filter != ActivityFilter.transfers)
         for (final withdrawal in withdrawals)
-          ActivityEntry.withdrawal(withdrawal),
+          ActivityEntry.withdrawal(
+            withdrawal,
+            accountName: accountNames[withdrawal.accountId],
+          ),
+      if (_filter != ActivityFilter.spends && _filter != ActivityFilter.moneyIn)
+        for (final transfer in transfers)
+          ActivityEntry.transfer(
+            transfer,
+            accountName: accountNames[transfer.fromAccountId],
+            toAccountName: accountNames[transfer.toAccountId],
+          ),
     ]..sort((a, b) => b.date.compareTo(a.date));
 
     final grouped = <DateTime, List<ActivityEntry>>{};
@@ -77,6 +100,9 @@ class _ActivityScreenState extends ConsumerState<ActivityScreen> {
       grouped.putIfAbsent(dateOnly(entry.date), () => []).add(entry);
     }
     final days = grouped.keys.toList()..sort((a, b) => b.compareTo(a));
+
+    final hasAny =
+        spends.isNotEmpty || withdrawals.isNotEmpty || transfers.isNotEmpty;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Activity')),
@@ -101,8 +127,12 @@ class _ActivityScreenState extends ConsumerState<ActivityScreen> {
                     label: Text('Spends'),
                   ),
                   ButtonSegment(
-                    value: ActivityFilter.withdrawals,
-                    label: Text('Cash in'),
+                    value: ActivityFilter.moneyIn,
+                    label: Text('Money in'),
+                  ),
+                  ButtonSegment(
+                    value: ActivityFilter.transfers,
+                    label: Text('Transfers'),
                   ),
                 ],
                 selected: {_filter},
@@ -115,20 +145,20 @@ class _ActivityScreenState extends ConsumerState<ActivityScreen> {
             child: entries.isEmpty
                 ? EmptyState(
                     icon: Icons.receipt_long_rounded,
-                    title: spends.isEmpty && withdrawals.isEmpty
-                        ? 'No activity yet'
-                        : 'Nothing in this filter',
-                    message: spends.isEmpty && withdrawals.isEmpty
-                        ? 'Every withdrawal and cash spend you log will '
-                              'appear here, newest first.'
-                        : 'Try another filter, or log a new cash spend.',
-                    action: spends.isEmpty && withdrawals.isEmpty
-                        ? FilledButton.icon(
+                    title: hasAny
+                        ? 'Nothing in this filter'
+                        : 'No activity yet',
+                    message: hasAny
+                        ? 'Try another filter, or log a new cash spend.'
+                        : 'Log a cash spend, import a bank statement, or move '
+                              'money between accounts. It all appears here.',
+                    action: hasAny
+                        ? null
+                        : FilledButton.icon(
                             onPressed: _openQuickLog,
                             icon: const Icon(Icons.bolt_rounded),
                             label: const Text('Log your first spend'),
-                          )
-                        : null,
+                          ),
                   )
                 : ListView(
                     padding: const EdgeInsets.fromLTRB(16, 4, 16, 100),

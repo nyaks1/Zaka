@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../accounts/accounts_screen.dart';
 import '../activity/activity_screen.dart';
 import '../dashboard/dashboard_screen.dart';
 import '../recurring/recurring_screen.dart';
@@ -22,6 +23,7 @@ class _HomeShellState extends State<HomeShell> {
         children: const [
           DashboardScreen(),
           ActivityScreen(),
+          AccountsScreen(),
           RecurringScreen(),
         ],
       ),
@@ -38,6 +40,11 @@ class _HomeShellState extends State<HomeShell> {
             icon: Icon(Icons.receipt_long_outlined),
             selectedIcon: Icon(Icons.receipt_long_rounded),
             label: 'Activity',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.account_balance_wallet_outlined),
+            selectedIcon: Icon(Icons.account_balance_wallet_rounded),
+            label: 'Accounts',
           ),
           NavigationDestination(
             icon: Icon(Icons.repeat_outlined),

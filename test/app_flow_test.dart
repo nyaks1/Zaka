@@ -46,17 +46,17 @@ void main() {
     await tester.pump(const Duration(seconds: 1));
   }
 
-  testWidgets('adds a withdrawal and logs a spend with the live balance', (
+  testWidgets('adds money and logs a spend with the live balance', (
     tester,
   ) async {
     await pumpApp(tester);
 
-    // Add cash.
-    await tester.tap(find.byTooltip('Add ATM withdrawal'));
+    // Add money to the cash account.
+    await tester.tap(find.byTooltip('Add money'));
     await settle(tester);
     await tester.enterText(find.byType(TextField).first, '500');
     await settle(tester);
-    await tester.tap(find.textContaining('Add R500.00 cash'));
+    await tester.tap(find.textContaining('Add R500.00'));
     await settle(tester);
     // Let the confirmation snackbar finish exiting so it cannot cover the FAB.
     await tester.pump(const Duration(seconds: 5));
@@ -73,11 +73,46 @@ void main() {
     await settle(tester);
 
     expect(find.text('R465.00'), findsWidgets);
+
+    // Recent activity sits below the balance, runway and category cards.
+    await tester.scrollUntilVisible(
+      find.text('−R35.00'),
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await settle(tester);
     expect(find.text('−R35.00'), findsWidgets);
 
     final spends = await database.select(database.spends).get();
     expect(spends.single.amountCents, 3500);
     expect(spends.single.category, 'taxi');
+
+    await disposeApp(tester);
+  });
+
+  testWidgets('adds a bank account and shows it in the total balance', (
+    tester,
+  ) async {
+    await pumpApp(tester);
+
+    await tester.tap(find.text('Accounts'));
+    await settle(tester);
+    await tester.tap(find.byTooltip('Add account'));
+    await settle(tester);
+
+    await tester.enterText(find.byType(TextField).first, 'FNB Cheque');
+    await tester.enterText(find.byType(TextField).last, '1000');
+    await settle(tester);
+    await tester.tap(find.widgetWithText(FilledButton, 'Add account'));
+    await settle(tester);
+
+    expect(find.text('FNB Cheque'), findsOneWidget);
+    expect(find.text('R1,000.00'), findsWidgets);
+
+    await tester.tap(find.text('Home'));
+    await settle(tester);
+    expect(find.text('Across 2 accounts'), findsOneWidget);
+    expect(find.text('R1,000.00'), findsWidgets);
 
     await disposeApp(tester);
   });

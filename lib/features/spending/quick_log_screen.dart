@@ -31,6 +31,7 @@ class _QuickLogScreenState extends ConsumerState<QuickLogScreen> {
   late DateTime _when = DateTime.now();
   Set<int> _days = {1, 2, 3, 4, 5};
   DateTime? _endsOn;
+  int? _accountId;
   bool _saving = false;
 
   @override
@@ -43,7 +44,25 @@ class _QuickLogScreenState extends ConsumerState<QuickLogScreen> {
   int? get _amountCents => parseRandToCents(_amountController.text);
 
   bool get _canSave =>
-      _amountCents != null && (!_repeat || _days.isNotEmpty) && !_saving;
+      _amountCents != null &&
+      _resolveAccountId() != null &&
+      (!_repeat || _days.isNotEmpty) &&
+      !_saving;
+
+  int? _resolveAccountId() {
+    final accounts = ref.read(accountsProvider).value ?? const [];
+    if (accounts.isEmpty) return null;
+    final current = _accountId;
+    if (current != null && accounts.any((account) => account.id == current)) {
+      return current;
+    }
+    return accounts
+        .firstWhere(
+          (account) => account.kind == 'cash',
+          orElse: () => accounts.first,
+        )
+        .id;
+  }
 
   Future<void> _pickDate() async {
     final now = DateTime.now();
@@ -78,7 +97,8 @@ class _QuickLogScreenState extends ConsumerState<QuickLogScreen> {
 
   Future<void> _save() async {
     final cents = _amountCents;
-    if (cents == null) return;
+    final accountId = _resolveAccountId();
+    if (cents == null || accountId == null) return;
     if (_repeat && _days.isEmpty) return;
 
     setState(() => _saving = true);
@@ -89,6 +109,7 @@ class _QuickLogScreenState extends ConsumerState<QuickLogScreen> {
             amountCents: cents,
             category: _category.name,
             spentAt: _when,
+            accountId: accountId,
             note: _noteController.text.trim().isEmpty
                 ? null
                 : _noteController.text.trim(),
@@ -128,9 +149,11 @@ class _QuickLogScreenState extends ConsumerState<QuickLogScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final cents = _amountCents;
+    final accounts = ref.watch(accountsProvider).value ?? const [];
+    final accountId = _resolveAccountId();
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Log cash')),
+      appBar: AppBar(title: const Text('Log spend')),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
         children: [
@@ -161,6 +184,29 @@ class _QuickLogScreenState extends ConsumerState<QuickLogScreen> {
               );
             },
           ),
+          if (accounts.isNotEmpty) ...[
+            const SizedBox(height: 16),
+            Card(
+              child: ListTile(
+                contentPadding: const EdgeInsets.fromLTRB(18, 2, 12, 2),
+                leading: const Icon(Icons.account_balance_wallet_rounded),
+                title: Text('Paid from', style: theme.textTheme.titleSmall),
+                trailing: DropdownButton<int>(
+                  value: accountId,
+                  underline: const SizedBox.shrink(),
+                  borderRadius: BorderRadius.circular(14),
+                  items: [
+                    for (final account in accounts)
+                      DropdownMenuItem(
+                        value: account.id,
+                        child: Text(account.name),
+                      ),
+                  ],
+                  onChanged: (value) => setState(() => _accountId = value),
+                ),
+              ),
+            ),
+          ],
           const SizedBox(height: 20),
           TextField(
             controller: _noteController,

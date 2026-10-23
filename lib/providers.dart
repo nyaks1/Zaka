@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'core/accounting.dart';
 import 'core/categories.dart';
 import 'core/dates.dart';
 import 'core/forecast.dart';
@@ -7,6 +8,7 @@ import 'core/recurrence.dart';
 import 'data/cash_repository.dart';
 import 'data/database.dart';
 import 'data/recurring_service.dart';
+import 'data/statement_importer.dart';
 
 final databaseProvider = Provider<AppDatabase>((ref) {
   final database = AppDatabase();
@@ -22,6 +24,17 @@ final recurringServiceProvider = Provider<RecurringService>(
   (ref) => RecurringService(ref.watch(databaseProvider)),
 );
 
+final statementImporterProvider = Provider<StatementImporter>(
+  (ref) => StatementImporter(
+    ref.watch(databaseProvider),
+    ref.watch(cashRepositoryProvider),
+  ),
+);
+
+final accountsProvider = StreamProvider<List<Account>>(
+  (ref) => ref.watch(cashRepositoryProvider).watchAccounts(),
+);
+
 final withdrawalsProvider = StreamProvider<List<Withdrawal>>(
   (ref) => ref.watch(cashRepositoryProvider).watchWithdrawals(),
 );
@@ -30,18 +43,13 @@ final spendsProvider = StreamProvider<List<Spend>>(
   (ref) => ref.watch(cashRepositoryProvider).watchSpends(),
 );
 
+final transfersProvider = StreamProvider<List<Transfer>>(
+  (ref) => ref.watch(cashRepositoryProvider).watchTransfers(),
+);
+
 final recurringRulesProvider = StreamProvider<List<RecurringRule>>(
   (ref) => ref.watch(cashRepositoryProvider).watchRecurringRules(),
 );
-
-class CashSummary {
-  const CashSummary({required this.withdrawnCents, required this.spentCents});
-
-  final int withdrawnCents;
-  final int spentCents;
-
-  int get balanceCents => withdrawnCents - spentCents;
-}
 
 AsyncValue<T>? _pending<T>(List<AsyncValue<Object?>> values) {
   for (final value in values) {
@@ -58,24 +66,82 @@ AsyncValue<T>? _pending<T>(List<AsyncValue<Object?>> values) {
   return null;
 }
 
+final accountBalancesProvider = Provider<AsyncValue<List<AccountBalance>>>((
+  ref,
+) {
+  final accounts = ref.watch(accountsProvider);
+  final withdrawals = ref.watch(withdrawalsProvider);
+  final spends = ref.watch(spendsProvider);
+  final transfers = ref.watch(transfersProvider);
+
+  final pending = _pending<List<AccountBalance>>([
+    accounts,
+    withdrawals,
+    spends,
+    transfers,
+  ]);
+  if (pending != null) return pending;
+
+  return AsyncValue.data(
+    computeAccountBalances(
+      accounts: accounts.requireValue,
+      withdrawals: withdrawals.requireValue,
+      spends: spends.requireValue,
+      transfers: transfers.requireValue,
+    ),
+  );
+});
+
+final totalBalanceProvider = Provider<AsyncValue<int>>(
+  (ref) => ref
+      .watch(accountBalancesProvider)
+      .whenData(
+        (balances) =>
+            balances.fold<int>(0, (sum, balance) => sum + balance.balanceCents),
+      ),
+);
+
+class CashSummary {
+  const CashSummary({
+    required this.balanceCents,
+    required this.moneyInCents,
+    required this.moneyOutCents,
+    required this.accountCount,
+  });
+
+  final int balanceCents;
+  final int moneyInCents;
+  final int moneyOutCents;
+  final int accountCount;
+}
+
 final cashSummaryProvider = Provider<AsyncValue<CashSummary>>((ref) {
+  final balances = ref.watch(accountBalancesProvider);
   final withdrawals = ref.watch(withdrawalsProvider);
   final spends = ref.watch(spendsProvider);
 
-  final pending = _pending<CashSummary>([withdrawals, spends]);
+  final pending = _pending<CashSummary>([balances, withdrawals, spends]);
   if (pending != null) return pending;
 
-  final withdrawn = withdrawals.requireValue.fold<int>(
+  final moneyIn = withdrawals.requireValue.fold<int>(
     0,
     (sum, item) => sum + item.amountCents,
   );
-  final spent = spends.requireValue.fold<int>(
+  final moneyOut = spends.requireValue.fold<int>(
     0,
     (sum, item) => sum + item.amountCents,
   );
 
   return AsyncValue.data(
-    CashSummary(withdrawnCents: withdrawn, spentCents: spent),
+    CashSummary(
+      balanceCents: balances.requireValue.fold<int>(
+        0,
+        (sum, balance) => sum + balance.balanceCents,
+      ),
+      moneyInCents: moneyIn,
+      moneyOutCents: moneyOut,
+      accountCount: balances.requireValue.length,
+    ),
   );
 });
 

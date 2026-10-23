@@ -21,7 +21,19 @@ String formatCentsCompact(int cents) => _randCompact.format(cents / 100);
 /// Parses user input like "35", "35.50" or "R 35,50" into cents.
 /// Returns null for empty, zero or invalid input.
 int? parseRandToCents(String raw) {
-  var cleaned = raw.replaceAll(RegExp(r'[^0-9.,]'), '');
+  final cents = parseSignedRandToCents(raw);
+  if (cents == null || cents <= 0) return null;
+  return cents;
+}
+
+/// Like [parseRandToCents], but allows a negative opening balance for a
+/// credit account or loan. Zero is valid here.
+int? parseSignedRandToCents(String raw) {
+  var cleaned = raw.replaceAll(RegExp(r'[^0-9.,-]'), '');
+  if (cleaned.isEmpty) return null;
+
+  final negative = cleaned.startsWith('-');
+  cleaned = cleaned.replaceAll('-', '');
   if (cleaned.isEmpty) return null;
 
   // Treat a lone comma as a decimal separator; drop thousands separators.
@@ -32,7 +44,7 @@ int? parseRandToCents(String raw) {
   }
 
   final value = double.tryParse(cleaned);
-  if (value == null || !value.isFinite || value <= 0) return null;
+  if (value == null || !value.isFinite) return null;
   final cents = (value * 100).round();
-  return cents <= 0 ? null : cents;
+  return negative ? -cents : cents;
 }

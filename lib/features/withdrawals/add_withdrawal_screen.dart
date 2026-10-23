@@ -18,7 +18,23 @@ class _AddWithdrawalScreenState extends ConsumerState<AddWithdrawalScreen> {
   final _amountController = TextEditingController();
   final _noteController = TextEditingController();
   late DateTime _when = DateTime.now();
+  int? _accountId;
   bool _saving = false;
+
+  int? _resolveAccountId() {
+    final accounts = ref.read(accountsProvider).value ?? const [];
+    if (accounts.isEmpty) return null;
+    final current = _accountId;
+    if (current != null && accounts.any((account) => account.id == current)) {
+      return current;
+    }
+    return accounts
+        .firstWhere(
+          (account) => account.kind == 'cash',
+          orElse: () => accounts.first,
+        )
+        .id;
+  }
 
   @override
   void dispose() {
@@ -49,7 +65,8 @@ class _AddWithdrawalScreenState extends ConsumerState<AddWithdrawalScreen> {
 
   Future<void> _save() async {
     final cents = parseRandToCents(_amountController.text);
-    if (cents == null) return;
+    final accountId = _resolveAccountId();
+    if (cents == null || accountId == null) return;
 
     setState(() => _saving = true);
     try {
@@ -58,6 +75,7 @@ class _AddWithdrawalScreenState extends ConsumerState<AddWithdrawalScreen> {
           .addWithdrawal(
             amountCents: cents,
             withdrawnAt: _when,
+            accountId: accountId,
             note: _noteController.text.trim().isEmpty
                 ? null
                 : _noteController.text.trim(),
@@ -65,9 +83,7 @@ class _AddWithdrawalScreenState extends ConsumerState<AddWithdrawalScreen> {
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('${formatCents(cents)} cash added to your pot.'),
-        ),
+        SnackBar(content: Text('${formatCents(cents)} added to your balance.')),
       );
       Navigator.of(context).pop(true);
     } catch (error) {
@@ -82,14 +98,18 @@ class _AddWithdrawalScreenState extends ConsumerState<AddWithdrawalScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final cents = parseRandToCents(_amountController.text);
+    final accounts = ref.watch(accountsProvider).value ?? const [];
+    final accountId = _resolveAccountId();
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Add cash')),
+      appBar: AppBar(title: const Text('Add money')),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
         children: [
           Text(
-            'Every ATM withdrawal becomes a cash pot you can spend down.',
+            'Record money arriving in an account: cash from the ATM, a salary, '
+            'or a transfer. For an ATM withdrawal, add the cash here after you '
+            'take it out.',
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
               height: 1.4,
@@ -100,6 +120,29 @@ class _AddWithdrawalScreenState extends ConsumerState<AddWithdrawalScreen> {
             controller: _amountController,
             onChanged: (_) => setState(() {}),
           ),
+          if (accounts.isNotEmpty) ...[
+            const SizedBox(height: 16),
+            Card(
+              child: ListTile(
+                contentPadding: const EdgeInsets.fromLTRB(18, 2, 12, 2),
+                leading: const Icon(Icons.account_balance_wallet_rounded),
+                title: Text('Add to', style: theme.textTheme.titleSmall),
+                trailing: DropdownButton<int>(
+                  value: accountId,
+                  underline: const SizedBox.shrink(),
+                  borderRadius: BorderRadius.circular(14),
+                  items: [
+                    for (final account in accounts)
+                      DropdownMenuItem(
+                        value: account.id,
+                        child: Text(account.name),
+                      ),
+                  ],
+                  onChanged: (value) => setState(() => _accountId = value),
+                ),
+              ),
+            ),
+          ],
           const SizedBox(height: 20),
           TextField(
             controller: _noteController,
@@ -133,7 +176,9 @@ class _AddWithdrawalScreenState extends ConsumerState<AddWithdrawalScreen> {
       bottomNavigationBar: SafeArea(
         minimum: const EdgeInsets.fromLTRB(16, 8, 16, 16),
         child: FilledButton.icon(
-          onPressed: cents == null || _saving ? null : _save,
+          onPressed: cents == null || accountId == null || _saving
+              ? null
+              : _save,
           icon: _saving
               ? const SizedBox(
                   width: 18,
@@ -142,7 +187,7 @@ class _AddWithdrawalScreenState extends ConsumerState<AddWithdrawalScreen> {
                 )
               : const Icon(Icons.add_rounded),
           label: Text(
-            cents == null ? 'Add cash' : 'Add ${formatCents(cents)} cash',
+            cents == null ? 'Add money' : 'Add ${formatCents(cents)}',
           ),
         ),
       ),

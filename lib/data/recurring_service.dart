@@ -50,6 +50,7 @@ class RecurringService {
                   category: rule.category,
                   spentAt: atNoon(date),
                   note: Value(rule.note),
+                  accountId: Value(rule.accountId),
                   recurringRuleId: Value(rule.id),
                 ),
                 mode: InsertMode.insertOrIgnore,
