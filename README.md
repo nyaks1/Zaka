@@ -20,73 +20,113 @@ The villain isn't cash. It's **invisible money**: the bank sees the withdrawal, 
 
 | Feature | What it does | Status |
 |---|---|---|
-| ATM withdrawal pots | Record a withdrawal; it becomes a pot you spend down | ☐ |
-| Two-tap cash logging | Log spends fast with SA presets (taxi, vendor, airtime, electricity) | ☐ |
-| Dashboard | Live balance, spending by category | ☐ |
-| Cash-runway forecast | Daily burn rate × remaining cash = the day your cash runs out | ☐ |
+| ATM withdrawal pots | Record a withdrawal; it becomes a pot you spend down | ✅ |
+| Two-tap cash logging | Log spends fast with SA presets (taxi, vendor, airtime, electricity) | ✅ |
+| Dashboard | Live balance, spending by category, recent activity | ✅ |
+| Recurring cash | A Mon–Fri taxi is logged once and posted automatically on the days you choose | ✅ |
+| Cash-runway forecast | Daily burn rate × remaining cash = the day your cash runs out | ✅ |
 | AI advisor (Gemini) | Explains your spending pattern in plain language | ☐ |
 | Consent + delete-all | Explicit consent before any AI call; wipe all data in one tap | ☐ |
 
-*(Tick each box as it ships. Anything unticked at submission is roadmap, not a feature.)*
+*(Anything unticked at submission is roadmap, not a feature.)*
+
+### Recurring taxi, explained
+
+A commuter who takes a taxi every weekday should not open the app five times a week. In **Log cash**, enter the fare, switch on **Repeat this spend**, and pick **Weekdays** (or any combination of days). Zaka saves the first fare immediately and stores the rule.
+
+On the next day the app opens, any due fares are posted automatically, so the balance and forecast stay correct. The rule remembers the last day it posted, and a database uniqueness constraint stops the same fare being added twice. The **Recurring** tab shows each rule, its next due day, and lets you pause or stop it. Pausing does not back-fill the days you were away.
 
 ## Architecture
 
-**Local-first.** All spending data lives on the device in an encrypted database. There is no central database of users' money to breach.
+**Local-first.** All spending data lives on the device in a SQLite database. There is no central database of users' money to breach.
 
 ```
 Flutter app (Riverpod)
    │
-   ├── Drift / SQLite  ← all cash data, on-device
+   ├── Drift / SQLite  ← withdrawals, spends, recurring rules (on-device)
+   │        │ streams
+   │        ├── live balance + category totals
+   │        └── cash-runway forecast (pure Dart, unit tested)
    │
-   └── AI proxy ──► Gemini API
+   └── AI proxy ──► Gemini API            (roadmap — not wired yet)
         (holds the API key; receives aggregated summaries only)
 ```
 
-- Works offline and on low data; only the advisor needs a connection.
-- The Gemini key never ships inside the app. Requests go through a small proxy.
-- Only **aggregated summaries** are sent to the AI, never raw entries or free-text notes.
+- Works offline; only the future advisor will need a connection.
+- Money is stored in **cents as integers**, never floating point.
+- The forecast is a pure function (`lib/core/forecast.dart`) fed by Riverpod providers, which makes it easy to test and change.
+- The Gemini key will never ship inside the app. Requests will go through a small proxy.
 
 ## Tech Stack
 
-- **Flutter / Dart** — cross-platform mobile app
+- **Flutter / Dart** — cross-platform app (Android, web; Windows desktop with Visual Studio)
 - **Drift (SQLite)** — typed, local-first persistence
-- **Riverpod** — state management
-- **Gemini API** — AI financial advisor, via proxy
+- **Riverpod** — state management and live queries
+- **Gemini API** — AI financial advisor, via proxy (roadmap)
 
-## Security & POPIA
+## Running it (Windows + WSL)
 
-Developed with a Secure System Development Cycle mindset:
+This project is deliberately kept on the **Windows** filesystem:
 
-- **Data minimisation:** cash records stay on-device; only aggregates go to the AI.
-- **Consent:** explicit, informed consent screen before any AI call, disclosing that processing by the AI provider may occur outside South Africa.
-- **Deletion:** one-tap delete-all wipes the local database.
-- **No PII in logs:** verified with `adb logcat` during testing.
-- **Secrets:** no keys in the repo or the APK; secret scanning (gitleaks) before pushes.
-- **Hardening:** minimum Android permissions, `allowBackup=false`, obfuscated release build.
-- **Testing:** `flutter analyze`, MobSF scan of the APK, dependency audit (OSV-Scanner), manual abuse-case tests.
+```
+Windows:  C:\src\projects\Zaka
+WSL:      /mnt/c/src/projects/Zaka
+          /home/nyaks/src/github/Zaka  → symlink to the same folder
+```
 
-Threat model summary (STRIDE across device ↔ local DB, app ↔ proxy, proxy ↔ Gemini) is in the submission document.
+Flutter is installed on Windows (`C:\src\flutter_windows_3.47.0-stable`). Windows Flutter cannot reliably build a project stored on the WSL filesystem because it fails to create plugin symlinks there, so keep the project on the Windows drive.
 
-**Known limitations:** certificate pinning and root detection are roadmap items.
+### From Windows (PowerShell or cmd)
 
-## Getting Started
-
-**Prerequisites:** Flutter SDK, Android Studio or a physical Android device with USB debugging.
-
-```bash
-git clone <this-repo-url>
-cd zaka
+```powershell
+cd C:\src\projects\Zaka
 flutter pub get
 dart run build_runner build --delete-conflicting-outputs   # generates Drift code
-flutter run --dart-define=ZAKA_AI_PROXY_URL=<your-proxy-url>
+flutter run -d chrome                                     # fastest way to see it
 ```
 
-Build a release APK:
+- `flutter run -d windows` needs the **“Desktop development with C++”** workload in Visual Studio. It is not installed on this machine yet.
+- Android: accept the SDK licences with `flutter doctor --android-licenses`, plug in a device, then `flutter run -d <device>`.
+
+### From WSL
+
+Use the wrapper so commands run through the Windows SDK:
 
 ```bash
-flutter build apk --release --obfuscate --split-debug-info=build/symbols \
-  --dart-define=ZAKA_AI_PROXY_URL=<your-proxy-url>
+tool/flutter-win.sh pub get
+tool/flutter-win.sh test
+tool/flutter-win.sh run -d chrome
+tool/flutter-win.sh build web --release
 ```
+
+A Windows equivalent is `tool\flutter-win.cmd`.
+
+### Web prerequisites
+
+`web/sqlite3.wasm` and `web/drift_worker.js` are checked in so Drift can open SQLite in the browser. They come from the drift `2.35.3` release. If you upgrade drift, replace both files from the matching release.
+
+### Build a release APK
+
+```bash
+flutter build apk --release --obfuscate --split-debug-info=build/symbols
+```
+
+## Testing
+
+```bash
+flutter analyze     # no issues
+flutter test        # 29 tests
+```
+
+Verified on this machine: `flutter analyze`, `flutter test`, `flutter build web --release`, and `flutter build apk --debug` (output at `build/app/outputs/flutter-apk/app-debug.apk`). The Windows desktop target still needs the Visual Studio C++ workload.
+
+Coverage:
+
+- **Forecast** — burn-rate averaging, lookback window, recurring commitments, horizon cap, empty data, zero balance.
+- **Recurrence** — Mon–Fri expansion across weekends, exclusive “after”, end dates, next occurrence, weekday encoding.
+- **Money** — parsing `R 1,234.50` / `35,50`, formatting cents.
+- **Database** — withdrawal + spend persistence, recurring taxi posting once per weekday, no duplicates on re-sync, paused rules.
+- **UI flows** — add a withdrawal, log a preset spend, see the live balance, set up a weekday taxi and find it under Recurring.
 
 ## Project Structure
 
@@ -94,15 +134,33 @@ Feature-first layout:
 
 ```
 lib/
-  core/            # theme, utils, shared widgets
-  data/            # Drift database, DAOs
+  core/            # theme, money, dates, forecast, recurrence rules
+  data/            # Drift database, repository, recurring posting service
   features/
     withdrawals/   # ATM withdrawal pots
-    spending/      # quick logging, categories
-    dashboard/     # balance, forecast
-    advisor/       # AI advisor, consent
-    settings/      # privacy, delete-all
+    spending/      # quick logging, presets, repeat setup
+    recurring/     # manage repeating spends
+    dashboard/     # balance, runway, category breakdown
+    activity/      # full timeline, delete an entry
+    shell/         # bottom navigation
+  widgets/         # shared UI pieces
+tool/              # Windows/WSL Flutter wrappers
 ```
+
+## Security & POPIA
+
+- **Data minimisation:** cash records stay on-device; no backend receives them. Only aggregates will go to the AI once the advisor ships.
+- **No PII in logs:** the app does not log amounts, notes or free text; database errors are logged without record contents.
+- **Secrets:** no API keys or secrets in the repo. Secret scanning (gitleaks) is intended before pushes.
+- **Deletion:** individual spends and withdrawals can be deleted from Activity. One-tap delete-all is roadmap.
+- **Hardening roadmap:** encryption at rest (SQLCipher), `allowBackup=false`, minimum Android permissions, obfuscated release build, MobSF and OSV-Scanner checks, certificate pinning and root detection.
+
+## Known Limitations
+
+- The AI advisor and its consent screen are not implemented yet; the app is fully usable offline without them.
+- The local database is plain SQLite, not encrypted at rest yet.
+- Windows desktop builds require Visual Studio C++ tooling, which is not installed on this machine.
+- The web build stores data in the browser's origin storage; it is a demo target, not the shipping target.
 
 ## Roadmap & Business Model
 

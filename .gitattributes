@@ -1,0 +1,15 @@
+# Keep Dart/Flutter sources LF so they behave the same in WSL and on Windows.
+* text=auto
+*.dart text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+*.md text eol=lf
+*.sh text eol=lf
+*.cmd text eol=crlf
+*.bat text eol=crlf
+*.ps1 text eol=crlf
+
+# Binary assets
+*.png binary
+*.ico binary
+*.wasm binary
