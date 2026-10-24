@@ -136,6 +136,9 @@ abstract final class ZakaTheme {
       ),
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
+        // Keep a floating snackbar clear of the dashboard FAB so the FAB stays
+        // tappable while a confirmation is on screen.
+        insetPadding: const EdgeInsets.fromLTRB(16, 0, 16, 88),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
       ),
       dividerTheme: DividerThemeData(

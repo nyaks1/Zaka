@@ -221,6 +221,11 @@ class AppDatabase extends _$AppDatabase {
       'UPDATE recurring_rules SET account_id = $defaultAccount '
       'WHERE account_id IS NULL',
     );
+
+    // These statements use raw SQL, so Drift cannot infer which query streams
+    // changed. Notify them explicitly; otherwise the dashboard keeps showing
+    // zero accounts after delete-all recreates the blank Cash account.
+    markTablesUpdated([accounts, withdrawals, spends, recurringRules]);
   }
 
   static QueryExecutor _openConnection() => driftDatabase(

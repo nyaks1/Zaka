@@ -10,7 +10,6 @@ import '../../core/money.dart';
 import '../../providers.dart';
 import '../../widgets/common.dart';
 import '../../widgets/runway_sparkline.dart';
-import '../accounts/move_money_screen.dart';
 import '../activity/activity_tile.dart';
 import '../advisor/advisor_screen.dart';
 import '../advisor/advisor_service.dart';
@@ -30,11 +29,6 @@ class DashboardScreen extends ConsumerWidget {
     Navigator.of(context).push(
       MaterialPageRoute<void>(builder: (_) => const AddWithdrawalScreen()),
     );
-  }
-
-  void _openMove(BuildContext context) {
-    Navigator.of(context)
-        .push(MaterialPageRoute<void>(builder: (_) => const MoveMoneyScreen()));
   }
 
   void _openAdvisor(BuildContext context) {
@@ -99,12 +93,6 @@ class DashboardScreen extends ConsumerWidget {
             onPressed: () => _openAdvisor(context),
             icon: const Icon(Icons.settings_outlined),
           ),
-          IconButton.filledTonal(
-            tooltip: 'Move money',
-            onPressed: () => _openMove(context),
-            icon: const Icon(Icons.swap_horiz_rounded),
-          ),
-          const SizedBox(width: 8),
           IconButton.filledTonal(
             tooltip: 'Add money',
             onPressed: () => _openWithdrawal(context),
@@ -327,15 +315,22 @@ class _BalanceCard extends StatelessWidget {
               style: theme.textTheme.bodySmall?.copyWith(color: Colors.white70),
             ),
             const SizedBox(height: 6),
-            TextButton.icon(
-              style: TextButton.styleFrom(
-                foregroundColor: Colors.white,
-                padding: EdgeInsets.zero,
-                visualDensity: VisualDensity.compact,
+            SizedBox(
+              width: double.infinity,
+              child: TextButton.icon(
+                style: TextButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  backgroundColor: Colors.white.withValues(alpha: 0.12),
+                  minimumSize: const Size.fromHeight(46),
+                  padding: const EdgeInsets.symmetric(horizontal: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                ),
+                onPressed: onAddCash,
+                icon: const Icon(Icons.add_rounded, size: 18),
+                label: const Text('Add money'),
               ),
-              onPressed: onAddCash,
-              icon: const Icon(Icons.add_rounded, size: 18),
-              label: const Text('Add money'),
             ),
           ],
         ],

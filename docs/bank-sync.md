@@ -1,10 +1,9 @@
 # Bank sync design
 
-Zaka is **import-first** today. You can add multiple accounts, move money
-between them, and import a month-end PDF or CSV statement into each account.
-Live bank sync is deliberately not wired up yet: it needs a provider agreement
-and a backend, and shipping a half-configured OAuth flow would put users'
-banking data at risk.
+Zaka is **import-first** today. You can add multiple accounts and import a
+month-end PDF or CSV statement into each account. Live bank sync is
+deliberately not wired up yet: it needs a provider agreement and a backend, and
+shipping a half-configured OAuth flow would put users' banking data at risk.
 
 This document is the implementation plan for the next phase.
 

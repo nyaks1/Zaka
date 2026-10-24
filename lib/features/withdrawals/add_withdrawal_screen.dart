@@ -108,8 +108,8 @@ class _AddWithdrawalScreenState extends ConsumerState<AddWithdrawalScreen> {
         children: [
           Text(
             'Record money arriving in an account: cash from the ATM, a salary, '
-            'or a transfer. For an ATM withdrawal, add the cash here after you '
-            'take it out.',
+            'or money added to an account. For an ATM withdrawal, add the cash '
+            'here after you take it out.',
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
               height: 1.4,

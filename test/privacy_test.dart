@@ -82,6 +82,22 @@ void main() {
     expect(accounts.single.name, 'Cash');
     expect(accounts.single.kind, 'cash');
   });
+
+  test('recreating the cash account updates account streams', () async {
+    final events = <List<Account>>[];
+    final subscription = database.select(database.accounts).watch().listen(
+      events.add,
+    );
+    await Future<void>.delayed(const Duration(milliseconds: 10));
+
+    await PrivacyService(database, store).deleteEverything();
+    await database.ensureDefaultAccount();
+    await Future<void>.delayed(const Duration(milliseconds: 10));
+
+    expect(events.last, hasLength(1));
+    expect(events.last.single.name, 'Cash');
+    await subscription.cancel();
+  });
 }
 
 class _FakeStore implements AdvisorConsentStore {

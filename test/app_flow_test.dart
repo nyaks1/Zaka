@@ -51,16 +51,17 @@ void main() {
   ) async {
     await pumpApp(tester);
 
-    // Add money to the cash account.
-    await tester.tap(find.byTooltip('Add money'));
+    // Tap the in-card Add money button (not the app-bar shortcut) so the
+    // dashboard's primary call to action is covered too.
+    await tester.tap(find.text('Add money'));
     await settle(tester);
     await tester.enterText(find.byType(TextField).first, '500');
     await settle(tester);
     await tester.tap(find.textContaining('Add R500.00'));
     await settle(tester);
-    // Let the confirmation snackbar finish exiting so it cannot cover the FAB.
-    await tester.pump(const Duration(seconds: 5));
-    await tester.pump(const Duration(milliseconds: 500));
+    // The floating snackbar must stay clear of the FAB, so a quick second tap
+    // should still reach Log cash.
+    await tester.pump(const Duration(milliseconds: 300));
 
     expect(find.text('R500.00'), findsWidgets);
 

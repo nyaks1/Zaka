@@ -7,7 +7,6 @@ import '../../providers.dart';
 import '../../widgets/common.dart';
 import 'add_account_screen.dart';
 import 'import_statement_screen.dart';
-import 'move_money_screen.dart';
 
 class AccountsScreen extends ConsumerWidget {
   const AccountsScreen({super.key});
@@ -22,14 +21,6 @@ class AccountsScreen extends ConsumerWidget {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (_) => ImportStatementScreen(initialAccountId: accountId),
-      ),
-    );
-  }
-
-  void _openMove(BuildContext context, int fromAccountId) {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => MoveMoneyScreen(initialFromAccountId: fromAccountId),
       ),
     );
   }
@@ -68,7 +59,7 @@ class AccountsScreen extends ConsumerWidget {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          removed ? '${balance.account.name} removed.' : 'Keep at least one account, and move or delete its entries first.',
+          removed ? '${balance.account.name} removed.' : 'Keep at least one account, and delete its entries first.',
         ),
       ),
     );
@@ -163,34 +154,17 @@ class AccountsScreen extends ConsumerWidget {
                   child: _AccountCard(
                     balance: balance,
                     onImport: () => _openImport(context, balance.account.id),
-                    onMove: items.length > 1
-                        ? () => _openMove(context, balance.account.id)
-                        : null,
                     onDelete: () => _delete(context, ref, balance),
                   ),
                 ),
               const SizedBox(height: 8),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: () => _openAdd(context),
-                      icon: const Icon(Icons.add_rounded),
-                      label: const Text('Add account'),
-                    ),
-                  ),
-                  if (items.length > 1) ...[
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: FilledButton.tonalIcon(
-                        onPressed: () =>
-                            _openMove(context, items.first.account.id),
-                        icon: const Icon(Icons.swap_horiz_rounded),
-                        label: const Text('Move money'),
-                      ),
-                    ),
-                  ],
-                ],
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: () => _openAdd(context),
+                  icon: const Icon(Icons.add_rounded),
+                  label: const Text('Add account'),
+                ),
               ),
               const SizedBox(height: 22),
               Card(
@@ -276,13 +250,11 @@ class _AccountCard extends StatelessWidget {
     required this.balance,
     required this.onImport,
     required this.onDelete,
-    this.onMove,
   });
 
   final AccountBalance balance;
   final VoidCallback onImport;
   final VoidCallback onDelete;
-  final VoidCallback? onMove;
 
   @override
   Widget build(BuildContext context) {
@@ -343,8 +315,6 @@ class _AccountCard extends StatelessWidget {
                 switch (value) {
                   case 'import':
                     onImport();
-                  case 'move':
-                    onMove?.call();
                   case 'delete':
                     onDelete();
                 }
@@ -360,17 +330,6 @@ class _AccountCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                if (onMove != null)
-                  const PopupMenuItem(
-                    value: 'move',
-                    child: Row(
-                      children: [
-                        Icon(Icons.swap_horiz_rounded, size: 20),
-                        SizedBox(width: 10),
-                        Text('Move money from here'),
-                      ],
-                    ),
-                  ),
                 const PopupMenuItem(
                   value: 'delete',
                   child: Row(

@@ -4,7 +4,7 @@
 
 Zaka makes cash visible. Budgeting apps see card swipes and EFTs, but the moment you withdraw at an ATM they go blind. Zaka starts exactly there: every withdrawal becomes a cash pot with a countdown, so you know when your cash will run out before it does.
 
-It now also tracks the rest of your money. Add your FNB, Capitec, ABSA, Standard Bank, Nedbank or TymeBank accounts, import a PDF or CSV statement, move money between accounts, and see one live total without handing your banking login to an app.
+It now also tracks the rest of your money. Add your FNB, Capitec, ABSA, Standard Bank, Nedbank or TymeBank accounts, import a PDF or CSV statement into each one, and see one live total without handing your banking login to an app.
 
 Built for the **FNB App of the Year Hackathon 2026** — theme: *Financial inclusion and money confidence.*
 
@@ -26,7 +26,6 @@ The villain isn't cash. It's **invisible money**: the bank sees the withdrawal, 
 | ATM withdrawal pots | Record a withdrawal; it becomes a pot you spend down | ✅ |
 | Two-tap cash logging | Log spends fast with SA presets (taxi, vendor, airtime, electricity) | ✅ |
 | Dashboard | Total across accounts, spending by category, recent activity | ✅ |
-| Transfers | Move money between accounts without counting it as spending | ✅ |
 | PDF + CSV import | Import a month-end PDF (password prompt included) or CSV, categorise it, and skip rows already imported | ✅ |
 | Recurring cash | A Mon–Fri taxi is logged once and posted automatically on the days you choose | ✅ |
 | Cash-runway forecast | Daily burn rate × remaining money = the day your money runs out | ✅ |
@@ -54,8 +53,9 @@ airtime, electricity, food, vendor) and can be deleted from Activity. Import
 each bank into its own account; a single bank statement only sees that bank's
 rows, never your cash or another bank.
 
-**Move money** records a transfer between two accounts you already track. It
-changes both balances but never appears as income or spending. The dashboard
+Zaka does not offer manual account-to-account transfers. The only movement
+between accounts is the automatic classification of an ATM or cash-withdrawal
+row from a statement, so that withdrawal is not counted twice. The dashboard
 total is the sum of every account balance, including a negative credit balance
 if you owe money.
 
@@ -239,7 +239,7 @@ lib/
   data/            # Drift database, repository, recurring service,
                    # statement importer, PDF extraction, BankProvider seam
   features/
-    accounts/      # add account, import PDF/CSV, move money
+    accounts/      # add account, import PDF/CSV
     withdrawals/   # add money / ATM withdrawal pots
     spending/      # quick logging, presets, repeat setup
     recurring/     # manage repeating spends
@@ -268,7 +268,7 @@ tool/              # Windows/WSL Flutter wrappers
 ## Known Limitations
 
 - **Live bank sync is not implemented.** PDF and CSV import are manual. The PDF parser is heuristic: it needs a text layer, and bank-specific layouts may need the preview checked or a CSV fallback. Scanned/image-only PDFs need OCR (roadmap), and other banks' CSV/PDF layouts are not verified. OFX and direct bank APIs remain roadmap.
-- Only ATM/cash-withdrawal descriptions are auto-classified as transfers. Other transfers between your own accounts should be recorded with **Move money**.
+- Only ATM/cash-withdrawal descriptions are auto-classified as transfers. Zaka does not offer manual account-to-account transfers; import each bank's statement into its own account.
 - Accounts cannot be edited yet; remove an empty account and add it again. An account with entries cannot be removed, and the last account is protected.
 - Credit accounts use a signed balance only; credit limits, minimum payments and interest are not modelled.
 - Ask Zaka needs the proxy deployed and `ADVISOR_PROXY_URL` set at build time for online tips. Without it, the app is fully usable and shows the on-device tip. The proxy's rate limit and budget alert need the optional Cloudflare KV binding.
