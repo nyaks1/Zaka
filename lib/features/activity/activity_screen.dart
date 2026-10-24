@@ -132,7 +132,7 @@ class _ActivityScreenState extends ConsumerState<ActivityScreen> {
                   ),
                   ButtonSegment(
                     value: ActivityFilter.transfers,
-                    label: Text('Transfers'),
+                    label: Text('Cash moves'),
                   ),
                 ],
                 selected: {_filter},
@@ -150,8 +150,8 @@ class _ActivityScreenState extends ConsumerState<ActivityScreen> {
                         : 'No activity yet',
                     message: hasAny
                         ? 'Try another filter, or log a new cash spend.'
-                        : 'Log a cash spend, import a bank statement, or move '
-                              'money between accounts. It all appears here.',
+                        : 'Log a cash spend or import a bank statement. It all '
+                              'appears here.',
                     action: hasAny
                         ? null
                         : FilledButton.icon(
