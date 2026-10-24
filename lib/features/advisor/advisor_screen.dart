@@ -212,8 +212,8 @@ class _AdvisorScreenState extends ConsumerState<AdvisorScreen> {
               ),
               _Bullet('The Gemini key stays on the proxy, never in the app.'),
               _Bullet(
-                'Per-install daily rate limiting and a budget alert are '
-                'configured on the proxy.',
+                'The proxy supports per-install daily rate limiting and a '
+                'budget alert.',
               ),
             ],
           ),
