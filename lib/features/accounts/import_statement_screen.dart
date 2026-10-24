@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/dates.dart';
@@ -76,6 +77,110 @@ class _ImportStatementScreenState extends ConsumerState<ImportStatementScreen> {
     }
   }
 
+  void _showHelp() {
+    const template =
+        'Date,Description,Amount,Balance\n'
+        '01/03/2026,SALARY DEPOSIT,28500.00,29000.00\n'
+        '02/03/2026,TAXI - BREE,-35.00,28965.00';
+
+    showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      isScrollControlled: true,
+      builder: (context) {
+        final theme = Theme.of(context);
+        return SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(24, 4, 24, 28),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Getting an FNB CSV', style: theme.textTheme.titleLarge),
+                const SizedBox(height: 10),
+                Text(
+                  'The FNB app usually downloads a PDF. The CSV export is '
+                  'normally in Online Banking on a browser.',
+                  style: theme.textTheme.bodyMedium?.copyWith(height: 1.45),
+                ),
+                const SizedBox(height: 16),
+                const _HelpStep(
+                  number: '1',
+                  text:
+                      'Sign in to FNB Online Banking at fnb.co.za on a '
+                      'computer.',
+                ),
+                const _HelpStep(
+                  number: '2',
+                  text: 'Open My Bank Accounts and select the account.',
+                ),
+                const _HelpStep(
+                  number: '3',
+                  text:
+                      'Open Statement History (or History) and choose the '
+                      'date range.',
+                ),
+                const _HelpStep(
+                  number: '4',
+                  text:
+                      'Choose Download or Export, then CSV. If you only see '
+                      'Excel, open it and use Save As → CSV.',
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Some FNB profiles only expose PDF. If that happens, create '
+                  'a small CSV with these columns:',
+                  style: theme.textTheme.bodyMedium?.copyWith(height: 1.45),
+                ),
+                const SizedBox(height: 10),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.surfaceContainerHighest,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: SelectableText(
+                    template,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      fontFamily: 'monospace',
+                      height: 1.5,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Negative amounts are money out. Balance is optional, and '
+                  'separate Debit/Credit columns also work. The file is parsed '
+                  'on this device and never uploaded.',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                    height: 1.45,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    FilledButton.icon(
+                      onPressed: () {
+                        Clipboard.setData(const ClipboardData(text: template));
+                        Navigator.of(context).pop();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('CSV template copied.')),
+                        );
+                      },
+                      icon: const Icon(Icons.copy_rounded),
+                      label: const Text('Copy template'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   Future<void> _load(String content, String label, int accountId) async {
     setState(() {
       _busy = true;
@@ -138,7 +243,17 @@ class _ImportStatementScreenState extends ConsumerState<ImportStatementScreen> {
 
     if (accounts.isEmpty) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Import statement')),
+        appBar: AppBar(
+          title: const Text('Import statement'),
+          actions: [
+            IconButton(
+              tooltip: 'Where do I get this?',
+              onPressed: _showHelp,
+              icon: const Icon(Icons.help_outline_rounded),
+            ),
+            const SizedBox(width: 8),
+          ],
+        ),
         body: const EmptyState(
           icon: Icons.account_balance_rounded,
           title: 'Add an account first',
@@ -150,7 +265,17 @@ class _ImportStatementScreenState extends ConsumerState<ImportStatementScreen> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Import statement')),
+      appBar: AppBar(
+        title: const Text('Import statement'),
+        actions: [
+          IconButton(
+            tooltip: 'Where do I get this?',
+            onPressed: _showHelp,
+            icon: const Icon(Icons.help_outline_rounded),
+          ),
+          const SizedBox(width: 8),
+        ],
+      ),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
         children: [
@@ -163,7 +288,16 @@ class _ImportStatementScreenState extends ConsumerState<ImportStatementScreen> {
               height: 1.4,
             ),
           ),
-          const SizedBox(height: 16),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton.icon(
+              style: TextButton.styleFrom(padding: EdgeInsets.zero),
+              onPressed: _showHelp,
+              icon: const Icon(Icons.help_outline_rounded, size: 18),
+              label: const Text('Where do I get this CSV?'),
+            ),
+          ),
+          const SizedBox(height: 8),
           Card(
             child: ListTile(
               leading: const Icon(Icons.account_balance_rounded),
@@ -449,6 +583,49 @@ class _Chip extends StatelessWidget {
           color: theme.colorScheme.onSurfaceVariant,
           fontWeight: FontWeight.w600,
         ),
+      ),
+    );
+  }
+}
+
+class _HelpStep extends StatelessWidget {
+  const _HelpStep({required this.number, required this.text});
+
+  final String number;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 24,
+            height: 24,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: theme.colorScheme.primaryContainer,
+              shape: BoxShape.circle,
+            ),
+            child: Text(
+              number,
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: theme.colorScheme.onPrimaryContainer,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              text,
+              style: theme.textTheme.bodyMedium?.copyWith(height: 1.45),
+            ),
+          ),
+        ],
       ),
     );
   }
