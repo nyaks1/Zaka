@@ -1,0 +1,24 @@
+name = "zaka-advisor"
+main = "src/index.js"
+compatibility_date = "2026-10-01"
+
+# Secrets (never put these in this file):
+#   wrangler secret put GEMINI_API_KEY
+#   wrangler secret put GEMINI_MODEL
+#   wrangler secret put BUDGET_ALERT_WEBHOOK   # optional
+#
+# GEMINI_MODEL must be a model ID from the current list at
+# https://ai.google.dev/gemini-api/docs/models. Do not hardcode a remembered
+# model name in the app or in this file.
+#
+# Per-install daily limiting and the budget alert need a KV namespace:
+#   wrangler kv namespace create ADVISOR_RATE_LIMIT
+# Then uncomment the binding and paste the id:
+# [[kv_namespaces]]
+# binding = "ADVISOR_RATE_LIMIT"
+# id = "replace-with-your-kv-id"
+
+[vars]
+DAILY_LIMIT = "20"
+DAILY_ALERT_CALLS = "100"
+ALLOWED_ORIGIN = "*"

@@ -1,8 +1,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Release builds need this for the advisor proxy. Flutter only adds it
+         automatically to debug/profile manifests. -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+
     <application
         android:label="Zaka"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:allowBackup="false"
+        android:fullBackupContent="false">
         <activity
             android:name=".MainActivity"
             android:exported="true"

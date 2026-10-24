@@ -4,7 +4,7 @@
 
 Zaka makes cash visible. Budgeting apps see card swipes and EFTs, but the moment you withdraw at an ATM they go blind. Zaka starts exactly there: every withdrawal becomes a cash pot with a countdown, so you know when your cash will run out before it does.
 
-It now also tracks the rest of your money. Add your FNB, Capitec, ABSA, Standard Bank, Nedbank or TymeBank accounts, import a CSV statement, move money between accounts, and see one live total without handing your banking login to an app.
+It now also tracks the rest of your money. Add your FNB, Capitec, ABSA, Standard Bank, Nedbank or TymeBank accounts, import a PDF or CSV statement, move money between accounts, and see one live total without handing your banking login to an app.
 
 Built for the **FNB App of the Year Hackathon 2026** — theme: *Financial inclusion and money confidence.*
 
@@ -27,27 +27,32 @@ The villain isn't cash. It's **invisible money**: the bank sees the withdrawal, 
 | Two-tap cash logging | Log spends fast with SA presets (taxi, vendor, airtime, electricity) | ✅ |
 | Dashboard | Total across accounts, spending by category, recent activity | ✅ |
 | Transfers | Move money between accounts without counting it as spending | ✅ |
-| FNB CSV import | Import a statement, categorise it, and skip rows already imported | ✅ |
+| PDF + CSV import | Import a month-end PDF (password prompt included) or CSV, categorise it, and skip rows already imported | ✅ |
 | Recurring cash | A Mon–Fri taxi is logged once and posted automatically on the days you choose | ✅ |
 | Cash-runway forecast | Daily burn rate × remaining money = the day your money runs out | ✅ |
+| Ask Zaka tips | Optional Gemini tips from a four-field, privacy-safe summary, with an on-device fallback | ✅ |
+| Consent + delete-all | Explicit consent before any AI call; wipe every table and setting in one tap | ✅ |
 | Live bank sync | Connect FNB through Stitch and refresh automatically | ☐ |
-| AI advisor (Gemini) | Explains your spending pattern in plain language | ☐ |
-| Consent + delete-all | Explicit consent before any AI call; wipe all data in one tap | ☐ |
 
 *(Anything unticked at submission is roadmap, not a feature.)*
 
 ### Accounts, imports and transfers
 
 The **Accounts** tab is the home for money that is not in your wallet. Add an
-account with its bank, type and opening balance, then import a CSV exported
-from FNB Online Banking. Zaka reads the usual `Date, Description, Amount,
-Balance` layout and statements that use separate `Debit`/`Credit` columns.
+account with its bank, type and opening balance, then import a month-end PDF
+from your bank, or a CSV exported from Online Banking. PDF text is extracted
+on the phone; a password-protected PDF asks for the password and never saves
+it. Zaka reads the usual `Date, Description, Amount, Balance` layout and
+statements that use separate `Debit`/`Credit` columns. The preview is the
+safety net: check it before importing.
 
 Imports are safe to repeat: every row gets a stable key, and the database
 rejects a second copy for the same account. ATM and cash-withdrawal rows become
 **transfers** to the cash wallet rather than spending, so the same money is not
 counted twice. Everything else is categorised from the description (taxi,
-airtime, electricity, food, vendor) and can be deleted from Activity.
+airtime, electricity, food, vendor) and can be deleted from Activity. Import
+each bank into its own account; a single bank statement only sees that bank's
+rows, never your cash or another bank.
 
 **Move money** records a transfer between two accounts you already track. It
 changes both balances but never appears as income or spending. The dashboard
@@ -57,6 +62,31 @@ if you owe money.
 Live bank sync is not switched on yet. See
 [`docs/bank-sync.md`](docs/bank-sync.md) for the Stitch/backend design and why
 it needs a server before it can ship.
+
+### Ask Zaka, privacy first
+
+The dashboard has an **Ask Zaka** card. It always shows a deterministic tip
+computed on the phone, for example:
+
+> At R90 a day, your cash runs out Thursday. Taxi is 48% of your spend.
+
+Optional Gemini tips are **off by default**. The privacy screen shows the exact
+JSON that may be sent, what is never sent, and an on/off switch. Only four
+fields can leave the phone: `runwayDays`, `dailyBurnRand`, `categoryPercent`
+and `periodDays`. Spend notes, account names, bank names, import keys and exact
+timestamps have no field in `AdvisorSummary` at all.
+
+`AdvisorService.askAdvisor` throws `StateError('No consent')` before it can
+create a token or make an HTTP call. The proxy holds the Gemini key, accepts
+POST only, caps the body at 1 KB / 1,000 characters, rejects extra fields and
+can rate-limit per install. If the network or proxy is unavailable, the card
+falls back to the same on-device tip. Output is labelled **tips and insights,
+not financial advice**; the prompt forbids product recommendations. See
+[`docs/advisor.md`](docs/advisor.md) and [`proxy/README.md`](proxy/README.md).
+
+The **Delete everything** control removes every account, entry, recurring rule
+and import key in one transaction, then clears all settings including the
+consent flag. A blank Cash account is recreated so the app still opens.
 
 ### Recurring taxi, explained
 
@@ -78,31 +108,35 @@ Flutter app (Riverpod)
    │        ├── live category totals
    │        └── cash-runway forecast (pure Dart, unit tested)
    │
-   ├── CSV importer ── on-device parsing + dedupe (FNB today)
+   ├── PDF / CSV importer ── on-device parsing + dedupe
+   │        (pdf_document / pdf_graphics; no file upload)
    │
    ├── BankProvider seam ──► Zaka backend ──► Stitch ──► FNB
    │                          (roadmap; holds secrets and tokens)
    │
-   └── AI proxy ──► Gemini API            (roadmap — not wired yet)
-        (holds the API key; receives aggregated summaries only)
+   └── Ask Zaka ──► Zaka proxy ──► Gemini API
+        (consent gate; four-field summary; offline fallback)
 ```
 
-- Works offline; only the future bank sync and advisor need a connection.
+- Works offline; only live bank sync and optional Ask Zaka need a connection.
 - Money is stored in **cents as integers**, never floating point.
 - The forecast is a pure function (`lib/core/forecast.dart`) fed by Riverpod providers, which makes it easy to test and change.
 - Account balances are computed by a pure function (`lib/core/accounting.dart`): opening balance + money in − money out + transfers.
-- Statement parsing (`lib/core/statement.dart`) is pure Dart and has no network or file-system dependency, so it is easy to test.
-- The Gemini key and any bank provider secret will never ship inside the app.
+- Statement parsing (`lib/core/statement.dart`) and PDF text extraction (`lib/data/pdf_statement.dart`) are pure Dart, with no network dependency, so they are easy to test.
+- The Gemini key and any bank provider secret never ship inside the app; the proxy is the only component that holds the Gemini key.
 
 ## Tech Stack
 
 - **Flutter / Dart** — cross-platform app (Android, web; Windows desktop with Visual Studio)
 - **Drift (SQLite)** — typed, local-first persistence
 - **Riverpod** — state management and live queries
-- **csv** — statement parsing
-- **file_selector** — choosing a statement file on web, desktop and Android
+- **csv** — CSV statement parsing
+- **pdf_document / pdf_graphics** — pure-Dart PDF text extraction on the phone
+- **file_selector** — choosing a PDF or CSV on web, desktop and Android
+- **shared_preferences** — the `consentAdvisor` flag and per-install advisor token
+- **http** — the POST to the advisor proxy
+- **Cloudflare Workers + KV** — the advisor proxy, allowlist, rate limit and budget alert
 - **Stitch** — planned bank-data provider, via a backend (roadmap)
-- **Gemini API** — AI financial advisor, via proxy (roadmap)
 
 ## Running it (Windows + WSL)
 
@@ -148,18 +182,35 @@ A Windows equivalent is `tool\flutter-win.cmd`.
 
 ### Build a release APK
 
+The release manifest now declares `android.permission.INTERNET` and sets
+`android:allowBackup="false"`. Build with the advisor proxy URL if you want the
+optional Gemini tips; without it the app uses the on-device fallback:
+
 ```bash
-flutter build apk --release --obfuscate --split-debug-info=build/symbols
+flutter build apk --release --obfuscate --split-debug-info=build/symbols \
+  --dart-define=ADVISOR_PROXY_URL=https://zaka-advisor.<subdomain>.workers.dev
 ```
+
+Deploy the proxy with [`proxy/README.md`](proxy/README.md). Set
+`GEMINI_MODEL` from the current list at
+<https://ai.google.dev/gemini-api/docs/models>; the repo deliberately has no
+default model name.
 
 ## Testing
 
 ```bash
 flutter analyze     # no issues
-flutter test        # 44 tests
+flutter test        # 64 tests
 ```
 
-Verified on this machine: `flutter analyze`, `flutter test`, `flutter build web --release`, and `flutter build apk --debug` (output at `build/app/outputs/flutter-apk/app-debug.apk`). The Windows desktop target still needs the Visual Studio C++ workload.
+Verified on this machine: `flutter analyze`, `flutter test`, `flutter build web
+--release`, and `flutter build apk --release` (output at
+`build/app/outputs/flutter-apk/app-release.apk`). The release APK manifest was
+checked for `INTERNET` and `allowBackup=false`. The proxy has 10 Node tests
+(`cd proxy && npm test`): POST-only, the four-field allowlist, extra fields,
+unknown categories, install token, 1 KB cap, content type, per-install daily
+limit, the “financial advice” output filter, and the Gemini prompt. The Windows
+desktop target still needs the Visual Studio C++ workload.
 
 Coverage:
 
@@ -167,10 +218,14 @@ Coverage:
 - **Recurrence** — Mon–Fri expansion across weekends, exclusive “after”, end dates, next occurrence, weekday encoding.
 - **Money** — parsing `R 1,234.50` / `35,50`, signed opening balances, formatting cents.
 - **Accounting** — opening balances, money in/out, transfers, per-account and total balances.
-- **Statement parsing** — FNB-style signed amounts, debit/credit columns, quoted descriptions, preamble rows, SA date formats, Rand/thousands/parentheses, repeatable row keys.
+- **Statement parsing** — FNB-style signed amounts, debit/credit columns, quoted descriptions, preamble rows, SA date formats, Rand/thousands/parentheses, trailing-minus amounts, repeatable row keys.
+- **PDF statements** — text extraction from a generated text PDF, date-led row reconstruction, debit/credit columns, running-balance direction, no-text PDF rejection.
 - **Importing** — salary, spend and ATM-to-cash classification; category guesses; re-import skips every row; duplicate safety.
 - **Database** — withdrawal + spend persistence, recurring taxi posting once per weekday, no duplicates on re-sync, paused rules, last-account protection.
 - **Migration** — a v1 cash-only database upgrades to v2 and keeps its entries attached to the cash account.
+- **Advisor privacy** — exactly four JSON fields; a `Sipho's tuckshop` note, import key and account name never appear; period filtering; missing-runway handling.
+- **Consent gate** — no consent throws `StateError('No consent')` before any HTTP call; the request body is exactly `summary.toJson()`; no proxy or network failure falls back to the deterministic tip.
+- **Delete-all** — every table is emptied in one transaction and preferences are cleared; a blank Cash account can be recreated.
 - **UI flows** — add money, log a preset spend, see the live balance, add a bank account and see the combined total, set up a weekday taxi and find it under Recurring.
 
 ## Project Structure
@@ -182,37 +237,41 @@ lib/
   core/            # theme, money, dates, forecast, recurrence,
                    # accounting, statement parsing
   data/            # Drift database, repository, recurring service,
-                   # statement importer, BankProvider seam
+                   # statement importer, PDF extraction, BankProvider seam
   features/
-    accounts/      # add account, import statement, move money
+    accounts/      # add account, import PDF/CSV, move money
     withdrawals/   # add money / ATM withdrawal pots
     spending/      # quick logging, presets, repeat setup
     recurring/     # manage repeating spends
-    dashboard/     # total balance, runway, category breakdown
+    dashboard/     # total balance, runway, category breakdown, Ask Zaka card
+    advisor/       # summary allowlist, consent gate, offline tip, privacy screen
     activity/      # full timeline, delete an entry
     shell/         # bottom navigation
   widgets/         # shared UI pieces
 docs/
+  advisor.md       # data allowlist, consent gate, proxy, FAIS boundary
   bank-sync.md     # Stitch/backend design for live bank sync
+proxy/             # Cloudflare Worker: Gemini key, allowlist, rate limit
 tool/              # Windows/WSL Flutter wrappers
 ```
 
 ## Security & POPIA
 
-- **Data minimisation:** cash and imported bank records stay on-device; no backend receives them. Statement files are parsed in the app and never uploaded. Only aggregates will go to the AI once the advisor ships.
-- **No banking credentials:** Zaka never asks for an internet-banking username, password or OTP. Live sync, when it ships, will use a provider consent screen and a backend that holds tokens.
-- **No PII in logs:** the app does not log amounts, notes, statement rows or free text; database errors are logged without record contents.
-- **Secrets:** no API keys or secrets in the repo. Secret scanning (gitleaks) is intended before pushes.
-- **Deletion:** individual spends and withdrawals can be deleted from Activity. One-tap delete-all is roadmap.
-- **Hardening roadmap:** encryption at rest (SQLCipher), `allowBackup=false`, minimum Android permissions, obfuscated release build, MobSF and OSV-Scanner checks, certificate pinning and root detection.
+- **Data minimisation:** cash and imported bank records stay on-device; no backend receives them. PDF and CSV files are parsed in the app and never uploaded. Ask Zaka can send only `runwayDays`, `dailyBurnRand`, `categoryPercent` and `periodDays`.
+- **Consent:** Ask Zaka is off by default. `askAdvisor` checks the stored `consentAdvisor` flag before any token creation or HTTP call. Turning it off stops all sends.
+- **No banking credentials:** Zaka never asks for an internet-banking username, password or OTP. A PDF password is used in memory for extraction and is not saved. Live sync, when it ships, will use a provider consent screen and a backend that holds tokens.
+- **No PII in logs:** the app does not log amounts, notes, statement rows or free text; database errors are logged without record contents. The proxy does not log the summary or install token.
+- **Secrets:** no API keys or secrets in the repo. The Gemini key and `GEMINI_MODEL` are Wrangler secrets. Secret scanning (gitleaks) is intended before pushes.
+- **Deletion:** individual spends and withdrawals can be deleted from Activity. **Delete everything** removes every table in one transaction, runs a best-effort SQLite `VACUUM`, then clears all settings including consent.
+- **Android hardening:** the release manifest declares `INTERNET` and sets `allowBackup=false`; statement backups are disabled. Encryption at rest (SQLCipher), minimum permissions, obfuscated release builds, MobSF and OSV-Scanner checks, certificate pinning and root detection remain on the hardening roadmap.
 
 ## Known Limitations
 
-- **Live bank sync is not implemented.** CSV import is manual and FNB is the verified format. Other banks may work if their CSV has a date and amount (or debit/credit) column, but they have not been tested. OFX, PDF and direct bank APIs are roadmap.
+- **Live bank sync is not implemented.** PDF and CSV import are manual. The PDF parser is heuristic: it needs a text layer, and bank-specific layouts may need the preview checked or a CSV fallback. Scanned/image-only PDFs need OCR (roadmap), and other banks' CSV/PDF layouts are not verified. OFX and direct bank APIs remain roadmap.
 - Only ATM/cash-withdrawal descriptions are auto-classified as transfers. Other transfers between your own accounts should be recorded with **Move money**.
 - Accounts cannot be edited yet; remove an empty account and add it again. An account with entries cannot be removed, and the last account is protected.
 - Credit accounts use a signed balance only; credit limits, minimum payments and interest are not modelled.
-- The AI advisor and its consent screen are not implemented yet; the app is fully usable offline without them.
+- Ask Zaka needs the proxy deployed and `ADVISOR_PROXY_URL` set at build time for online tips. Without it, the app is fully usable and shows the on-device tip. The proxy's rate limit and budget alert need the optional Cloudflare KV binding.
 - The local database is plain SQLite, not encrypted at rest yet.
 - Windows desktop builds require Visual Studio C++ tooling, which is not installed on this machine. The `file_selector` plugin also needs Windows Developer Mode for plugin symlinks; web and Android builds are unaffected.
 - The web build stores data in the browser's origin storage; it is a demo target, not the shipping target.
@@ -221,7 +280,7 @@ tool/              # Windows/WSL Flutter wrappers
 
 No ads, ever.
 
-- **Free:** cash tracking and CSV import forever, plus a monthly allowance of advisor questions.
+- **Free:** cash tracking, PDF/CSV import and the on-device Ask Zaka tip forever, plus a monthly allowance of online advisor questions.
 - **Zaka Plus (about R29/month):** live bank sync, unlimited advisor, goals and alerts, PDF reports.
 - **Zaka Ultra (about R50/month):** shared stokvel and household pots, proactive cash-runway alerts, voice logging in SA languages, consented income and spending statement.
 - **Later:** stokvel group features, opt-in product referrals with explicit consent, anonymised aggregate insights, and the categorisation engine as an SDK for other SA fintechs.

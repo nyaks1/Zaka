@@ -7,7 +7,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/dates.dart';
 import '../../core/money.dart';
+import '../../core/statement.dart';
 import '../../data/database.dart';
+import '../../data/pdf_statement.dart';
 import '../../data/statement_importer.dart';
 import '../../providers.dart';
 import '../../widgets/common.dart';
@@ -26,7 +28,7 @@ class _ImportStatementScreenState extends ConsumerState<ImportStatementScreen> {
   final _pasteController = TextEditingController();
   int? _accountId;
   String? _fileName;
-  String? _content;
+  StatementParseResult? _parsed;
   StatementImportPreview? _preview;
   String? _error;
   bool _busy = false;
@@ -54,19 +56,32 @@ class _ImportStatementScreenState extends ConsumerState<ImportStatementScreen> {
     try {
       const group = XTypeGroup(
         label: 'Bank statement',
-        extensions: ['csv', 'txt'],
-        mimeTypes: ['text/csv', 'text/plain'],
+        extensions: ['pdf', 'csv', 'txt'],
+        mimeTypes: ['application/pdf', 'text/csv', 'text/plain'],
       );
       final file = await openFile(acceptedTypeGroups: [group]);
       if (file == null) return;
       final bytes = await file.readAsBytes();
-      final content = _decode(bytes);
+      final isPdf =
+          file.name.toLowerCase().endsWith('.pdf') || _looksLikePdf(bytes);
       if (!mounted) return;
-      await _load(content, file.name, accountId);
+      if (isPdf) {
+        await _loadPdf(bytes, file.name, accountId);
+      } else {
+        await _loadContent(_decode(bytes), file.name, accountId);
+      }
     } catch (error) {
       if (!mounted) return;
       setState(() => _error = 'Could not read that file: $error');
     }
+  }
+
+  bool _looksLikePdf(Uint8List bytes) {
+    if (bytes.length < 5) return false;
+    return bytes[0] == 0x25 &&
+        bytes[1] == 0x50 &&
+        bytes[2] == 0x44 &&
+        bytes[3] == 0x46;
   }
 
   String _decode(List<int> bytes) {
@@ -95,40 +110,43 @@ class _ImportStatementScreenState extends ConsumerState<ImportStatementScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Getting an FNB CSV', style: theme.textTheme.titleLarge),
+                Text(
+                  'Getting a bank statement',
+                  style: theme.textTheme.titleLarge,
+                ),
                 const SizedBox(height: 10),
                 Text(
-                  'The FNB app usually downloads a PDF. The CSV export is '
-                  'normally in Online Banking on a browser.',
+                  'Your bank app usually downloads a PDF. Choose that PDF '
+                  'here and Zaka reads the transactions on this device. If it '
+                  'asks for a password, enter the one your bank sent you. A '
+                  'scanned image has no text layer, so use the CSV route below '
+                  'for that.',
                   style: theme.textTheme.bodyMedium?.copyWith(height: 1.45),
                 ),
                 const SizedBox(height: 16),
                 const _HelpStep(
                   number: '1',
                   text:
-                      'Sign in to FNB Online Banking at fnb.co.za on a '
-                      'computer.',
+                      'Open your bank app and go to the account. Tap '
+                      'Statements or Statement history.',
                 ),
                 const _HelpStep(
                   number: '2',
-                  text: 'Open My Bank Accounts and select the account.',
+                  text:
+                      'Pick the month you want, then download or share the '
+                      'PDF to your phone.',
                 ),
                 const _HelpStep(
                   number: '3',
                   text:
-                      'Open Statement History (or History) and choose the '
-                      'date range.',
-                ),
-                const _HelpStep(
-                  number: '4',
-                  text:
-                      'Choose Download or Export, then CSV. If you only see '
-                      'Excel, open it and use Save As → CSV.',
+                      'Come back here, choose the account, and select the PDF. '
+                      'Check the preview before importing.',
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Some FNB profiles only expose PDF. If that happens, create '
-                  'a small CSV with these columns:',
+                  'CSV still works and is handy for other banks. A CSV needs '
+                  'at least Date, Description and Amount. This template also '
+                  'includes Balance:',
                   style: theme.textTheme.bodyMedium?.copyWith(height: 1.45),
                 ),
                 const SizedBox(height: 10),
@@ -149,9 +167,9 @@ class _ImportStatementScreenState extends ConsumerState<ImportStatementScreen> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Negative amounts are money out. Balance is optional, and '
-                  'separate Debit/Credit columns also work. The file is parsed '
-                  'on this device and never uploaded.',
+                  'PDF text and CSV rows are parsed on this device and never '
+                  'uploaded. If the preview looks wrong, cancel and use the '
+                  'CSV export instead.',
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                     height: 1.45,
@@ -181,11 +199,129 @@ class _ImportStatementScreenState extends ConsumerState<ImportStatementScreen> {
     );
   }
 
-  Future<void> _load(String content, String label, int accountId) async {
+  Future<void> _loadContent(String content, String label, int accountId) async {
     setState(() {
       _busy = true;
       _error = null;
-      _content = content;
+      _parsed = null;
+      _preview = null;
+      _fileName = label;
+    });
+    try {
+      final parsed = parseStatementCsv(content);
+      await _previewParsed(parsed, label, accountId);
+    } catch (error) {
+      if (!mounted) return;
+      setState(() {
+        _busy = false;
+        _error = '$error';
+      });
+    }
+  }
+
+  Future<void> _loadPdf(
+    Uint8List bytes,
+    String label,
+    int accountId, {
+    String? password,
+  }) async {
+    setState(() {
+      _busy = true;
+      _error = null;
+      _parsed = null;
+      _preview = null;
+      _fileName = label;
+    });
+
+    try {
+      final parsed = await parsePdfStatement(bytes, password: password ?? '');
+      if (!mounted) return;
+      await _previewParsed(parsed, label, accountId);
+    } on PdfPasswordException {
+      if (!mounted) return;
+      setState(() => _busy = false);
+      if (password != null) {
+        setState(() {
+          _error =
+              'That password did not open the PDF. Check it and try again, '
+              'or export a CSV statement.';
+        });
+        return;
+      }
+
+      final entered = await _askPdfPassword(label);
+      if (!mounted) return;
+      if (entered == null) {
+        setState(() {
+          _error =
+              'This PDF is password-protected. Enter its password, or export '
+              'a CSV statement from Online Banking.';
+        });
+        return;
+      }
+      await _loadPdf(bytes, label, accountId, password: entered);
+    } catch (error) {
+      if (!mounted) return;
+      setState(() {
+        _busy = false;
+        _error = '$error';
+      });
+    }
+  }
+
+  Future<String?> _askPdfPassword(String label) async {
+    final controller = TextEditingController();
+    final result = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('PDF password'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              '$label is password-protected. Enter the password your bank '
+              'sent you. It is used only on this phone and is not saved.',
+            ),
+            const SizedBox(height: 14),
+            TextField(
+              controller: controller,
+              autofocus: true,
+              obscureText: true,
+              decoration: const InputDecoration(
+                labelText: 'Password',
+                border: OutlineInputBorder(),
+              ),
+              onSubmitted: (value) => Navigator.of(context).pop(value),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(controller.text),
+            child: const Text('Open'),
+          ),
+        ],
+      ),
+    );
+    controller.dispose();
+    if (result == null || result.isEmpty) return null;
+    return result;
+  }
+
+  Future<void> _previewParsed(
+    StatementParseResult parsed,
+    String label,
+    int accountId,
+  ) async {
+    setState(() {
+      _busy = true;
+      _error = null;
+      _parsed = parsed;
       _fileName = label;
       _preview = null;
     });
@@ -193,7 +329,7 @@ class _ImportStatementScreenState extends ConsumerState<ImportStatementScreen> {
     try {
       final preview = await ref
           .read(statementImporterProvider)
-          .preview(accountId: accountId, content: content);
+          .previewParsed(accountId: accountId, parsed: parsed);
       if (!mounted) return;
       setState(() {
         _preview = preview;
@@ -209,14 +345,14 @@ class _ImportStatementScreenState extends ConsumerState<ImportStatementScreen> {
   }
 
   Future<void> _import(int accountId) async {
-    final content = _content;
-    if (content == null) return;
+    final parsed = _parsed;
+    if (parsed == null) return;
 
     setState(() => _busy = true);
     try {
       final result = await ref
           .read(statementImporterProvider)
-          .import(accountId: accountId, content: content);
+          .importParsed(accountId: accountId, parsed: parsed);
       if (!mounted) return;
       final parts = <String>[
         '${result.imported} imported',
@@ -259,7 +395,7 @@ class _ImportStatementScreenState extends ConsumerState<ImportStatementScreen> {
           title: 'Add an account first',
           message:
               'Create the bank account you want to import into, then '
-              'come back with its CSV statement.',
+              'come back with its PDF or CSV statement.',
         ),
       );
     }
@@ -280,9 +416,9 @@ class _ImportStatementScreenState extends ConsumerState<ImportStatementScreen> {
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
         children: [
           Text(
-            'Export a CSV from FNB Online Banking, then choose it here. '
-            'Imported rows are matched against what you already have, so '
-            're-importing the same statement is safe.',
+            'Drop in a month-end PDF from your bank, or a CSV. Zaka reads it '
+            'on this device, then matches the rows against what you already '
+            'have so re-importing the same statement is safe.',
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
               height: 1.4,
@@ -294,7 +430,7 @@ class _ImportStatementScreenState extends ConsumerState<ImportStatementScreen> {
               style: TextButton.styleFrom(padding: EdgeInsets.zero),
               onPressed: _showHelp,
               icon: const Icon(Icons.help_outline_rounded, size: 18),
-              label: const Text('Where do I get this CSV?'),
+              label: const Text('Where do I get this statement?'),
             ),
           ),
           const SizedBox(height: 8),
@@ -315,9 +451,9 @@ class _ImportStatementScreenState extends ConsumerState<ImportStatementScreen> {
                 onChanged: (value) {
                   if (value == null) return;
                   setState(() => _accountId = value);
-                  final content = _content;
-                  if (content != null) {
-                    _load(content, _fileName ?? 'statement.csv', value);
+                  final parsed = _parsed;
+                  if (parsed != null) {
+                    _previewParsed(parsed, _fileName ?? 'statement', value);
                   }
                 },
               ),
@@ -329,7 +465,7 @@ class _ImportStatementScreenState extends ConsumerState<ImportStatementScreen> {
                 ? null
                 : () => _pickFile(accountId),
             icon: const Icon(Icons.upload_file_rounded),
-            label: const Text('Choose CSV file'),
+            label: const Text('Choose PDF or CSV'),
           ),
           if (_fileName != null) ...[
             const SizedBox(height: 8),
@@ -374,7 +510,7 @@ class _ImportStatementScreenState extends ConsumerState<ImportStatementScreen> {
           OutlinedButton.icon(
             onPressed: accountId == null || _busy
                 ? null
-                : () => _load(
+                : () => _loadContent(
                     _pasteController.text,
                     'Pasted statement',
                     accountId,

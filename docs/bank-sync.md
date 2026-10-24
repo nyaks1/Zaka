@@ -1,9 +1,10 @@
 # Bank sync design
 
 Zaka is **import-first** today. You can add multiple accounts, move money
-between them, and import an FNB CSV statement. Live bank sync is deliberately
-not wired up yet: it needs a provider agreement and a backend, and shipping a
-half-configured OAuth flow would put users' banking data at risk.
+between them, and import a month-end PDF or CSV statement into each account.
+Live bank sync is deliberately not wired up yet: it needs a provider agreement
+and a backend, and shipping a half-configured OAuth flow would put users'
+banking data at risk.
 
 This document is the implementation plan for the next phase.
 
@@ -47,8 +48,8 @@ Flutter app ──HTTPS──> Zaka backend ──GraphQL/OAuth──> Stitch �
   public "connect any bank" API. Coverage and pricing come from the provider
   contract.
 
-For a personal build, start with Stitch's sandbox or stay on CSV import until a
-production agreement is justified. For a product, expect company onboarding,
+For a personal build, start with Stitch's sandbox or stay on PDF/CSV import
+until a production agreement is justified. For a product, expect company onboarding,
 a security review, POPIA obligations, and per-account or per-call pricing.
 
 ## Target data model
@@ -74,8 +75,8 @@ A sync adapter should:
 5. Leave ambiguous rows for the user to recategorise rather than guessing.
 
 `statementImportKey` and the `StatementImporter` already implement the same
-deduplication and ATM-to-cash behaviour for CSV files. A live feed should reuse
-that logic rather than growing a second ledger.
+deduplication and ATM-to-cash behaviour for CSV files and parsed PDF rows. A
+live feed should reuse that logic rather than growing a second ledger.
 
 ## Consent and security
 
@@ -95,7 +96,8 @@ that logic rather than growing a second ledger.
 
 ## Rollout
 
-1. **Now:** accounts, transfers, CSV import, dedupe, ATM-to-cash classification.
+1. **Now:** accounts, transfers, PDF/CSV import, dedupe, ATM-to-cash
+   classification, and optional Ask Zaka tips via a separate proxy.
 2. **Sandbox:** backend skeleton, Stitch adapter, link flow, one FNB test
    account, pull-to-refresh.
 3. **Private beta:** webhooks, scheduled refresh, consent expiry, revoke,

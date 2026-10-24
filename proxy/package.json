@@ -1,0 +1,8 @@
+{
+  "name": "zaka-advisor-proxy",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test"
+  }
+}

@@ -169,13 +169,35 @@ class AppDatabase extends _$AppDatabase {
     },
     beforeOpen: (details) async {
       await customStatement('PRAGMA foreign_keys = ON');
-      await _ensureDefaultAccount();
+      await ensureDefaultAccount();
     },
   );
 
+  /// Removes every row from every table. Callers that also store settings must
+  /// clear those separately; [PrivacyService] does both.
+  Future<void> deleteEverything() {
+    return transaction(() async {
+      await delete(transfers).go();
+      await delete(spends).go();
+      await delete(withdrawals).go();
+      await delete(recurringRules).go();
+      await delete(accounts).go();
+    });
+  }
+
+  /// Best-effort rebuild after a delete-all so SQLite does not keep old rows
+  /// in free pages. It cannot run inside the delete transaction.
+  Future<void> compact() async {
+    try {
+      await customStatement('VACUUM');
+    } catch (_) {
+      // The rows are already gone; compaction is defence in depth.
+    }
+  }
+
   /// Every database has a cash account. Existing v1 rows are attached to it
   /// when upgrading, so balances keep working without a manual step.
-  Future<void> _ensureDefaultAccount() async {
+  Future<void> ensureDefaultAccount() async {
     final count = await customSelect('SELECT COUNT(*) AS count FROM accounts')
         .getSingle();
     if (count.read<int>('count') == 0) {

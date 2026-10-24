@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:http/http.dart' as http;
 
 import 'core/accounting.dart';
 import 'core/categories.dart';
@@ -9,6 +10,9 @@ import 'data/cash_repository.dart';
 import 'data/database.dart';
 import 'data/recurring_service.dart';
 import 'data/statement_importer.dart';
+import 'features/advisor/advisor_service.dart';
+import 'features/advisor/advisor_summary.dart';
+import 'features/advisor/privacy_service.dart';
 
 final databaseProvider = Provider<AppDatabase>((ref) {
   final database = AppDatabase();
@@ -204,3 +208,44 @@ final weeklyCategoryTotalsProvider =
 
       return AsyncValue.data(totals);
     });
+
+final advisorPreferencesProvider = Provider<AdvisorConsentStore>(
+  (ref) => AdvisorPreferences(),
+);
+
+final advisorConsentProvider = FutureProvider<bool>(
+  (ref) => ref.watch(advisorPreferencesProvider).hasConsent(),
+);
+
+final advisorServiceProvider = Provider<AdvisorService>((ref) {
+  final client = http.Client();
+  ref.onDispose(client.close);
+  return AdvisorService(
+    ref.watch(advisorPreferencesProvider),
+    client,
+    const String.fromEnvironment('ADVISOR_PROXY_URL'),
+  );
+});
+
+final advisorSummaryProvider = Provider<AsyncValue<AdvisorSummary>>((ref) {
+  final forecast = ref.watch(forecastProvider);
+  final spends = ref.watch(spendsProvider);
+
+  final pending = _pending<AdvisorSummary>([forecast, spends]);
+  if (pending != null) return pending;
+
+  return AsyncValue.data(
+    AdvisorSummary.build(
+      forecast.requireValue,
+      spends.requireValue,
+      DateTime.now(),
+    ),
+  );
+});
+
+final privacyServiceProvider = Provider<PrivacyService>(
+  (ref) => PrivacyService(
+    ref.watch(databaseProvider),
+    ref.watch(advisorPreferencesProvider),
+  ),
+);

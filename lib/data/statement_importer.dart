@@ -64,9 +64,9 @@ class StatementImportResult {
   final int transfers;
 }
 
-/// Turns a bank CSV into Zaka entries. Debits become spends, credits become
-/// money in, and ATM/cash withdrawals become transfers to the cash account
-/// so the same money is not counted twice.
+/// Turns a bank statement into Zaka entries. Debits become spends, credits
+/// become money in, and ATM/cash withdrawals become transfers to the cash
+/// account so the same money is not counted twice.
 class StatementImporter {
   StatementImporter(this._db, this._repository);
 
@@ -76,6 +76,18 @@ class StatementImporter {
   Future<StatementImportPreview> preview({
     required int accountId,
     required String content,
+  }) {
+    return previewParsed(
+      accountId: accountId,
+      parsed: parseStatementCsv(content),
+    );
+  }
+
+  /// Used by the PDF path, which extracts text first and then calls the same
+  /// classification and dedupe logic as a CSV import.
+  Future<StatementImportPreview> previewParsed({
+    required int accountId,
+    required StatementParseResult parsed,
   }) async {
     final account = await (_db.select(
       _db.accounts,
@@ -84,7 +96,6 @@ class StatementImporter {
       throw const StatementFormatException('Choose an account first.');
     }
 
-    final parsed = parseStatementCsv(content);
     final existing = await _existingKeys(accountId);
     final cashAccountId = await _cashAccountId(excluding: accountId);
     final seen = <String>{};
@@ -116,8 +127,18 @@ class StatementImporter {
   Future<StatementImportResult> import({
     required int accountId,
     required String content,
+  }) {
+    return importParsed(
+      accountId: accountId,
+      parsed: parseStatementCsv(content),
+    );
+  }
+
+  Future<StatementImportResult> importParsed({
+    required int accountId,
+    required StatementParseResult parsed,
   }) async {
-    final preview = await this.preview(accountId: accountId, content: content);
+    final preview = await previewParsed(accountId: accountId, parsed: parsed);
     final cashAccountId = await _cashAccountId(excluding: accountId);
 
     var imported = 0;

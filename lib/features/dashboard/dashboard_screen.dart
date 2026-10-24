@@ -12,6 +12,9 @@ import '../../widgets/common.dart';
 import '../../widgets/runway_sparkline.dart';
 import '../accounts/move_money_screen.dart';
 import '../activity/activity_tile.dart';
+import '../advisor/advisor_screen.dart';
+import '../advisor/advisor_service.dart';
+import '../advisor/advisor_summary.dart';
 import '../spending/quick_log_screen.dart';
 import '../withdrawals/add_withdrawal_screen.dart';
 
@@ -34,11 +37,18 @@ class DashboardScreen extends ConsumerWidget {
         .push(MaterialPageRoute<void>(builder: (_) => const MoveMoneyScreen()));
   }
 
+  void _openAdvisor(BuildContext context) {
+    Navigator.of(context)
+        .push(MaterialPageRoute<void>(builder: (_) => const AdvisorScreen()));
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final summary = ref.watch(cashSummaryProvider);
     final forecast = ref.watch(forecastProvider).value;
+    final advisorSummary = ref.watch(advisorSummaryProvider);
+    final advisorConsent = ref.watch(advisorConsentProvider).value ?? false;
     final categoryTotals =
         ref.watch(weeklyCategoryTotalsProvider).value ??
         const <SpendCategory, int>{};
@@ -84,6 +94,11 @@ class DashboardScreen extends ConsumerWidget {
           ],
         ),
         actions: [
+          IconButton(
+            tooltip: 'Privacy & Ask Zaka',
+            onPressed: () => _openAdvisor(context),
+            icon: const Icon(Icons.settings_outlined),
+          ),
           IconButton.filledTonal(
             tooltip: 'Move money',
             onPressed: () => _openMove(context),
@@ -143,6 +158,12 @@ class DashboardScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 16),
               _RunwayCard(forecast: forecast),
+              const SizedBox(height: 16),
+              _AskZakaCard(
+                summary: advisorSummary,
+                consented: advisorConsent,
+                onOpen: () => _openAdvisor(context),
+              ),
               const SizedBox(height: 26),
               SectionHeader(
                 title: 'Where money went',
@@ -386,6 +407,84 @@ class _BalanceStat extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _AskZakaCard extends StatelessWidget {
+  const _AskZakaCard({
+    required this.summary,
+    required this.consented,
+    required this.onOpen,
+  });
+
+  final AsyncValue<AdvisorSummary> summary;
+  final bool consented;
+  final VoidCallback onOpen;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final tip = summary.value == null
+        ? 'Log a few spends and Zaka will turn them into a plain-language '
+              'cash-flow tip.'
+        : offlineTip(summary.value!);
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 18, 20, 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  width: 34,
+                  height: 34,
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.primaryContainer,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.auto_awesome_rounded,
+                    size: 18,
+                    color: theme.colorScheme.onPrimaryContainer,
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text('Ask Zaka', style: theme.textTheme.titleMedium),
+                ),
+                _Pill(
+                  label: consented ? 'On' : 'Offline',
+                  color: consented
+                      ? theme.colorScheme.primary
+                      : theme.colorScheme.onSurfaceVariant,
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Text(tip, style: theme.textTheme.bodyMedium?.copyWith(height: 1.5)),
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    'Tips, not financial advice.',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ),
+                TextButton(
+                  onPressed: onOpen,
+                  child: Text(consented ? 'Get tips' : 'Set up'),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

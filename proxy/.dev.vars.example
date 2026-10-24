@@ -1,0 +1,5 @@
+# Copy to .dev.vars for local `wrangler dev` only. Never commit the real values.
+GEMINI_API_KEY=replace-me
+# Take this from https://ai.google.dev/gemini-api/docs/models
+GEMINI_MODEL=replace-with-current-model-id
+BUDGET_ALERT_WEBHOOK=

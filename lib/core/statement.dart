@@ -202,6 +202,10 @@ int? parseStatementAmountCents(String raw) {
   }
 
   text = text.replaceAll(RegExp(r'[^0-9.,+\-]'), '');
+  if (text.endsWith('-')) {
+    negative = true;
+    text = text.substring(0, text.length - 1);
+  }
   if (text.startsWith('-')) {
     negative = true;
     text = text.substring(1);
@@ -468,3 +472,313 @@ String _isoDate(DateTime date) =>
     '${date.year.toString().padLeft(4, '0')}-'
     '${date.month.toString().padLeft(2, '0')}-'
     '${date.day.toString().padLeft(2, '0')}';
+
+/// Parses text extracted from a bank statement PDF. PDFs do not have columns,
+/// so this reconstructs transactions from date-led lines and uses the running
+/// balance to work out whether money came in or went out.
+///
+/// The result is shown in the import preview before anything is saved. If a
+/// statement uses an unusual layout, the preview is the safety net: the user
+/// can see the rows and cancel.
+StatementParseResult parseStatementText(String content, {DateTime? now}) {
+  final rawLines = content
+      .replaceAll('\r\n', '\n')
+      .replaceAll('\r', '\n')
+      .split('\n');
+  final lines = rawLines
+      .map(
+        (line) => line
+            .replaceAll('\u00a0', ' ')
+            .replaceAll(RegExp(r'[ \t]+'), ' ')
+            .trim(),
+      )
+      .toList(growable: false);
+
+  final defaultYear =
+      _detectStatementYear(lines) ?? (now ?? DateTime.now()).year;
+  final parsed = <StatementRow>[];
+  final warnings = <String>[];
+  final seenKeys = <String, int>{};
+  _PdfRowBuilder? current;
+  int? previousBalance;
+
+  void finish() {
+    final builder = current;
+    current = null;
+    if (builder == null || builder.amountCents == null) return;
+
+    final amount = builder.amountCents!;
+    if (amount == 0) return;
+    final description = builder.description.trim().isEmpty
+        ? 'Imported transaction'
+        : _cleanPdfDescription(builder.description);
+    final baseKey =
+        '${_isoDate(builder.date)}|$amount|'
+        '${_normalise(description)}';
+    final occurrence = (seenKeys[baseKey] ?? 0) + 1;
+    seenKeys[baseKey] = occurrence;
+
+    parsed.add(
+      StatementRow(
+        lineNumber: builder.lineNumber,
+        date: builder.date,
+        description: description,
+        amountCents: amount,
+        balanceCents: builder.balanceCents,
+        occurrence: occurrence,
+      ),
+    );
+  }
+
+  for (var i = 0; i < lines.length; i++) {
+    final line = lines[i];
+    if (line.isEmpty) continue;
+    final lower = line.toLowerCase();
+
+    if (_isOpeningBalanceLine(lower)) {
+      finish();
+      final opening = _extractPdfAmounts(line);
+      if (opening.isNotEmpty) {
+        previousBalance = parseStatementAmountCents(opening.last.text);
+      }
+      continue;
+    }
+
+    if (_isPdfNoise(lower)) {
+      finish();
+      continue;
+    }
+
+    final dated = _splitLeadingDate(line, defaultYear);
+    if (dated != null) {
+      finish();
+      current = _PdfRowBuilder(
+        date: dated.date,
+        lineNumber: i + 1,
+        description: '',
+      );
+      final amounts = _extractPdfAmounts(dated.rest);
+      if (amounts.isEmpty) {
+        current!.description = dated.rest;
+        continue;
+      }
+
+      current!.description = dated.rest
+          .substring(0, amounts.first.start)
+          .trim();
+      _applyPdfAmounts(current!, amounts, previousBalance, warnings, i + 1);
+      if (current!.balanceCents != null) {
+        previousBalance = current!.balanceCents;
+      } else if (previousBalance != null && current!.amountCents != null) {
+        previousBalance = previousBalance + current!.amountCents!;
+      }
+      continue;
+    }
+
+    if (current == null) continue;
+
+    final amounts = _extractPdfAmounts(line);
+    if (amounts.isNotEmpty) {
+      final prefix = line.substring(0, amounts.first.start).trim();
+      if (prefix.isNotEmpty) {
+        current!.description = '${current!.description} $prefix'.trim();
+      }
+      if (current!.amountCents == null) {
+        _applyPdfAmounts(current!, amounts, previousBalance, warnings, i + 1);
+        if (current!.balanceCents != null) {
+          previousBalance = current!.balanceCents;
+        } else if (previousBalance != null && current!.amountCents != null) {
+          previousBalance = previousBalance + current!.amountCents!;
+        }
+      }
+    } else if (line.length <= 140) {
+      current!.description = '${current!.description} $line'.trim();
+    }
+  }
+
+  finish();
+
+  if (parsed.isEmpty) {
+    throw const StatementFormatException(
+      'No transactions could be read from this PDF. Try exporting a CSV '
+      'statement instead.',
+    );
+  }
+
+  return StatementParseResult(rows: parsed, warnings: warnings);
+}
+
+class _PdfRowBuilder {
+  _PdfRowBuilder({
+    required this.date,
+    required this.lineNumber,
+    required this.description,
+  });
+
+  final DateTime date;
+  final int lineNumber;
+  String description;
+  int? amountCents;
+  int? balanceCents;
+}
+
+class _PdfAmount {
+  const _PdfAmount(this.text, this.start);
+
+  final String text;
+  final int start;
+}
+
+final _pdfAmountPattern = RegExp(
+  r'(?<![\w])(-?\(?\s*(?:R\s*)?\d+(?:[ \u00a0.,]\d{3})*[.,]\d{2}\s*\)?-?\s*(?:CR|DR)?)(?![\w])',
+  caseSensitive: false,
+);
+
+List<_PdfAmount> _extractPdfAmounts(String line) {
+  return [
+    for (final match in _pdfAmountPattern.allMatches(line))
+      _PdfAmount(match.group(0)!.trim(), match.start),
+  ];
+}
+
+void _applyPdfAmounts(
+  _PdfRowBuilder builder,
+  List<_PdfAmount> amounts,
+  int? previousBalance,
+  List<String> warnings,
+  int lineNumber,
+) {
+  if (amounts.isEmpty) return;
+
+  final amountText = amounts.length >= 2
+      ? amounts[amounts.length - 2].text
+      : amounts.last.text;
+  final balanceText = amounts.length >= 2 ? amounts.last.text : null;
+
+  var amount = parseStatementAmountCents(amountText);
+  final balance = balanceText == null
+      ? null
+      : parseStatementAmountCents(balanceText);
+  if (amount == null) return;
+
+  if (balance != null && previousBalance != null) {
+    final delta = balance - previousBalance;
+    if (delta != 0) {
+      amount = delta;
+    } else if (!_hasExplicitSign(amountText)) {
+      amount = _guessPdfSign(amount, builder.description);
+    }
+  } else if (!_hasExplicitSign(amountText) && amount > 0) {
+    amount = _guessPdfSign(amount, builder.description);
+    warnings.add(
+      'Line $lineNumber: direction inferred from the description for '
+      '"${_cleanPdfDescription(builder.description)}". Check the preview.',
+    );
+  }
+
+  builder.amountCents = amount;
+  builder.balanceCents = balance;
+}
+
+int _guessPdfSign(int amount, String description) {
+  final text = description.toLowerCase();
+  if (RegExp(
+    r'salary|deposit|credit|refund|received|interest|transfer in|'
+    r'reversal|cash in',
+  ).hasMatch(text)) {
+    return amount.abs();
+  }
+  return -amount.abs();
+}
+
+bool _hasExplicitSign(String text) {
+  final upper = text.toUpperCase();
+  return text.trimLeft().startsWith('-') ||
+      text.trimRight().endsWith('-') ||
+      text.startsWith('(') ||
+      text.endsWith(')') ||
+      upper.contains('DR') ||
+      upper.contains('CR');
+}
+
+bool _isOpeningBalanceLine(String lower) {
+  return lower.startsWith('opening balance') ||
+      lower.startsWith('balance brought forward') ||
+      lower.startsWith('balance b/f') ||
+      lower.startsWith('brought forward');
+}
+
+bool _isPdfNoise(String lower) {
+  if (lower == 'fnb' || lower == 'first national bank') return true;
+  if (lower.startsWith('page ') ||
+      lower.startsWith('closing balance') ||
+      lower.startsWith('account number') ||
+      lower.startsWith('branch code') ||
+      lower.startsWith('this is a computer') ||
+      lower.startsWith('please note') ||
+      lower.startsWith('terms and conditions') ||
+      lower.startsWith('vat registration') ||
+      lower.startsWith('statement period') ||
+      lower.startsWith('statement date') ||
+      lower.startsWith('statement number') ||
+      lower.startsWith('statement of account') ||
+      lower.startsWith('statement summary') ||
+      lower.startsWith('total debits') ||
+      lower.startsWith('total credits') ||
+      lower.startsWith('total transactions') ||
+      lower.startsWith('total amount') ||
+      lower.startsWith('total value')) {
+    return true;
+  }
+  if (lower.contains('available balance') ||
+      lower.contains('date description') ||
+      lower.contains('date details')) {
+    return true;
+  }
+  return RegExp(r'^page \d+ of \d+').hasMatch(lower);
+}
+
+int? _detectStatementYear(List<String> lines) {
+  int? latest;
+  for (final line in lines) {
+    for (final match in RegExp(r'\b(20\d{2})\b').allMatches(line)) {
+      final year = int.tryParse(match.group(1)!);
+      if (year != null && (latest == null || year > latest)) latest = year;
+    }
+  }
+  return latest;
+}
+
+({DateTime date, String rest})? _splitLeadingDate(
+  String line,
+  int defaultYear,
+) {
+  final patterns = <RegExp>[
+    RegExp(r'^(\d{4}[/-]\d{1,2}[/-]\d{1,2})(?:\s+(.*))?$'),
+    RegExp(r'^(\d{1,2}[/-]\d{1,2}[/-]\d{2,4})(?:\s+(.*))?$'),
+    RegExp(r'^(\d{1,2}\s+[A-Za-z]{3,9}\s+\d{2,4})(?:\s+(.*))?$'),
+    RegExp(r'^(\d{1,2}\s+[A-Za-z]{3,9})(?:\s+(.*))?$'),
+  ];
+
+  for (final pattern in patterns) {
+    final match = pattern.firstMatch(line);
+    if (match == null) continue;
+    var dateText = match.group(1)!;
+    var date = parseStatementDate(dateText);
+    if (date == null && !RegExp(r'\d{4}').hasMatch(dateText)) {
+      date = parseStatementDate('$dateText $defaultYear');
+    }
+    if (date != null) {
+      return (date: date, rest: (match.group(2) ?? '').trim());
+    }
+  }
+  return null;
+}
+
+String _cleanPdfDescription(String value) {
+  return value
+      .replaceAll(RegExp(r'\s+'), ' ')
+      .replaceAll(RegExp(r'^[\s\-–—:]+'), '')
+      .replaceAll(RegExp(r'[\s\-–—:]+$'), '')
+      .trim();
+}
