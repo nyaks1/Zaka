@@ -1,0 +1,6 @@
+# These are placeholder test tokens in the curl examples from commit
+# b742609. The examples now generate a random token at runtime, but the old
+# commit remains in history.
+b742609cd9b4bb1dbfabdf08f724a3ee84b1e80c:proxy/README.md:curl-auth-header:75
+b742609cd9b4bb1dbfabdf08f724a3ee84b1e80c:proxy/README.md:curl-auth-header:86
+b742609cd9b4bb1dbfabdf08f724a3ee84b1e80c:proxy/README.md:curl-auth-header:118

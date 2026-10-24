@@ -91,6 +91,12 @@ Gemini key. It enforces:
 - an optional per-install daily rate limit in Cloudflare KV;
 - an optional daily usage webhook for the budget alert.
 
+The install token is a per-install rate-limit key, not a shared secret. The app
+generates it on the phone and the worker only checks its shape, so it does not
+stop someone from minting their own token. Enable the KV binding and the budget
+alert before sharing the proxy URL widely. Without KV, the allowlist and size
+checks still work, but there is no live daily cap.
+
 The worker does not log the summary or the token. The Gemini key and model are
 Wrangler secrets. `GEMINI_MODEL` has no default in the repo: set it from the
 current list at <https://ai.google.dev/gemini-api/docs/models>.

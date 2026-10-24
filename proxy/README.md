@@ -39,9 +39,12 @@ npx wrangler kv namespace create ADVISOR_RATE_LIMIT
 ```
 
 Without the KV binding the worker still enforces the allowlist, size cap and
-POST-only rule; it just cannot rate-limit or alert. For the web build, set
-`ALLOWED_ORIGIN` in `wrangler.toml` to the deployed web origin instead of `*`.
-The Android app does not send an `Origin` header.
+POST-only rule; it just cannot rate-limit or alert. The install token is a
+rate-limit key, not a shared secret: the worker only checks its shape, so do not
+treat it as authentication. Enable KV and a budget alert before sharing the URL
+widely. For the web build, set `ALLOWED_ORIGIN` in `wrangler.toml` to the
+deployed web origin instead of `*`. The Android app does not send an `Origin`
+header.
 
 ## Build the app against the proxy
 
@@ -67,14 +70,16 @@ four summary fields.
 
 ## curl checks
 
-Use a token of at least 24 characters.
+Use a token of 24–128 URL-safe characters. Generate a fresh one for the
+checks; do not commit a real install token.
 
 Valid request:
 
 ```sh
+TOKEN="$(python3 -c 'import secrets; print(secrets.token_urlsafe(32))')"
 curl -i -X POST "$ADVISOR_URL" \
   -H 'content-type: application/json' \
-  -H 'x-install-token: test-install-token-1234567890' \
+  -H "x-install-token: $TOKEN" \
   --data '{"runwayDays":3,"dailyBurnRand":90,"categoryPercent":{"Taxi":48,"Food":52},"periodDays":14}'
 ```
 
@@ -85,7 +90,7 @@ Extra field (must be rejected):
 ```sh
 curl -i -X POST "$ADVISOR_URL" \
   -H 'content-type: application/json' \
-  -H 'x-install-token: test-install-token-1234567890' \
+  -H "x-install-token: $TOKEN" \
   --data '{"runwayDays":3,"dailyBurnRand":90,"categoryPercent":{"Taxi":48},"periodDays":14,"note":"Sipho"}'
 ```
 
@@ -117,7 +122,7 @@ print('{"runwayDays":3,"dailyBurnRand":90,"categoryPercent":{"Taxi":48},"periodD
 PY
 curl -i -X POST "$ADVISOR_URL" \
   -H 'content-type: application/json' \
-  -H 'x-install-token: test-install-token-1234567890' \
+  -H "x-install-token: $TOKEN" \
   --data-binary @/tmp/zaka-big.json
 ```
 

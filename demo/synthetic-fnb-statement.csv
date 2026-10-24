@@ -1,0 +1,22 @@
+Date,Description,Amount,Balance
+2026/09/01,Salary - Synthetic Employer,15000.00,15000.00
+2026/09/01,Rent - Synthetic Landlord,-4500.00,10500.00
+2026/09/02,Taxi - Synthetic Rank,-85.00,10415.00
+2026/09/03,Groceries - Synthetic Store,-620.50,9794.50
+2026/09/04,Airtime - Synthetic Network,-99.00,9695.50
+2026/09/05,Electricity - Synthetic Prepaid,-450.00,9245.50
+2026/09/07,ATM Cash Withdrawal - Synthetic ATM,-800.00,8445.50
+2026/09/08,Taxi - Synthetic Rank,-90.00,8355.50
+2026/09/09,Food - Synthetic Spaza,-120.00,8235.50
+2026/09/10,Vendor - Synthetic Market,-250.00,7985.50
+2026/09/12,Groceries - Synthetic Store,-540.00,7445.50
+2026/09/14,Taxi - Synthetic Rank,-85.00,7360.50
+2026/09/15,Airtime - Synthetic Network,-99.00,7261.50
+2026/09/16,Electricity - Synthetic Prepaid,-300.00,6961.50
+2026/09/18,Food - Synthetic Spaza,-180.00,6781.50
+2026/09/20,Vendor - Synthetic Market,-320.00,6461.50
+2026/09/22,Taxi - Synthetic Rank,-90.00,6371.50
+2026/09/24,Groceries - Synthetic Store,-480.00,5891.50
+2026/09/26,ATM Cash Withdrawal - Synthetic ATM,-500.00,5391.50
+2026/09/28,Food - Synthetic Spaza,-150.00,5241.50
+2026/09/30,Bank Fee - Synthetic Bank,-65.00,5176.50
