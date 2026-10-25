@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_boxicons/flutter_boxicons.dart';
 
 import '../accounts/accounts_screen.dart';
 import '../activity/activity_screen.dart';
@@ -32,23 +33,23 @@ class _HomeShellState extends State<HomeShell> {
         onDestinationSelected: (index) => setState(() => _index = index),
         destinations: const [
           NavigationDestination(
-            icon: Icon(Icons.home_outlined),
-            selectedIcon: Icon(Icons.home_rounded),
+            icon: Icon(Boxicons.bx_home),
+            selectedIcon: Icon(Boxicons.bxs_home),
             label: 'Home',
           ),
           NavigationDestination(
-            icon: Icon(Icons.receipt_long_outlined),
-            selectedIcon: Icon(Icons.receipt_long_rounded),
+            icon: Icon(Boxicons.bx_receipt),
+            selectedIcon: Icon(Boxicons.bxs_receipt),
             label: 'Activity',
           ),
           NavigationDestination(
-            icon: Icon(Icons.account_balance_wallet_outlined),
-            selectedIcon: Icon(Icons.account_balance_wallet_rounded),
+            icon: Icon(Boxicons.bx_wallet),
+            selectedIcon: Icon(Boxicons.bxs_wallet),
             label: 'Accounts',
           ),
           NavigationDestination(
-            icon: Icon(Icons.repeat_outlined),
-            selectedIcon: Icon(Icons.repeat_rounded),
+            icon: Icon(Boxicons.bx_repeat),
+            selectedIcon: Icon(Boxicons.bx_repeat),
             label: 'Recurring',
           ),
         ],

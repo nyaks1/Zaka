@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_boxicons/flutter_boxicons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/categories.dart';
@@ -31,27 +32,34 @@ class RecurringScreen extends ConsumerWidget {
       builder: (context) => AlertDialog(
         title: const Text('Stop repeating this spend?'),
         content: const Text(
-          'Past entries stay in your activity. Zaka just stops adding new ones.',
+          'Past spends remain in your history. Zaka will simply stop adding '
+          'it on future days.',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Keep'),
+            child: const Text('Cancel'),
           ),
           FilledButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Stop'),
+            child: const Text('Stop repeating'),
           ),
         ],
       ),
     );
-    if (confirmed != true) return;
+    if (confirmed != true || !context.mounted) return;
+
     await ref.read(cashRepositoryProvider).deleteRule(rule.id);
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Rule removed.')));
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     final rules = ref.watch(recurringRulesProvider);
     final accounts = ref.watch(accountsProvider).value ?? const [];
     final accountNames = {
@@ -64,7 +72,7 @@ class RecurringScreen extends ConsumerWidget {
       floatingActionButton: FloatingActionButton.extended(
         heroTag: 'new-recurring-fab',
         onPressed: () => _openNew(context),
-        icon: const Icon(Icons.repeat_rounded),
+        icon: const Icon(Boxicons.bx_repeat),
         label: const Text('New'),
       ),
       body: rules.when(
@@ -73,14 +81,14 @@ class RecurringScreen extends ConsumerWidget {
         data: (items) {
           if (items.isEmpty) {
             return EmptyState(
-              icon: Icons.local_taxi_rounded,
+              icon: Boxicons.bx_taxi,
               title: 'Set a fare once, not every morning',
               message:
                   'Take a taxi Monday to Friday? Log it once with “Repeat” '
                   'turned on. Zaka adds it automatically on the days you choose.',
               action: FilledButton.icon(
                 onPressed: () => _openNew(context),
-                icon: const Icon(Icons.repeat_rounded),
+                icon: const Icon(Boxicons.bx_repeat),
                 label: const Text('Set up a weekday taxi'),
               ),
             );
@@ -89,33 +97,36 @@ class RecurringScreen extends ConsumerWidget {
           return ListView(
             padding: const EdgeInsets.fromLTRB(16, 4, 16, 100),
             children: [
-              Card(
-                color: theme.colorScheme.primaryContainer.withValues(
-                  alpha: 0.45,
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF141416) : const Color(0xFFFAFAFA),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: isDark ? const Color(0xFF27272A) : const Color(0xFFE4E4E7),
+                    width: 1,
+                  ),
                 ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Icon(
-                        Icons.auto_awesome_rounded,
-                        size: 20,
-                        color: theme.colorScheme.primary,
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Text(
-                          'Zaka posts these when they are due, the next time '
-                          'you open the app. You only log the first one.',
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            height: 1.4,
-                            color: theme.colorScheme.onSurface,
-                          ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(
+                      Boxicons.bx_info_circle,
+                      size: 18,
+                      color: theme.colorScheme.onSurface,
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        'Zaka posts these when they are due, the next time '
+                        'you open the app. You only log the first one.',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          height: 1.4,
+                          color: theme.colorScheme.onSurface,
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(height: 14),
@@ -178,23 +189,36 @@ class _RuleCard extends StatelessWidget {
 
     return Card(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 14, 8, 14),
+        padding: const EdgeInsets.fromLTRB(14, 12, 6, 12),
         child: Row(
           children: [
-            CategoryAvatar(category: category, size: 46),
+            CategoryAvatar(category: category, size: 40),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    '${formatCents(rule.amountCents)} '
-                    '${category.label.toLowerCase()}',
-                    style: theme.textTheme.titleSmall,
+                  Row(
+                    children: [
+                      Flexible(
+                        child: Text(
+                          describeWeekdays(weekdays),
+                          style: theme.textTheme.titleSmall,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        '${formatCents(rule.amountCents)} ${category.label.toLowerCase()}',
+                        style: theme.textTheme.labelMedium?.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 3),
+                  const SizedBox(height: 2),
                   Text(
-                    '${describeWeekdays(weekdays)} · $status$accountSuffix',
+                    '$status$accountSuffix',
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: theme.colorScheme.onSurfaceVariant,
                     ),
@@ -215,7 +239,11 @@ class _RuleCard extends StatelessWidget {
             Switch.adaptive(value: rule.active, onChanged: onToggle),
             PopupMenuButton<String>(
               tooltip: 'More',
-              icon: const Icon(Icons.more_vert_rounded, size: 20),
+              icon: Icon(
+                Boxicons.bx_dots_vertical_rounded,
+                size: 18,
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
               onSelected: (value) {
                 if (value == 'delete') onDelete();
               },
@@ -224,7 +252,7 @@ class _RuleCard extends StatelessWidget {
                   value: 'delete',
                   child: Row(
                     children: [
-                      Icon(Icons.delete_outline_rounded, size: 20),
+                      Icon(Boxicons.bx_trash, size: 18),
                       SizedBox(width: 10),
                       Text('Stop repeating'),
                     ],

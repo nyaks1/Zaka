@@ -1,48 +1,44 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_boxicons/flutter_boxicons.dart';
 
 /// The four SA cash presets (taxi, vendor, airtime, electricity) plus a
 /// couple of general-purpose buckets.
+/// Clean architectural monochrome palette and Boxicons icon set.
 enum SpendCategory {
   taxi(
     label: 'Taxi',
     description: 'Taxi fare',
-    icon: Icons.local_taxi_rounded,
-    color: Color(0xFFE8A33D),
+    icon: Boxicons.bx_taxi,
     preset: true,
   ),
   vendor(
     label: 'Vendor',
     description: 'Street vendor',
-    icon: Icons.storefront_rounded,
-    color: Color(0xFF8B5CF6),
+    icon: Boxicons.bx_store,
     preset: true,
   ),
   airtime(
     label: 'Airtime',
     description: 'Airtime & data',
-    icon: Icons.smartphone_rounded,
-    color: Color(0xFF3B82F6),
+    icon: Boxicons.bx_mobile,
     preset: true,
   ),
   electricity(
     label: 'Electricity',
     description: 'Prepaid electricity',
-    icon: Icons.bolt_rounded,
-    color: Color(0xFFF97316),
+    icon: Boxicons.bx_bolt_circle,
     preset: true,
   ),
   food(
     label: 'Food',
     description: 'Food & drink',
-    icon: Icons.restaurant_rounded,
-    color: Color(0xFFEC4899),
+    icon: Boxicons.bx_restaurant,
     preset: false,
   ),
   other(
     label: 'Other',
     description: 'Other cash spend',
-    icon: Icons.more_horiz_rounded,
-    color: Color(0xFF64748B),
+    icon: Boxicons.bx_dots_horizontal_rounded,
     preset: false,
   );
 
@@ -50,15 +46,22 @@ enum SpendCategory {
     required this.label,
     required this.description,
     required this.icon,
-    required this.color,
     required this.preset,
   });
 
   final String label;
   final String description;
   final IconData icon;
-  final Color color;
   final bool preset;
+
+  Color get color => switch (this) {
+    SpendCategory.taxi => const Color(0xFF18181B),
+    SpendCategory.vendor => const Color(0xFF27272A),
+    SpendCategory.airtime => const Color(0xFF3F3F46),
+    SpendCategory.electricity => const Color(0xFF52525B),
+    SpendCategory.food => const Color(0xFF71717A),
+    SpendCategory.other => const Color(0xFFA1A1AA),
+  };
 
   static List<SpendCategory> get presets =>
       values.where((category) => category.preset).toList(growable: false);

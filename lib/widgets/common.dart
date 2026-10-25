@@ -3,21 +3,34 @@ import 'package:flutter/material.dart';
 import '../core/categories.dart';
 
 class CategoryAvatar extends StatelessWidget {
-  const CategoryAvatar({super.key, required this.category, this.size = 44});
+  const CategoryAvatar({super.key, required this.category, this.size = 40});
 
   final SpendCategory category;
   final double size;
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
       width: size,
       height: size,
       decoration: BoxDecoration(
-        color: category.color.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(size * 0.32),
+        color: isDark ? const Color(0xFF18181B) : const Color(0xFFF4F4F5),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(
+          color: isDark ? const Color(0xFF27272A) : const Color(0xFFE4E4E7),
+          width: 1,
+        ),
       ),
-      child: Icon(category.icon, color: category.color, size: size * 0.5),
+      child: Center(
+        child: Icon(
+          category.icon,
+          color: theme.colorScheme.onSurface,
+          size: size * 0.48,
+        ),
+      ),
     );
   }
 }
@@ -32,10 +45,19 @@ class SectionHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Padding(
-      padding: const EdgeInsets.fromLTRB(4, 8, 4, 12),
+      padding: const EdgeInsets.fromLTRB(2, 12, 2, 8),
       child: Row(
         children: [
-          Expanded(child: Text(title, style: theme.textTheme.titleMedium)),
+          Expanded(
+            child: Text(
+              title.toUpperCase(),
+              style: theme.textTheme.labelSmall?.copyWith(
+                letterSpacing: 1.2,
+                fontWeight: FontWeight.w700,
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ),
           ?trailing,
         ],
       ),
@@ -62,7 +84,9 @@ class EmptyState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final accent = color ?? theme.colorScheme.primary;
+    final isDark = theme.brightness == Brightness.dark;
+    final fg = theme.colorScheme.onSurface;
+
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(28),
@@ -70,21 +94,27 @@ class EmptyState extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 76,
-              height: 76,
+              width: 56,
+              height: 56,
               decoration: BoxDecoration(
-                color: accent.withValues(alpha: 0.12),
-                shape: BoxShape.circle,
+                color: isDark ? const Color(0xFF18181B) : const Color(0xFFF4F4F5),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color: isDark ? const Color(0xFF27272A) : const Color(0xFFE4E4E7),
+                  width: 1,
+                ),
               ),
-              child: Icon(icon, size: 36, color: accent),
+              child: Icon(icon, size: 26, color: fg),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 16),
             Text(
               title,
               textAlign: TextAlign.center,
-              style: theme.textTheme.titleLarge,
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w700,
+              ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 6),
             Text(
               message,
               textAlign: TextAlign.center,
@@ -93,7 +123,7 @@ class EmptyState extends StatelessWidget {
                 height: 1.4,
               ),
             ),
-            if (action != null) ...[const SizedBox(height: 24), action!],
+            if (action != null) ...[const SizedBox(height: 20), action!],
           ],
         ),
       ),

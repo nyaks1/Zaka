@@ -4,13 +4,14 @@ import 'package:flutter/material.dart';
 
 import '../core/forecast.dart';
 
-/// A small projected-balance line for the runway card.
+/// A minimalist projected-balance line for the runway card.
+/// High contrast, crisp hairline axes, zero gradient fills.
 class RunwaySparkline extends StatelessWidget {
   const RunwaySparkline({
     super.key,
     required this.points,
     required this.color,
-    this.height = 84,
+    this.height = 72,
   });
 
   final List<ForecastPoint> points;
@@ -48,7 +49,7 @@ class _SparklinePainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     if (size.width <= 0 || size.height <= 0) return;
 
-    // Draw the zero line so "running out" is visually obvious.
+    // Draw the baseline so "running out" is visually obvious.
     final balances = points.map((point) => point.balanceCents).toList();
     final maxValue = balances.isEmpty
         ? 1
@@ -68,7 +69,7 @@ class _SparklinePainter extends CustomPainter {
 
     final zeroY = yFor(0).clamp(0.0, size.height);
     final zeroPaint = Paint()
-      ..color = gridColor.withValues(alpha: 0.7)
+      ..color = gridColor
       ..strokeWidth = 1;
     _drawDashedLine(
       canvas,
@@ -84,44 +85,26 @@ class _SparklinePainter extends CustomPainter {
       path.lineTo(xFor(i), yFor(balances[i]));
     }
 
-    final fillPath = Path.from(path)
-      ..lineTo(size.width, size.height)
-      ..lineTo(0, size.height)
-      ..close();
-
-    canvas.drawPath(
-      fillPath,
-      Paint()
-        ..shader = LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            color.withValues(alpha: 0.28),
-            color.withValues(alpha: 0.02),
-          ],
-        ).createShader(Offset.zero & size),
-    );
-
+    // Clean, crisp stroke with zero gradient area fill
     canvas.drawPath(
       path,
       Paint()
         ..color = color
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 2.6
-        ..strokeCap = StrokeCap.round
-        ..strokeJoin = StrokeJoin.round,
+        ..strokeWidth = 2.0
+        ..strokeCap = StrokeCap.square
+        ..strokeJoin = StrokeJoin.miter,
     );
 
     if (points.length > 1) {
       final last = Offset(xFor(points.length - 1), yFor(balances.last));
-      canvas.drawCircle(last, 4, Paint()..color = color);
-      canvas.drawCircle(last, 2, Paint()..color = Colors.white);
+      canvas.drawCircle(last, 3.5, Paint()..color = color);
     }
   }
 
   void _drawDashedLine(Canvas canvas, Offset start, Offset end, Paint paint) {
     const dash = 4.0;
-    const gap = 5.0;
+    const gap = 4.0;
     var x = start.dx;
     while (x < end.dx) {
       canvas.drawLine(

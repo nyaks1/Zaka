@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_boxicons/flutter_boxicons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/dates.dart';
@@ -186,7 +187,7 @@ class _ImportStatementScreenState extends ConsumerState<ImportStatementScreen> {
                           const SnackBar(content: Text('CSV template copied.')),
                         );
                       },
-                      icon: const Icon(Icons.copy_rounded),
+                      icon: const Icon(Boxicons.bx_copy),
                       label: const Text('Copy template'),
                     ),
                   ],
@@ -385,13 +386,13 @@ class _ImportStatementScreenState extends ConsumerState<ImportStatementScreen> {
             IconButton(
               tooltip: 'Where do I get this?',
               onPressed: _showHelp,
-              icon: const Icon(Icons.help_outline_rounded),
+              icon: const Icon(Boxicons.bx_help_circle),
             ),
             const SizedBox(width: 8),
           ],
         ),
         body: const EmptyState(
-          icon: Icons.account_balance_rounded,
+          icon: Boxicons.bxs_bank,
           title: 'Add an account first',
           message:
               'Create the bank account you want to import into, then '
@@ -407,7 +408,7 @@ class _ImportStatementScreenState extends ConsumerState<ImportStatementScreen> {
           IconButton(
             tooltip: 'Where do I get this?',
             onPressed: _showHelp,
-            icon: const Icon(Icons.help_outline_rounded),
+            icon: const Icon(Boxicons.bx_help_circle),
           ),
           const SizedBox(width: 8),
         ],
@@ -429,14 +430,14 @@ class _ImportStatementScreenState extends ConsumerState<ImportStatementScreen> {
             child: TextButton.icon(
               style: TextButton.styleFrom(padding: EdgeInsets.zero),
               onPressed: _showHelp,
-              icon: const Icon(Icons.help_outline_rounded, size: 18),
+              icon: const Icon(Boxicons.bx_help_circle, size: 18),
               label: const Text('Where do I get this statement?'),
             ),
           ),
           const SizedBox(height: 8),
           Card(
             child: ListTile(
-              leading: const Icon(Icons.account_balance_rounded),
+              leading: const Icon(Boxicons.bxs_bank),
               title: Text('Import into', style: theme.textTheme.titleSmall),
               trailing: DropdownButton<int>(
                 value: accountId,
@@ -464,7 +465,7 @@ class _ImportStatementScreenState extends ConsumerState<ImportStatementScreen> {
             onPressed: accountId == null || _busy
                 ? null
                 : () => _pickFile(accountId),
-            icon: const Icon(Icons.upload_file_rounded),
+            icon: const Icon(Boxicons.bx_upload),
             label: const Text('Choose PDF or CSV'),
           ),
           if (_fileName != null) ...[
@@ -515,7 +516,7 @@ class _ImportStatementScreenState extends ConsumerState<ImportStatementScreen> {
                     'Pasted statement',
                     accountId,
                   ),
-            icon: const Icon(Icons.preview_rounded),
+            icon: const Icon(Boxicons.bx_file),
             label: const Text('Preview pasted CSV'),
           ),
           if (_busy) ...[
@@ -559,7 +560,7 @@ class _ImportStatementScreenState extends ConsumerState<ImportStatementScreen> {
                   height: 18,
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
-              : const Icon(Icons.download_done_rounded),
+              : const Icon(Boxicons.bx_check),
           label: Text(
             _preview == null
                 ? 'Import transactions'

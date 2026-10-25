@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_boxicons/flutter_boxicons.dart';
 
 import '../../core/categories.dart';
 import '../../core/dates.dart';
@@ -80,10 +81,9 @@ class ActivityTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     final amountColor = entry.isTransfer
         ? theme.colorScheme.onSurfaceVariant
-        : entry.isWithdrawal
-        ? const Color(0xFF1B8A5A)
         : theme.colorScheme.onSurface;
     final sign = entry.isTransfer
         ? ''
@@ -91,37 +91,45 @@ class ActivityTile extends StatelessWidget {
         ? '+'
         : '−';
 
+    final tileBorder = Border.all(
+      color: isDark ? const Color(0xFF27272A) : const Color(0xFFE4E4E7),
+      width: 1,
+    );
+    final tileBg = isDark ? const Color(0xFF18181B) : const Color(0xFFF4F4F5);
+
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
       leading: entry.isTransfer
           ? Container(
-              width: 44,
-              height: 44,
+              width: 40,
+              height: 40,
               decoration: BoxDecoration(
-                color: theme.colorScheme.secondaryContainer,
-                borderRadius: BorderRadius.circular(14),
+                color: tileBg,
+                borderRadius: BorderRadius.circular(6),
+                border: tileBorder,
               ),
               child: Icon(
-                Icons.swap_horiz_rounded,
-                color: theme.colorScheme.onSecondaryContainer,
-                size: 22,
+                Boxicons.bx_transfer,
+                color: theme.colorScheme.onSurface,
+                size: 20,
               ),
             )
           : entry.isWithdrawal
           ? Container(
-              width: 44,
-              height: 44,
+              width: 40,
+              height: 40,
               decoration: BoxDecoration(
-                color: const Color(0xFF1B8A5A).withValues(alpha: 0.14),
-                borderRadius: BorderRadius.circular(14),
+                color: tileBg,
+                borderRadius: BorderRadius.circular(6),
+                border: tileBorder,
               ),
-              child: const Icon(
-                Icons.south_west_rounded,
-                color: Color(0xFF1B8A5A),
-                size: 22,
+              child: Icon(
+                Boxicons.bx_down_arrow_alt,
+                color: theme.colorScheme.onSurface,
+                size: 20,
               ),
             )
-          : CategoryAvatar(category: entry.category),
+          : CategoryAvatar(category: entry.category, size: 40),
       title: Text(
         entry.title,
         maxLines: 1,
@@ -149,7 +157,11 @@ class ActivityTile extends StatelessWidget {
           if (onDelete != null)
             PopupMenuButton<String>(
               tooltip: 'More',
-              icon: const Icon(Icons.more_vert_rounded, size: 20),
+              icon: Icon(
+                Boxicons.bx_dots_vertical_rounded,
+                size: 18,
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
               onSelected: (value) {
                 if (value == 'delete') onDelete!();
               },
@@ -158,7 +170,7 @@ class ActivityTile extends StatelessWidget {
                   value: 'delete',
                   child: Row(
                     children: [
-                      Icon(Icons.delete_outline_rounded, size: 20),
+                      Icon(Boxicons.bx_trash, size: 18),
                       SizedBox(width: 10),
                       Text('Delete'),
                     ],

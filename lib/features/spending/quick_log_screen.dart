@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_boxicons/flutter_boxicons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/categories.dart';
@@ -189,7 +190,7 @@ class _QuickLogScreenState extends ConsumerState<QuickLogScreen> {
             Card(
               child: ListTile(
                 contentPadding: const EdgeInsets.fromLTRB(18, 2, 12, 2),
-                leading: const Icon(Icons.account_balance_wallet_rounded),
+                leading: const Icon(Boxicons.bx_wallet),
                 title: Text('Paid from', style: theme.textTheme.titleSmall),
                 trailing: DropdownButton<int>(
                   value: accountId,
@@ -227,13 +228,13 @@ class _QuickLogScreenState extends ConsumerState<QuickLogScreen> {
                 horizontal: 18,
                 vertical: 6,
               ),
-              leading: const Icon(Icons.event_rounded),
+              leading: const Icon(Boxicons.bx_calendar),
               title: Text(
                 '${dayLabel(_when)} · ${timeOfDay(_when)}',
                 style: theme.textTheme.titleSmall,
               ),
               subtitle: const Text('Tap to change the date'),
-              trailing: const Icon(Icons.chevron_right_rounded),
+              trailing: const Icon(Boxicons.bx_chevron_right),
               onTap: _pickDate,
             ),
           ),
@@ -323,7 +324,7 @@ class _QuickLogScreenState extends ConsumerState<QuickLogScreen> {
                         if (_endsOn != null)
                           IconButton(
                             tooltip: 'Remove end date',
-                            icon: const Icon(Icons.close_rounded, size: 18),
+                            icon: const Icon(Boxicons.bx_x, size: 18),
                             onPressed: () => setState(() => _endsOn = null),
                           ),
                       ],
@@ -353,7 +354,7 @@ class _QuickLogScreenState extends ConsumerState<QuickLogScreen> {
                   height: 18,
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
-              : const Icon(Icons.check_rounded),
+              : const Icon(Boxicons.bx_check),
           label: Text(
             cents == null
                 ? 'Log spend'
@@ -379,31 +380,41 @@ class _CategoryTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final fg = theme.colorScheme.onSurface;
+    final border = isDark ? const Color(0xFF27272A) : const Color(0xFFE4E4E7);
+    final bg = selected
+        ? (isDark ? const Color(0xFF27272A) : const Color(0xFFF4F4F5))
+        : (isDark ? const Color(0xFF09090B) : Colors.white);
+
     return Material(
-      color: selected
-          ? category.color.withValues(alpha: 0.14)
-          : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.35),
+      color: bg,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(6),
         side: BorderSide(
-          color: selected ? category.color : Colors.transparent,
-          width: 1.4,
+          color: selected ? fg : border,
+          width: selected ? 1.5 : 1.0,
         ),
       ),
       child: InkWell(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(6),
         onTap: onTap,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
           child: Row(
             children: [
-              Icon(category.icon, color: category.color, size: 22),
+              Icon(category.icon, color: fg, size: 20),
               const SizedBox(width: 10),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(category.label, style: theme.textTheme.labelLarge),
+                    Text(
+                      category.label,
+                      style: theme.textTheme.labelLarge?.copyWith(
+                        fontWeight: selected ? FontWeight.w700 : FontWeight.w600,
+                      ),
+                    ),
                     Text(
                       category.description,
                       maxLines: 1,

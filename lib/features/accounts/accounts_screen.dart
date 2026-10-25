@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_boxicons/flutter_boxicons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/accounting.dart';
@@ -97,7 +98,7 @@ class AccountsScreen extends ConsumerWidget {
                 const SizedBox(height: 18),
                 FilledButton.icon(
                   onPressed: () => Navigator.of(context).pop(),
-                  icon: const Icon(Icons.check_rounded),
+                  icon: const Icon(Boxicons.bx_check),
                   label: const Text('Got it'),
                 ),
               ],
@@ -117,10 +118,10 @@ class AccountsScreen extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('Accounts'),
         actions: [
-          IconButton.filledTonal(
+          IconButton(
             tooltip: 'Add account',
             onPressed: () => _openAdd(context),
-            icon: const Icon(Icons.add_rounded),
+            icon: const Icon(Boxicons.bx_plus),
           ),
           const SizedBox(width: 8),
         ],
@@ -162,7 +163,7 @@ class AccountsScreen extends ConsumerWidget {
                 width: double.infinity,
                 child: OutlinedButton.icon(
                   onPressed: () => _openAdd(context),
-                  icon: const Icon(Icons.add_rounded),
+                  icon: const Icon(Boxicons.bx_plus),
                   label: const Text('Add account'),
                 ),
               ),
@@ -171,15 +172,15 @@ class AccountsScreen extends ConsumerWidget {
                 child: ListTile(
                   contentPadding: const EdgeInsets.fromLTRB(18, 8, 14, 8),
                   leading: Icon(
-                    Icons.account_balance_rounded,
-                    color: theme.colorScheme.primary,
+                    Boxicons.bxs_bank,
+                    color: theme.colorScheme.onSurface,
                   ),
                   title: const Text('Automatic bank sync'),
                   subtitle: const Text(
                     'Import an FNB CSV today. Live sync needs Stitch and a '
                     'backend.',
                   ),
-                  trailing: const Icon(Icons.info_outline_rounded),
+                  trailing: const Icon(Boxicons.bx_info_circle),
                   onTap: () => _showBankSyncInfo(context),
                 ),
               ),
@@ -200,44 +201,58 @@ class _TotalCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
-      padding: const EdgeInsets.fromLTRB(22, 20, 22, 22),
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(28),
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFF127A5A), Color(0xFF074434)],
+        color: isDark ? const Color(0xFF141416) : const Color(0xFFFAFAFA),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: isDark ? const Color(0xFF27272A) : const Color(0xFFE4E4E7),
+          width: 1,
         ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'TOTAL ACROSS ALL ACCOUNTS',
-            style: theme.textTheme.labelSmall?.copyWith(
-              color: Colors.white70,
-              letterSpacing: 1.2,
-              fontWeight: FontWeight.w600,
-            ),
+          Row(
+            children: [
+              Text(
+                'TOTAL ACROSS ALL ACCOUNTS',
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                  letterSpacing: 1.2,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const Spacer(),
+              Icon(
+                Boxicons.bx_wallet,
+                size: 18,
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 10),
           FittedBox(
             fit: BoxFit.scaleDown,
             alignment: Alignment.centerLeft,
             child: Text(
               formatCents(totalCents),
               style: theme.textTheme.displaySmall?.copyWith(
-                color: Colors.white,
                 fontWeight: FontWeight.w700,
-                fontSize: 44,
+                fontSize: 40,
+                letterSpacing: -1.0,
               ),
             ),
           ),
           const SizedBox(height: 6),
           Text(
             accountCount == 1 ? '1 account' : '$accountCount accounts',
-            style: theme.textTheme.bodySmall?.copyWith(color: Colors.white70),
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
           ),
         ],
       ),
@@ -259,6 +274,7 @@ class _AccountCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     final account = balance.account;
     final negative = balance.balanceCents < 0;
     final subtitle = [
@@ -268,21 +284,24 @@ class _AccountCard extends StatelessWidget {
 
     return Card(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 10, 6, 10),
+        padding: const EdgeInsets.fromLTRB(14, 12, 6, 12),
         child: Row(
           children: [
             Container(
-              width: 46,
-              height: 46,
+              width: 40,
+              height: 40,
               decoration: BoxDecoration(
-                color: theme.colorScheme.primaryContainer.withValues(
-                  alpha: 0.55,
+                color: isDark ? const Color(0xFF18181B) : const Color(0xFFF4F4F5),
+                borderRadius: BorderRadius.circular(6),
+                border: Border.all(
+                  color: isDark ? const Color(0xFF27272A) : const Color(0xFFE4E4E7),
+                  width: 1,
                 ),
-                borderRadius: BorderRadius.circular(15),
               ),
               child: Icon(
                 _kindIcon(account.kind),
-                color: theme.colorScheme.onPrimaryContainer,
+                size: 20,
+                color: theme.colorScheme.onSurface,
               ),
             ),
             const SizedBox(width: 12),
@@ -310,7 +329,11 @@ class _AccountCard extends StatelessWidget {
             ),
             PopupMenuButton<String>(
               tooltip: 'Account actions',
-              icon: const Icon(Icons.more_vert_rounded, size: 20),
+              icon: Icon(
+                Boxicons.bx_dots_vertical_rounded,
+                size: 18,
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
               onSelected: (value) {
                 switch (value) {
                   case 'import':
@@ -319,22 +342,22 @@ class _AccountCard extends StatelessWidget {
                     onDelete();
                 }
               },
-              itemBuilder: (context) => [
-                const PopupMenuItem(
+              itemBuilder: (context) => const [
+                PopupMenuItem(
                   value: 'import',
                   child: Row(
                     children: [
-                      Icon(Icons.upload_file_rounded, size: 20),
+                      Icon(Boxicons.bx_upload, size: 18),
                       SizedBox(width: 10),
                       Text('Import statement'),
                     ],
                   ),
                 ),
-                const PopupMenuItem(
+                PopupMenuItem(
                   value: 'delete',
                   child: Row(
                     children: [
-                      Icon(Icons.delete_outline_rounded, size: 20),
+                      Icon(Boxicons.bx_trash, size: 18),
                       SizedBox(width: 10),
                       Text('Remove account'),
                     ],
@@ -350,10 +373,10 @@ class _AccountCard extends StatelessWidget {
 }
 
 IconData _kindIcon(String kind) => switch (kind) {
-  'cash' => Icons.account_balance_wallet_rounded,
-  'savings' => Icons.savings_rounded,
-  'credit' => Icons.credit_card_rounded,
-  _ => Icons.account_balance_rounded,
+  'cash' => Boxicons.bx_wallet,
+  'savings' => Boxicons.bx_money,
+  'credit' => Boxicons.bx_credit_card,
+  _ => Boxicons.bxs_bank,
 };
 
 String _kindLabel(String kind) => switch (kind) {

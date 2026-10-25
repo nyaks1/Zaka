@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_boxicons/flutter_boxicons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
@@ -79,10 +80,12 @@ class DashboardScreen extends ConsumerWidget {
           children: [
             const Text('Zaka'),
             Text(
-              DateFormat('EEEE d MMMM').format(DateTime.now()),
+              DateFormat('EEEE · d MMMM').format(DateTime.now()).toUpperCase(),
               style: theme.textTheme.labelSmall?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
-                fontWeight: FontWeight.w500,
+                letterSpacing: 1.0,
+                fontSize: 10,
+                fontWeight: FontWeight.w700,
               ),
             ),
           ],
@@ -91,12 +94,12 @@ class DashboardScreen extends ConsumerWidget {
           IconButton(
             tooltip: 'Privacy & Ask Zaka',
             onPressed: () => _openAdvisor(context),
-            icon: const Icon(Icons.settings_outlined),
+            icon: const Icon(Boxicons.bx_cog),
           ),
-          IconButton.filledTonal(
+          IconButton(
             tooltip: 'Add money',
             onPressed: () => _openWithdrawal(context),
-            icon: const Icon(Icons.add_card_rounded),
+            icon: const Icon(Boxicons.bx_plus),
           ),
           const SizedBox(width: 8),
         ],
@@ -104,7 +107,7 @@ class DashboardScreen extends ConsumerWidget {
       floatingActionButton: FloatingActionButton.extended(
         heroTag: 'log-cash-fab',
         onPressed: () => _openQuickLog(context),
-        icon: const Icon(Icons.bolt_rounded),
+        icon: const Icon(Boxicons.bx_bolt_circle),
         label: const Text('Log cash'),
       ),
       body: summary.when(
@@ -116,8 +119,8 @@ class DashboardScreen extends ConsumerWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(
-                  Icons.error_outline_rounded,
-                  size: 42,
+                  Boxicons.bx_error_circle,
+                  size: 40,
                   color: theme.colorScheme.error,
                 ),
                 const SizedBox(height: 12),
@@ -139,20 +142,20 @@ class DashboardScreen extends ConsumerWidget {
             physics: const AlwaysScrollableScrollPhysics(),
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 120),
             children: [
-              _BalanceCard(
+              _CapitalOverview(
                 summary: cash,
                 accounts: accountBalances,
                 onAddCash: () => _openWithdrawal(context),
               ),
-              const SizedBox(height: 16),
-              _RunwayCard(forecast: forecast),
-              const SizedBox(height: 16),
-              _AskZakaCard(
+              const SizedBox(height: 14),
+              _RunwayTelemetry(forecast: forecast),
+              const SizedBox(height: 14),
+              _AdvisorDispatch(
                 summary: advisorSummary,
                 consented: advisorConsent,
                 onOpen: () => _openAdvisor(context),
               ),
-              const SizedBox(height: 26),
+              const SizedBox(height: 24),
               SectionHeader(
                 title: 'Where money went',
                 trailing: Text(
@@ -163,15 +166,15 @@ class DashboardScreen extends ConsumerWidget {
                 ),
               ),
               _CategoryBreakdown(totals: categoryTotals),
-              const SizedBox(height: 26),
+              const SizedBox(height: 24),
               const SectionHeader(title: 'Recent activity'),
               _RecentActivity(entries: entries.take(6).toList()),
-              const SizedBox(height: 20),
+              const SizedBox(height: 24),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
-                    Icons.lock_outline_rounded,
+                    Boxicons.bx_lock_alt,
                     size: 14,
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
@@ -195,8 +198,10 @@ class DashboardScreen extends ConsumerWidget {
   }
 }
 
-class _BalanceCard extends StatelessWidget {
-  const _BalanceCard({
+/// Architectural Capital Ledger layout.
+/// High contrast, razor 1px borders, zero gradients or shadows.
+class _CapitalOverview extends StatelessWidget {
+  const _CapitalOverview({
     required this.summary,
     required this.accounts,
     required this.onAddCash,
@@ -209,130 +214,167 @@ class _BalanceCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final noActivity = summary.moneyInCents == 0 && summary.moneyOutCents == 0;
+    final isDark = theme.brightness == Brightness.dark;
+    final border = isDark ? const Color(0xFF27272A) : const Color(0xFFE4E4E7);
+    final bg = isDark ? const Color(0xFF09090B) : Colors.white;
 
     return Container(
-      padding: const EdgeInsets.fromLTRB(22, 20, 22, 22),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(28),
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFF127A5A), Color(0xFF074434)],
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF074434).withValues(alpha: 0.25),
-            blurRadius: 24,
-            offset: const Offset(0, 10),
-          ),
-        ],
+        color: bg,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: border, width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Text(
-                'TOTAL MONEY',
-                style: theme.textTheme.labelSmall?.copyWith(
-                  color: Colors.white70,
-                  letterSpacing: 1.4,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const Spacer(),
-              const Icon(
-                Icons.account_balance_wallet_rounded,
-                color: Colors.white70,
-                size: 22,
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          FittedBox(
-            fit: BoxFit.scaleDown,
-            alignment: Alignment.centerLeft,
-            child: Text(
-              formatCents(summary.balanceCents),
-              style: theme.textTheme.displaySmall?.copyWith(
-                color: Colors.white,
-                fontWeight: FontWeight.w700,
-                fontSize: 46,
-              ),
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            summary.accountCount == 1
-                ? 'Across 1 account'
-                : 'Across ${summary.accountCount} accounts',
-            style: theme.textTheme.bodySmall?.copyWith(color: Colors.white70),
-          ),
-          if (accounts.isNotEmpty) ...[
-            const SizedBox(height: 14),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
+          Padding(
+            padding: const EdgeInsets.fromLTRB(18, 16, 18, 14),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                for (final balance in accounts.take(3))
-                  _AccountChip(
-                    name: balance.account.name,
-                    amountCents: balance.balanceCents,
-                  ),
-                if (accounts.length > 3)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    child: Text(
-                      '+${accounts.length - 3} more',
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: Colors.white70,
+                Row(
+                  children: [
+                    Text(
+                      'TOTAL MONEY',
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        letterSpacing: 1.2,
+                        fontWeight: FontWeight.w700,
+                        color: theme.colorScheme.onSurfaceVariant,
                       ),
                     ),
-                  ),
-              ],
-            ),
-          ],
-          const SizedBox(height: 18),
-          Row(
-            children: [
-              _BalanceStat(
-                label: 'Money in',
-                value: formatCents(summary.moneyInCents),
-              ),
-              const SizedBox(width: 28),
-              _BalanceStat(
-                label: 'Money out',
-                value: formatCents(summary.moneyOutCents),
-              ),
-            ],
-          ),
-          if (noActivity) ...[
-            const SizedBox(height: 10),
-            Text(
-              'Add the money you already have, or import a bank statement, to '
-              'start the countdown.',
-              style: theme.textTheme.bodySmall?.copyWith(color: Colors.white70),
-            ),
-            const SizedBox(height: 6),
-            SizedBox(
-              width: double.infinity,
-              child: TextButton.icon(
-                style: TextButton.styleFrom(
-                  foregroundColor: Colors.white,
-                  backgroundColor: Colors.white.withValues(alpha: 0.12),
-                  minimumSize: const Size.fromHeight(46),
-                  padding: const EdgeInsets.symmetric(horizontal: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
+                    const Spacer(),
+                    Text(
+                      summary.accountCount == 1
+                          ? 'Across 1 account'
+                          : 'Across ${summary.accountCount} accounts',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    formatCents(summary.balanceCents),
+                    style: theme.textTheme.displaySmall?.copyWith(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 42,
+                      letterSpacing: -1.2,
+                      height: 1.1,
+                    ),
                   ),
                 ),
+                if (accounts.isNotEmpty) ...[
+                  const SizedBox(height: 14),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      for (final balance in accounts.take(3))
+                        _AccountChip(
+                          name: balance.account.name,
+                          amountCents: balance.balanceCents,
+                        ),
+                      if (accounts.length > 3)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 6),
+                          child: Text(
+                            '+${accounts.length - 3} more',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ],
+              ],
+            ),
+          ),
+          Divider(height: 1, thickness: 1, color: border),
+          IntrinsicHeight(
+            child: Row(
+              children: [
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 18,
+                      vertical: 12,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'MONEY IN',
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            letterSpacing: 1.0,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          formatCents(summary.moneyInCents),
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                VerticalDivider(width: 1, thickness: 1, color: border),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 18,
+                      vertical: 12,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'MONEY OUT',
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            letterSpacing: 1.0,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          formatCents(summary.moneyOutCents),
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Divider(height: 1, thickness: 1, color: border),
+          Padding(
+            padding: const EdgeInsets.all(12),
+            child: SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                style: OutlinedButton.styleFrom(
+                  minimumSize: const Size.fromHeight(42),
+                ),
                 onPressed: onAddCash,
-                icon: const Icon(Icons.add_rounded, size: 18),
+                icon: const Icon(Boxicons.bx_plus, size: 16),
                 label: const Text('Add money'),
               ),
             ),
-          ],
+          ),
         ],
       ),
     );
@@ -348,27 +390,33 @@ class _AccountChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final border = isDark ? const Color(0xFF27272A) : const Color(0xFFE4E4E7);
+    final bg = isDark ? const Color(0xFF18181B) : const Color(0xFFF4F4F5);
+
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
+        color: bg,
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: border, width: 1),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
             name,
-            style: theme.textTheme.labelSmall?.copyWith(color: Colors.white70),
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+              fontWeight: FontWeight.w500,
+            ),
           ),
-          const SizedBox(height: 1),
+          const SizedBox(width: 8),
           Text(
             formatCents(amountCents),
-            style: theme.textTheme.labelLarge?.copyWith(
-              color: Colors.white,
+            style: theme.textTheme.labelSmall?.copyWith(
               fontWeight: FontWeight.w700,
+              color: theme.colorScheme.onSurface,
             ),
           ),
         ],
@@ -377,233 +425,141 @@ class _AccountChip extends StatelessWidget {
   }
 }
 
-class _BalanceStat extends StatelessWidget {
-  const _BalanceStat({required this.label, required this.value});
-
-  final String label;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: theme.textTheme.labelSmall?.copyWith(color: Colors.white60),
-        ),
-        const SizedBox(height: 2),
-        Text(
-          value,
-          style: theme.textTheme.titleSmall?.copyWith(
-            color: Colors.white,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _AskZakaCard extends StatelessWidget {
-  const _AskZakaCard({
-    required this.summary,
-    required this.consented,
-    required this.onOpen,
-  });
-
-  final AsyncValue<AdvisorSummary> summary;
-  final bool consented;
-  final VoidCallback onOpen;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final tip = summary.value == null
-        ? 'Log a few spends and Zaka will turn them into a plain-language '
-              'cash-flow tip.'
-        : offlineTip(summary.value!);
-
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 18, 20, 16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  width: 34,
-                  height: 34,
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.primaryContainer,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    Icons.auto_awesome_rounded,
-                    size: 18,
-                    color: theme.colorScheme.onPrimaryContainer,
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Text('Ask Zaka', style: theme.textTheme.titleMedium),
-                ),
-                _Pill(
-                  label: consented ? 'On' : 'Offline',
-                  color: consented
-                      ? theme.colorScheme.primary
-                      : theme.colorScheme.onSurfaceVariant,
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Text(tip, style: theme.textTheme.bodyMedium?.copyWith(height: 1.5)),
-            const SizedBox(height: 10),
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    'Tips, not financial advice.',
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ),
-                TextButton(
-                  onPressed: onOpen,
-                  child: Text(consented ? 'Get tips' : 'Set up'),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _RunwayCard extends StatelessWidget {
-  const _RunwayCard({required this.forecast});
+/// Asymmetric Runway Telemetry layout.
+/// Displays days remaining, daily burn rate, commitments, and crisp sparkline.
+class _RunwayTelemetry extends StatelessWidget {
+  const _RunwayTelemetry({required this.forecast});
 
   final ForecastResult? forecast;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final border = isDark ? const Color(0xFF27272A) : const Color(0xFFE4E4E7);
+    final bg = isDark ? const Color(0xFF09090B) : Colors.white;
 
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 18, 20, 18),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(
-                  Icons.speed_rounded,
-                  size: 20,
-                  color: theme.colorScheme.primary,
-                ),
-                const SizedBox(width: 8),
-                Text('Money runway', style: theme.textTheme.titleMedium),
-                const Spacer(),
-                if (forecast != null && forecast!.hasData)
-                  _Pill(
-                    label: forecast!.lastsBeyondHorizon
-                        ? '${forecast!.horizonDays}+ days'
-                        : '${forecast!.daysRemaining} days',
-                    color:
-                        forecast!.daysRemaining != null &&
-                            forecast!.daysRemaining! <= 7
-                        ? theme.colorScheme.error
-                        : theme.colorScheme.primary,
-                  ),
-              ],
-            ),
-            const SizedBox(height: 14),
-            if (forecast == null)
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 24),
-                child: Center(child: CircularProgressIndicator()),
-              )
-            else if (!forecast!.hasData)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 4),
-                child: Text(
-                  'Log a spend or set a repeating fare and Zaka will show '
-                  'the day your money runs out.',
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
-                    height: 1.4,
-                  ),
-                ),
-              )
-            else ...[
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    forecast!.daysRemaining == null
-                        ? '${forecast!.horizonDays}+'
-                        : '${forecast!.daysRemaining}',
-                    style: theme.textTheme.displaySmall?.copyWith(
-                      fontSize: 38,
-                      height: 1,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 4),
-                    child: Text(
-                      forecast!.daysRemaining == 1
-                          ? 'day of money left'
-                          : 'days of money left',
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ),
-                ],
+    return Container(
+      padding: const EdgeInsets.fromLTRB(18, 16, 18, 16),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: border, width: 1),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Boxicons.bx_line_chart,
+                size: 18,
+                color: theme.colorScheme.onSurface,
               ),
-              const SizedBox(height: 8),
+              const SizedBox(width: 8),
               Text(
-                _runwayMessage(forecast!),
-                style: theme.textTheme.bodySmall?.copyWith(
+                'MONEY RUNWAY',
+                style: theme.textTheme.labelSmall?.copyWith(
+                  letterSpacing: 1.2,
+                  fontWeight: FontWeight.w700,
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+              const Spacer(),
+              if (forecast != null && forecast!.hasData)
+                _TagBadge(
+                  label: forecast!.lastsBeyondHorizon
+                      ? '${forecast!.horizonDays}+ DAYS'
+                      : '${forecast!.daysRemaining} DAYS',
+                  alert:
+                      forecast!.daysRemaining != null &&
+                      forecast!.daysRemaining! <= 7,
+                ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          if (forecast == null)
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 20),
+              child: Center(child: CircularProgressIndicator()),
+            )
+          else if (!forecast!.hasData)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 6),
+              child: Text(
+                'Log a spend or set a repeating fare and Zaka will show '
+                'the day your money runs out.',
+                style: theme.textTheme.bodyMedium?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                   height: 1.4,
                 ),
               ),
-              const SizedBox(height: 14),
-              RunwaySparkline(
-                points: forecast!.points.take(31).toList(growable: false),
-                color:
-                    forecast!.daysRemaining != null &&
-                        forecast!.daysRemaining! <= 7
-                    ? theme.colorScheme.error
-                    : theme.colorScheme.primary,
-              ),
-              const SizedBox(height: 14),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: [
-                  _InfoChip(
-                    icon: Icons.local_fire_department_rounded,
-                    label: '${formatCents(forecast!.dailyBurnCents)}/day',
+            )
+          else ...[
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  forecast!.daysRemaining == null
+                      ? '${forecast!.horizonDays}+'
+                      : '${forecast!.daysRemaining}',
+                  style: theme.textTheme.displaySmall?.copyWith(
+                    fontSize: 36,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: -1.0,
+                    height: 1.0,
                   ),
-                  if (forecast!.hasCommitments)
-                    _InfoChip(
-                      icon: Icons.repeat_rounded,
-                      label:
-                          '${formatCents(forecast!.recurringUpcomingCents)} scheduled',
+                ),
+                const SizedBox(width: 8),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 2),
+                  child: Text(
+                    forecast!.daysRemaining == 1
+                        ? 'day of money left'
+                        : 'days of money left',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
                     ),
-                ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(
+              _runwayMessage(forecast!),
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+                height: 1.4,
               ),
-            ],
+            ),
+            const SizedBox(height: 12),
+            RunwaySparkline(
+              points: forecast!.points.take(31).toList(growable: false),
+              color:
+                  forecast!.daysRemaining != null &&
+                      forecast!.daysRemaining! <= 7
+                  ? theme.colorScheme.error
+                  : theme.colorScheme.onSurface,
+            ),
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                _TelemetryChip(
+                  icon: Boxicons.bxs_flame,
+                  label: '${formatCents(forecast!.dailyBurnCents)} / day',
+                ),
+                if (forecast!.hasCommitments)
+                  _TelemetryChip(
+                    icon: Boxicons.bx_repeat,
+                    label:
+                        '${formatCents(forecast!.recurringUpcomingCents)} scheduled',
+                  ),
+              ],
+            ),
           ],
-        ),
+        ],
       ),
     );
   }
@@ -621,31 +577,135 @@ class _RunwayCard extends StatelessWidget {
   }
 }
 
-class _Pill extends StatelessWidget {
-  const _Pill({required this.label, required this.color});
+/// Editorial Intelligence Dispatch layout.
+/// Features a crisp 3px accent border on the left, clear typography, and discrete actions.
+class _AdvisorDispatch extends StatelessWidget {
+  const _AdvisorDispatch({
+    required this.summary,
+    required this.consented,
+    required this.onOpen,
+  });
 
-  final String label;
-  final Color color;
+  final AsyncValue<AdvisorSummary> summary;
+  final bool consented;
+  final VoidCallback onOpen;
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final border = isDark ? const Color(0xFF27272A) : const Color(0xFFE4E4E7);
+    final bg = isDark ? const Color(0xFF09090B) : Colors.white;
+    final fg = theme.colorScheme.onSurface;
+
+    final tip = summary.value == null
+        ? 'Log a few spends and Zaka will turn them into a plain-language '
+              'cash-flow tip.'
+        : offlineTip(summary.value!);
+
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(99),
+        color: bg,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: border, width: 1),
       ),
-      child: Text(
-        label,
-        style: Theme.of(context).textTheme.labelSmall
-            ?.copyWith(color: color, fontWeight: FontWeight.w700),
+      padding: const EdgeInsets.fromLTRB(18, 16, 18, 14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Boxicons.bx_star, size: 18, color: fg),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'Ask Zaka',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+              _TagBadge(
+                label: consented ? 'ONLINE' : 'OFFLINE',
+                alert: false,
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Text(
+            tip,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              height: 1.5,
+              color: fg,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  'Tips, not financial advice.',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ),
+              TextButton(
+                onPressed: onOpen,
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  minimumSize: const Size(0, 36),
+                ),
+                child: Text(consented ? 'Get tips' : 'Set up'),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
 }
 
-class _InfoChip extends StatelessWidget {
-  const _InfoChip({required this.icon, required this.label});
+class _TagBadge extends StatelessWidget {
+  const _TagBadge({required this.label, required this.alert});
+
+  final String label;
+  final bool alert;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    final color = alert
+        ? theme.colorScheme.error
+        : (isDark ? const Color(0xFFA1A1AA) : const Color(0xFF71717A));
+    final borderColor = alert
+        ? theme.colorScheme.error
+        : (isDark ? const Color(0xFF3F3F46) : const Color(0xFFD4D4D8));
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(color: borderColor, width: 1),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          color: color,
+          fontSize: 10,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 0.8,
+        ),
+      ),
+    );
+  }
+}
+
+class _TelemetryChip extends StatelessWidget {
+  const _TelemetryChip({required this.icon, required this.label});
 
   final IconData icon;
   final String label;
@@ -653,21 +713,26 @@ class _InfoChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final border = isDark ? const Color(0xFF27272A) : const Color(0xFFE4E4E7);
+    final bg = isDark ? const Color(0xFF141416) : const Color(0xFFF4F4F5);
+
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
-        borderRadius: BorderRadius.circular(99),
+        color: bg,
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: border, width: 1),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(icon, size: 14, color: theme.colorScheme.onSurfaceVariant),
-          const SizedBox(width: 5),
+          const SizedBox(width: 6),
           Text(
             label,
             style: theme.textTheme.labelSmall?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
+              color: theme.colorScheme.onSurface,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -685,13 +750,14 @@ class _CategoryBreakdown extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     final entries = totals.entries.where((entry) => entry.value > 0).toList()
       ..sort((a, b) => b.value.compareTo(a.value));
 
     if (entries.isEmpty) {
       return Card(
         child: Padding(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(18),
           child: Text(
             'No spends in the last 7 days. Logged and imported spends show '
             'up here.',
@@ -708,15 +774,15 @@ class _CategoryBreakdown extends StatelessWidget {
 
     return Card(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(18, 18, 18, 6),
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 6),
         child: Column(
           children: [
             for (final entry in entries)
               Padding(
-                padding: const EdgeInsets.only(bottom: 14),
+                padding: const EdgeInsets.only(bottom: 12),
                 child: Row(
                   children: [
-                    CategoryAvatar(category: entry.key, size: 38),
+                    CategoryAvatar(category: entry.key, size: 36),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Column(
@@ -732,21 +798,23 @@ class _CategoryBreakdown extends StatelessWidget {
                               ),
                               Text(
                                 formatCents(entry.value),
-                                style: theme.textTheme.labelLarge,
+                                style: theme.textTheme.labelLarge?.copyWith(
+                                  fontWeight: FontWeight.w700,
+                                ),
                               ),
                             ],
                           ),
                           const SizedBox(height: 6),
                           ClipRRect(
-                            borderRadius: BorderRadius.circular(99),
+                            borderRadius: BorderRadius.circular(2),
                             child: LinearProgressIndicator(
                               value: entry.value / maxAmount,
-                              minHeight: 6,
-                              backgroundColor: entry.key.color.withValues(
-                                alpha: 0.12,
-                              ),
+                              minHeight: 4,
+                              backgroundColor: isDark
+                                  ? const Color(0xFF27272A)
+                                  : const Color(0xFFE4E4E7),
                               valueColor: AlwaysStoppedAnimation<Color>(
-                                entry.key.color,
+                                theme.colorScheme.onSurface,
                               ),
                             ),
                           ),
@@ -775,7 +843,7 @@ class _RecentActivity extends StatelessWidget {
     if (entries.isEmpty) {
       return Card(
         child: Padding(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(18),
           child: Text(
             'Nothing yet. Tap “Log cash” whenever you spend, or import a bank '
             'statement from Accounts.',

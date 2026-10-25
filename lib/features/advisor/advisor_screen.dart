@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_boxicons/flutter_boxicons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../providers.dart';
@@ -152,8 +153,8 @@ class _AdvisorScreenState extends ConsumerState<AdvisorScreen> {
                   Row(
                     children: [
                       Icon(
-                        Icons.auto_awesome_rounded,
-                        color: theme.colorScheme.primary,
+                        Boxicons.bx_star,
+                        color: theme.colorScheme.onSurface,
                       ),
                       const SizedBox(width: 8),
                       Text(
@@ -189,7 +190,7 @@ class _AdvisorScreenState extends ConsumerState<AdvisorScreen> {
           _SummaryCard(summary: summary),
           const SizedBox(height: 14),
           _SectionCard(
-            icon: Icons.block_rounded,
+            icon: Boxicons.bx_block,
             title: 'What is never sent',
             children: const [
               _Bullet('Spend notes or transaction descriptions'),
@@ -201,7 +202,7 @@ class _AdvisorScreenState extends ConsumerState<AdvisorScreen> {
           ),
           const SizedBox(height: 14),
           _SectionCard(
-            icon: Icons.shield_outlined,
+            icon: Boxicons.bx_shield,
             title: 'How the proxy protects it',
             children: const [
               _Bullet('Only POST requests are accepted.'),
@@ -224,11 +225,9 @@ class _AdvisorScreenState extends ConsumerState<AdvisorScreen> {
               onChanged: busy || consentLoading ? null : _setConsent,
               secondary: Icon(
                 consented
-                    ? Icons.lock_open_rounded
-                    : Icons.lock_outline_rounded,
-                color: consented
-                    ? theme.colorScheme.primary
-                    : theme.colorScheme.onSurfaceVariant,
+                    ? Boxicons.bx_lock_open_alt
+                    : Boxicons.bx_lock_alt,
+                color: theme.colorScheme.onSurface,
               ),
               title: const Text('Allow Ask Zaka'),
               subtitle: Text(
@@ -270,8 +269,8 @@ class _AdvisorScreenState extends ConsumerState<AdvisorScreen> {
                   )
                 : Icon(
                     consented
-                        ? Icons.auto_awesome_rounded
-                        : Icons.lock_open_rounded,
+                        ? Boxicons.bx_star
+                        : Boxicons.bx_lock_open_alt,
                   ),
             label: Text(
               consented ? 'Get tips from Gemini' : 'Turn on Ask Zaka',
@@ -280,7 +279,6 @@ class _AdvisorScreenState extends ConsumerState<AdvisorScreen> {
           if (_reply != null) ...[
             const SizedBox(height: 14),
             Card(
-              color: theme.colorScheme.primaryContainer.withValues(alpha: 0.5),
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(18, 16, 18, 18),
                 child: Column(
@@ -289,8 +287,8 @@ class _AdvisorScreenState extends ConsumerState<AdvisorScreen> {
                     Row(
                       children: [
                         Icon(
-                          Icons.lightbulb_outline_rounded,
-                          color: theme.colorScheme.primary,
+                          Boxicons.bx_bulb,
+                          color: theme.colorScheme.onSurface,
                         ),
                         const SizedBox(width: 8),
                         Text(
@@ -345,7 +343,7 @@ class _AdvisorScreenState extends ConsumerState<AdvisorScreen> {
                     height: 18,
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
-                : const Icon(Icons.delete_forever_rounded),
+                : const Icon(Boxicons.bx_trash),
             label: const Text('Delete everything'),
           ),
           const SizedBox(height: 18),
@@ -379,8 +377,8 @@ class _SummaryCard extends StatelessWidget {
             Row(
               children: [
                 Icon(
-                  Icons.data_object_rounded,
-                  color: theme.colorScheme.primary,
+                  Boxicons.bx_code_alt,
+                  color: theme.colorScheme.onSurface,
                 ),
                 const SizedBox(width: 8),
                 Expanded(
@@ -452,8 +450,8 @@ class _OfflineTipCard extends StatelessWidget {
             Row(
               children: [
                 Icon(
-                  Icons.offline_bolt_rounded,
-                  color: theme.colorScheme.primary,
+                  Boxicons.bx_bolt_circle,
+                  color: theme.colorScheme.onSurface,
                 ),
                 const SizedBox(width: 8),
                 Text('Offline preview', style: theme.textTheme.titleSmall),
@@ -500,7 +498,7 @@ class _SectionCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                Icon(icon, color: theme.colorScheme.primary),
+                Icon(icon, color: theme.colorScheme.onSurface),
                 const SizedBox(width: 8),
                 Text(title, style: theme.textTheme.titleMedium),
               ],
@@ -533,7 +531,7 @@ class _Bullet extends StatelessWidget {
               width: 5,
               height: 5,
               decoration: BoxDecoration(
-                color: theme.colorScheme.primary,
+                color: theme.colorScheme.onSurfaceVariant,
                 shape: BoxShape.circle,
               ),
             ),

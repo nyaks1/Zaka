@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_boxicons/flutter_boxicons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/dates.dart';
@@ -125,7 +126,7 @@ class _AddWithdrawalScreenState extends ConsumerState<AddWithdrawalScreen> {
             Card(
               child: ListTile(
                 contentPadding: const EdgeInsets.fromLTRB(18, 2, 12, 2),
-                leading: const Icon(Icons.account_balance_wallet_rounded),
+                leading: const Icon(Boxicons.bx_wallet),
                 title: Text('Add to', style: theme.textTheme.titleSmall),
                 trailing: DropdownButton<int>(
                   value: accountId,
@@ -161,13 +162,13 @@ class _AddWithdrawalScreenState extends ConsumerState<AddWithdrawalScreen> {
                 horizontal: 18,
                 vertical: 6,
               ),
-              leading: const Icon(Icons.event_rounded),
+              leading: const Icon(Boxicons.bx_calendar),
               title: Text(
                 '${dayLabel(_when)} · ${timeOfDay(_when)}',
                 style: theme.textTheme.titleSmall,
               ),
               subtitle: const Text('Tap to change the date'),
-              trailing: const Icon(Icons.chevron_right_rounded),
+              trailing: const Icon(Boxicons.bx_chevron_right),
               onTap: _pickDate,
             ),
           ),
@@ -185,7 +186,7 @@ class _AddWithdrawalScreenState extends ConsumerState<AddWithdrawalScreen> {
                   height: 18,
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
-              : const Icon(Icons.add_rounded),
+              : const Icon(Boxicons.bx_plus),
           label: Text(
             cents == null ? 'Add money' : 'Add ${formatCents(cents)}',
           ),

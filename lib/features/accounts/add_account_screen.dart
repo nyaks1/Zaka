@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_boxicons/flutter_boxicons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/money.dart';
@@ -160,7 +161,7 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
                   height: 18,
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
-              : const Icon(Icons.add_rounded),
+              : const Icon(Boxicons.bx_plus),
           label: const Text('Add account'),
         ),
       ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_boxicons/flutter_boxicons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/dates.dart';
@@ -110,7 +111,7 @@ class _ActivityScreenState extends ConsumerState<ActivityScreen> {
         heroTag: 'activity-log-fab',
         onPressed: _openQuickLog,
         tooltip: 'Log cash',
-        child: const Icon(Icons.add_rounded),
+        child: const Icon(Boxicons.bx_plus),
       ),
       body: Column(
         children: [
@@ -144,7 +145,7 @@ class _ActivityScreenState extends ConsumerState<ActivityScreen> {
           Expanded(
             child: entries.isEmpty
                 ? EmptyState(
-                    icon: Icons.receipt_long_rounded,
+                    icon: Boxicons.bx_receipt,
                     title: hasAny
                         ? 'Nothing in this filter'
                         : 'No activity yet',
@@ -156,7 +157,7 @@ class _ActivityScreenState extends ConsumerState<ActivityScreen> {
                         ? null
                         : FilledButton.icon(
                             onPressed: _openQuickLog,
-                            icon: const Icon(Icons.bolt_rounded),
+                            icon: const Icon(Boxicons.bx_bolt_circle),
                             label: const Text('Log your first spend'),
                           ),
                   )
