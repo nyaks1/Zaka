@@ -130,16 +130,9 @@ class AccountsScreen extends ConsumerWidget {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, _) => Center(child: Text('Could not load: $error')),
         data: (items) {
-          final total = items.fold<int>(
-            0,
-            (sum, balance) => sum + balance.balanceCents,
-          );
-
           return ListView(
-            padding: const EdgeInsets.fromLTRB(16, 4, 16, 100),
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 100),
             children: [
-              _TotalCard(totalCents: total, accountCount: items.length),
-              const SizedBox(height: 22),
               SectionHeader(
                 title: 'Your accounts',
                 trailing: Text(
@@ -177,8 +170,7 @@ class AccountsScreen extends ConsumerWidget {
                   ),
                   title: const Text('Automatic bank sync'),
                   subtitle: const Text(
-                    'Import an FNB CSV today. Live sync needs Stitch and a '
-                    'backend.',
+                    'Import a PDF or CSV statement. Live bank sync is coming.',
                   ),
                   trailing: const Icon(Boxicons.bx_info_circle),
                   onTap: () => _showBankSyncInfo(context),
@@ -187,74 +179,6 @@ class AccountsScreen extends ConsumerWidget {
             ],
           );
         },
-      ),
-    );
-  }
-}
-
-class _TotalCard extends StatelessWidget {
-  const _TotalCard({required this.totalCents, required this.accountCount});
-
-  final int totalCents;
-  final int accountCount;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-
-    return Container(
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF141416) : const Color(0xFFFAFAFA),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: isDark ? const Color(0xFF27272A) : const Color(0xFFE4E4E7),
-          width: 1,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Text(
-                'TOTAL ACROSS ALL ACCOUNTS',
-                style: theme.textTheme.labelSmall?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
-                  letterSpacing: 1.2,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              const Spacer(),
-              Icon(
-                Boxicons.bx_wallet,
-                size: 18,
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          FittedBox(
-            fit: BoxFit.scaleDown,
-            alignment: Alignment.centerLeft,
-            child: Text(
-              formatCents(totalCents),
-              style: theme.textTheme.displaySmall?.copyWith(
-                fontWeight: FontWeight.w700,
-                fontSize: 40,
-                letterSpacing: -1.0,
-              ),
-            ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            accountCount == 1 ? '1 account' : '$accountCount accounts',
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -277,10 +201,10 @@ class _AccountCard extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
     final account = balance.account;
     final negative = balance.balanceCents < 0;
-    final subtitle = [
+    final subtitle = {
       if (account.institution.isNotEmpty) account.institution,
       _kindLabel(account.kind),
-    ].join(' · ');
+    }.join(' · ');
 
     return Card(
       child: Padding(

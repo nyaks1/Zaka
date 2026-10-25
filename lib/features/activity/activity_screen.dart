@@ -107,12 +107,14 @@ class _ActivityScreenState extends ConsumerState<ActivityScreen> {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Activity')),
-      floatingActionButton: FloatingActionButton(
-        heroTag: 'activity-log-fab',
-        onPressed: _openQuickLog,
-        tooltip: 'Log cash',
-        child: const Icon(Boxicons.bx_plus),
-      ),
+      floatingActionButton: entries.isEmpty
+          ? null
+          : FloatingActionButton(
+              heroTag: 'activity-log-fab',
+              onPressed: _openQuickLog,
+              tooltip: 'Log cash',
+              child: const Icon(Boxicons.bx_plus),
+            ),
       body: Column(
         children: [
           Padding(
@@ -133,7 +135,7 @@ class _ActivityScreenState extends ConsumerState<ActivityScreen> {
                   ),
                   ButtonSegment(
                     value: ActivityFilter.transfers,
-                    label: Text('Cash moves'),
+                    label: Text('Cash'),
                   ),
                 ],
                 selected: {_filter},

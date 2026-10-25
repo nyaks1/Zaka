@@ -69,12 +69,14 @@ class RecurringScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Recurring')),
-      floatingActionButton: FloatingActionButton.extended(
-        heroTag: 'new-recurring-fab',
-        onPressed: () => _openNew(context),
-        icon: const Icon(Boxicons.bx_repeat),
-        label: const Text('New'),
-      ),
+      floatingActionButton: (rules.value?.isNotEmpty == true)
+          ? FloatingActionButton.extended(
+              heroTag: 'new-recurring-fab',
+              onPressed: () => _openNew(context),
+              icon: const Icon(Boxicons.bx_repeat),
+              label: const Text('New'),
+            )
+          : null,
       body: rules.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, _) => Center(child: Text('Could not load: $error')),

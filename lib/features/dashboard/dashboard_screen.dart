@@ -17,6 +17,7 @@ import '../advisor/advisor_service.dart';
 import '../advisor/advisor_summary.dart';
 import '../spending/quick_log_screen.dart';
 import '../withdrawals/add_withdrawal_screen.dart';
+import '../../data/sample_data.dart';
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
@@ -75,18 +76,29 @@ class DashboardScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        title: Row(
           children: [
-            const Text('Zaka'),
-            Text(
-              DateFormat('EEEE · d MMMM').format(DateTime.now()).toUpperCase(),
-              style: theme.textTheme.labelSmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-                letterSpacing: 1.0,
-                fontSize: 10,
-                fontWeight: FontWeight.w700,
-              ),
+            Image.asset(
+              'assets/logo.png',
+              width: 28,
+              height: 28,
+              errorBuilder: (_, _, _) => const SizedBox.shrink(),
+            ),
+            const SizedBox(width: 10),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Zaka'),
+                Text(
+                  DateFormat('EEEE · d MMMM').format(DateTime.now()).toUpperCase(),
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                    letterSpacing: 1.0,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -95,11 +107,6 @@ class DashboardScreen extends ConsumerWidget {
             tooltip: 'Privacy & Ask Zaka',
             onPressed: () => _openAdvisor(context),
             icon: const Icon(Boxicons.bx_cog),
-          ),
-          IconButton(
-            tooltip: 'Add money',
-            onPressed: () => _openWithdrawal(context),
-            icon: const Icon(Boxicons.bx_plus),
           ),
           const SizedBox(width: 8),
         ],
@@ -140,8 +147,15 @@ class DashboardScreen extends ConsumerWidget {
               ref.read(recurringServiceProvider).postDue(DateTime.now()),
           child: ListView(
             physics: const AlwaysScrollableScrollPhysics(),
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 120),
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 96),
             children: [
+              if (cash.balanceCents == 0 &&
+                  cash.moneyInCents == 0 &&
+                  cash.moneyOutCents == 0 &&
+                  entries.isEmpty) ...[
+                _FirstRunLandingCard(ref: ref),
+                const SizedBox(height: 14),
+              ],
               _CapitalOverview(
                 summary: cash,
                 accounts: accountBalances,
@@ -458,11 +472,10 @@ class _RunwayTelemetry extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Text(
-                'MONEY RUNWAY',
-                style: theme.textTheme.labelSmall?.copyWith(
-                  letterSpacing: 1.2,
+                'Money runway',
+                style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w700,
-                  color: theme.colorScheme.onSurfaceVariant,
+                  color: theme.colorScheme.onSurface,
                 ),
               ),
               const Spacer(),
@@ -626,7 +639,7 @@ class _AdvisorDispatch extends StatelessWidget {
                 ),
               ),
               _TagBadge(
-                label: consented ? 'ONLINE' : 'OFFLINE',
+                label: consented ? 'Tips on' : 'Tips off',
                 alert: false,
               ),
             ],
@@ -868,3 +881,95 @@ class _RecentActivity extends StatelessWidget {
     );
   }
 }
+
+class _FirstRunLandingCard extends StatefulWidget {
+  const _FirstRunLandingCard({required this.ref});
+
+  final WidgetRef ref;
+
+  @override
+  State<_FirstRunLandingCard> createState() => _FirstRunLandingCardState();
+}
+
+class _FirstRunLandingCardState extends State<_FirstRunLandingCard> {
+  bool _loading = false;
+
+  Future<void> _load() async {
+    setState(() => _loading = true);
+    try {
+      await loadSampleData(widget.ref);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Sample data loaded.')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Could not load sample data: $e')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final border = isDark ? const Color(0xFF27272A) : const Color(0xFFE4E4E7);
+    final bg = isDark ? const Color(0xFF09090B) : Colors.white;
+
+    return Container(
+      padding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: border, width: 1),
+      ),
+      child: Column(
+        children: [
+          Image.asset(
+            'assets/landing.png',
+            height: 120,
+            fit: BoxFit.contain,
+            errorBuilder: (_, _, _) => const SizedBox.shrink(),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'Private Cash Runway',
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            'Zaka tracks daily cash flow, recurring fares, and predicts when money runs out without cloud syncing.',
+            textAlign: TextAlign.center,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+              height: 1.4,
+            ),
+          ),
+          const SizedBox(height: 16),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              onPressed: _loading ? null : _load,
+              icon: _loading
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Boxicons.bx_bolt_circle, size: 16),
+              label: const Text('Try with sample data'),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+

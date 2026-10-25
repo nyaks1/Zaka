@@ -200,8 +200,22 @@ abstract final class ZakaTheme {
         elevation: 0,
         backgroundColor: bg,
         surfaceTintColor: Colors.transparent,
-        indicatorColor: isDark ? const Color(0xFF27272A) : const Color(0xFFE4E4E7),
+        indicatorColor: Colors.transparent,
         labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+        iconTheme: WidgetStateProperty.resolveWith((states) => IconThemeData(
+          color: states.contains(WidgetState.selected)
+              ? (isDark ? Colors.white : Colors.black)
+              : (isDark ? Colors.white54 : Colors.black45),
+        )),
+        labelTextStyle: WidgetStateProperty.resolveWith((states) => TextStyle(
+          color: states.contains(WidgetState.selected)
+              ? (isDark ? Colors.white : Colors.black)
+              : (isDark ? Colors.white54 : Colors.black45),
+          fontWeight: states.contains(WidgetState.selected)
+              ? FontWeight.w600
+              : FontWeight.w500,
+          fontSize: 12,
+        )),
       ),
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
