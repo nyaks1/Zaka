@@ -1,0 +1,501 @@
+﻿
+10-25 11:52:38.945 D/BarFollowAnimation( 2685): pairAppearanceRegionAndWin win=Window{a31af6f u0 
+za.co.zaka.zaka/za.co.zaka.zaka.MainActivity} 8
+10-25 11:52:39.433 I/MiuiInputUtil( 2685): MiuiSpecialWindowInfo: a31af6f za.co.zaka.zaka/za.co.zaka.zaka.MainActivity(
+11,0x0,0x0,[0,0,1220,2712],1.00);GestureStubLeft(6,0x104,0x0,[0,260,62,2635],1.00);GestureStubRight(5,0x104,0x0,[1158,2
+60,1220,2635],1.00);GestureStubHome<none>;GestureStub(7,0x104,0x0,[0,2649,1220,2712],1.00);StatusBar1<none>;StatusBar(9
+,0x104,0x0,[0,0,1220,130],1.00);
+10-25 11:52:39.434 I/MIUIInput( 2685): [MotionEvent] publisher action=0x0, deviceId=7, 1019996608, channel 'a31af6f 
+za.co.zaka.zaka/za.co.zaka.zaka.MainActivity'
+10-25 11:52:39.434 I/MIUIInput( 1892): [MotionEvent] ViewRootImpl windowName 
+'za.co.zaka.zaka/za.co.zaka.zaka.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=1019996608, 
+downTime=1019996608, phoneEventTime=1792921959432 } moveCount:0
+10-25 11:52:39.445 D/BarFollowAnimation( 2685): pairAppearanceRegionAndWin win=Window{a31af6f u0 
+za.co.zaka.zaka/za.co.zaka.zaka.MainActivity} 8
+10-25 11:52:39.460 D/BarFollowAnimation( 2685): pairAppearanceRegionAndWin win=Window{a31af6f u0 
+za.co.zaka.zaka/za.co.zaka.zaka.MainActivity} 8
+10-25 11:52:39.541 I/MIUIInput( 2685): [MotionEvent] publisher action=0x1, deviceId=7, 1019996715, channel 'a31af6f 
+za.co.zaka.zaka/za.co.zaka.zaka.MainActivity'
+10-25 11:52:39.541 I/MIUIInput( 1892): [MotionEvent] ViewRootImpl windowName 
+'za.co.zaka.zaka/za.co.zaka.zaka.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=1019996715, 
+downTime=1019996608, phoneEventTime=1792921959540 } moveCount:0
+10-25 11:52:39.544 I/ImeTracker( 1892): za.co.zaka.zaka:c7ace585: onRequestShow at ORIGIN_CLIENT reason 
+SHOW_SOFT_INPUT fromUser false
+10-25 11:52:39.545 D/InsetsController( 1892): za.co.zaka.zaka/za.co.zaka.zaka.MainActivity  show: ime 
+android.view.InsetsController@c381d29 android.view.InsetsController.applyAnimation:2241 
+android.view.InsetsController.applyAnimation:2212 android.view.InsetsController.show:1321 
+android.view.inputmethod.InputMethodManager.showSoftInput:2587 
+android.view.inputmethod.InputMethodManager.showSoftInput:2471 
+android.view.inputmethod.InputMethodManager.showSoftInput:2463 
+10-25 11:52:39.545 I/DisplayPolicyStubImpl( 2685): boost for touch up, package:za.co.zaka.zaka
+10-25 11:52:39.548 D/WindowManager( 2685): updateSystemBarAttributes displayId: 0 Window{a31af6f u0 
+za.co.zaka.zaka/za.co.zaka.zaka.MainActivity} winAppearance=LIGHT_STATUS_BARS
+10-25 11:52:39.548 D/WmSystemUiDebug( 2685): on system bar attributes changed displayId=0 appearance=LIGHT_STATUS_BARS 
+appearanceRegions=[AppearanceRegion{LIGHT_STATUS_BARS bounds=[0,0][1220,2712]}] navbarColorManagedByIme=false 
+behavior=1 requestedVisibleTypes=[statusBars navigationBars captionBar ime systemGestures mandatorySystemGestures 
+tappableElement displayCutout windowDecor systemOverlays] packageName=za.co.zaka.zaka letterboxDetails=[]
+10-25 11:52:39.549 D/BarFollowAnimation( 2685): onTaskInfoChanedForCaptionBar Task{1736ffe #4034 type=standard 
+I=za.co.zaka.zaka/.MainActivity} shouldbeVisible:true isVisible:true isOnTop:true windowMode:1 preDisplayId:-1 
+displayId:0 mCaptionAssociatedTask:null mIsTouchedInCaption:false
+10-25 11:52:39.550 D/BarFollowAnimation( 2685): pairAppearanceRegionAndWin win=Window{a31af6f u0 
+za.co.zaka.zaka/za.co.zaka.zaka.MainActivity} 8
+10-25 11:52:39.554 D/MiuiDecorationController( 5328): relayout::taskId=4034, visible=true, bounds=Rect(0, 0 - 1220, 
+2712), focused=true, oldImmersive=false, newImmersive=false, windowMode=1, activityType=1, displayId=0, 
+baseActivity=ComponentInfo{za.co.zaka.zaka/za.co.zaka.zaka.MainActivity}, 
+topActivity=ComponentInfo{za.co.zaka.zaka/za.co.zaka.zaka.MainActivity}, callers=com.android.wm.shell.multitasking.miui
+multiwinswitch.miuiwindowdecor.decoration.MiuiDecorationController.relayout:4 
+com.android.wm.shell.multitasking.miuimultiwinswitch.miuiwindowdecor.MulWinSwitchDecorViewModel.onTaskInfoChanged:18 
+com.android.wm.shell.multitasking.common.taskmanager.MultiTaskingTaskListener.onTaskInfoChanged:47 
+com.android.wm.shell.ShellTaskOrganizer.onTaskInfoChanged:136 
+android.window.TaskOrganizer$1.lambda$onTaskInfoChanged$6:300 
+10-25 11:52:39.555 I/GoogleInputMethodService( 9097): GoogleInputMethodService.onStartInputView():1638 
+onStartInputView(EditorInfo{EditorInfo{packageName=za.co.zaka.zaka, inputType=2002, inputTypeString=Number, 
+enableLearning=false, autoCorrection=false, autoComplete=false, imeOptions=2000005, privateImeOptions=null, 
+actionName=NEXT, actionLabel=null, initialSelStart=0, initialSelEnd=0, initialCapsMode=0, label=null, fieldId=1, 
+fieldName=null, extras=Bundle[{androidx.core.view.inputmethod.EditorInfoCompat.STYLUS_HANDWRITING_ENABLED=true, 
+hand_writing_keyboard_type=1}], hintText=null, hintLocales=[]}}, false)
+10-25 11:52:39.561 D/ActivityTaskManager( 2685):  setSkipCaptureLayers tr: Task{1736ffe #4034 type=standard 
+I=za.co.zaka.zaka/.MainActivity}
+10-25 11:52:39.572 D/CoreBackPreview( 2685): Window{a31af6f u0 za.co.zaka.zaka/za.co.zaka.zaka.MainActivity}: Setting 
+back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@97ff786, 
+mPriority=0, mIsAnimationCallback=true, mOverrideBehavior=0}
+10-25 11:52:39.574 D/BarFollowAnimation( 2685): pairAppearanceRegionAndWin win=Window{a31af6f u0 
+za.co.zaka.zaka/za.co.zaka.zaka.MainActivity} 8
+10-25 11:52:39.583 D/BarFollowAnimation( 2685): pairAppearanceRegionAndWin win=Window{a31af6f u0 
+za.co.zaka.zaka/za.co.zaka.zaka.MainActivity} 8
+10-25 11:52:39.592 D/BarFollowAnimation( 2685): pairAppearanceRegionAndWin win=Window{a31af6f u0 
+za.co.zaka.zaka/za.co.zaka.zaka.MainActivity} 8
+10-25 11:52:39.594 D/BarFollowAnimation( 2685): pairAppearanceRegionAndWin win=Window{a31af6f u0 
+za.co.zaka.zaka/za.co.zaka.zaka.MainActivity} 8
+10-25 11:52:39.597 D/BarFollowAnimation( 2685): pairAppearanceRegionAndWin win=Window{a31af6f u0 
+za.co.zaka.zaka/za.co.zaka.zaka.MainActivity} 8
+10-25 11:52:39.607 D/BarFollowAnimation( 2685): pairAppearanceRegionAndWin win=Window{a31af6f u0 
+za.co.zaka.zaka/za.co.zaka.zaka.MainActivity} 8
+10-25 11:52:39.623 D/InsetsController( 1892): za.co.zaka.zaka/za.co.zaka.zaka.MainActivity  show: ime 
+android.view.InsetsController@c381d29 android.view.InsetsController.applyAnimation:2241 
+android.view.InsetsController.applyAnimation:2212 android.view.InsetsController.onControlsChanged:1147 
+android.view.ViewRootImpl.onActiveControlsChanged:3360 android.view.ViewRootImpl.handleInsetsControlChanged:3314 
+android.view.ViewRootImpl$W.insetsControlChanged:13894 
+10-25 11:52:40.124 D/InsetsController( 1892): cancelAnimation of types:8 animType:0 
+host:za.co.zaka.zaka/za.co.zaka.zaka.MainActivity invokeCallback=false
+10-25 11:52:40.124 I/ImeTracker( 1892): za.co.zaka.zaka:c7ace585: onShown
+10-25 11:52:40.310 I/DisplayPolicyStubImpl( 2685): boost for touch up failed because of timediff < 1, 
+package:za.co.zaka.zaka
+10-25 11:52:41.611 D/ScrollScenario( 2685): ScrollState: fling end on za.co.zaka.zaka
+10-25 11:52:44.917 D/ScrollScenario( 2685): ScrollState: scroll start on za.co.zaka.zaka
+10-25 11:52:44.941 D/CoreBackPreview( 2685): startBackNavigation currentTask=Task{1736ffe #4034 type=standard 
+I=za.co.zaka.zaka/.MainActivity}, topRunningActivity=ActivityRecord{263509181 u0 za.co.zaka.zaka/.MainActivity t4034}, 
+callbackInfo=OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@97ff786, 
+mPriority=0, mIsAnimationCallback=true, mOverrideBehavior=0}, currentFocus=Window{a31af6f u0 
+za.co.zaka.zaka/za.co.zaka.zaka.MainActivity}
+10-25 11:52:44.943 D/InsetsController( 1892): za.co.zaka.zaka/za.co.zaka.zaka.MainActivity hide: ime 
+android.view.InsetsController@c381d29 android.view.InsetsController.controlWindowInsetsAnimation:1483 
+android.view.ImeBackAnimationController.onBackStarted:101 
+android.window.WindowOnBackInvokedDispatcher$OnBackInvokedCallbackWrapper.lambda$onBackStarted$0:585 
+android.window.WindowOnBackInvokedDispatcher$OnBackInvokedCallbackWrapper.$r8$lambda$4ToXODqn8sufRph7IG5pjjhTGhE:0 
+android.window.WindowOnBackInvokedDispatcher$OnBackInvokedCallbackWrapper$$ExternalSyntheticLambda4.run:0 
+android.os.Handler.handleCallback:1029 
+10-25 11:52:44.944 D/BarFollowAnimation( 2685): pairAppearanceRegionAndWin win=Window{a31af6f u0 
+za.co.zaka.zaka/za.co.zaka.zaka.MainActivity} 8
+10-25 11:52:44.949 D/WindowManager( 2685): updateSystemBarAttributes displayId: 0 Window{a31af6f u0 
+za.co.zaka.zaka/za.co.zaka.zaka.MainActivity} winAppearance=LIGHT_STATUS_BARS
+10-25 11:52:44.950 D/WmSystemUiDebug( 2685): on system bar attributes changed displayId=0 appearance=LIGHT_STATUS_BARS 
+appearanceRegions=[AppearanceRegion{LIGHT_STATUS_BARS bounds=[0,0][1220,2712]}] navbarColorManagedByIme=false 
+behavior=1 requestedVisibleTypes=[statusBars navigationBars captionBar systemGestures mandatorySystemGestures 
+tappableElement displayCutout windowDecor systemOverlays] packageName=za.co.zaka.zaka letterboxDetails=[]
+10-25 11:52:44.950 D/BarFollowAnimation( 2685): onTaskInfoChanedForCaptionBar Task{1736ffe #4034 type=standard 
+I=za.co.zaka.zaka/.MainActivity} shouldbeVisible:true isVisible:true isOnTop:true windowMode:1 preDisplayId:-1 
+displayId:0 mCaptionAssociatedTask:null mIsTouchedInCaption:false
+10-25 11:52:44.952 D/MiuiDecorationController( 5328): relayout::taskId=4034, visible=true, bounds=Rect(0, 0 - 1220, 
+2712), focused=true, oldImmersive=false, newImmersive=false, windowMode=1, activityType=1, displayId=0, 
+baseActivity=ComponentInfo{za.co.zaka.zaka/za.co.zaka.zaka.MainActivity}, 
+topActivity=ComponentInfo{za.co.zaka.zaka/za.co.zaka.zaka.MainActivity}, callers=com.android.wm.shell.multitasking.miui
+multiwinswitch.miuiwindowdecor.decoration.MiuiDecorationController.relayout:4 
+com.android.wm.shell.multitasking.miuimultiwinswitch.miuiwindowdecor.MulWinSwitchDecorViewModel.onTaskInfoChanged:18 
+com.android.wm.shell.multitasking.common.taskmanager.MultiTaskingTaskListener.onTaskInfoChanged:47 
+com.android.wm.shell.ShellTaskOrganizer.onTaskInfoChanged:136 
+android.window.TaskOrganizer$1.lambda$onTaskInfoChanged$6:300 
+10-25 11:52:44.952 D/BarFollowAnimation( 2685): pairAppearanceRegionAndWin win=Window{a31af6f u0 
+za.co.zaka.zaka/za.co.zaka.zaka.MainActivity} 8
+10-25 11:52:44.955 D/BarFollowAnimation( 2685): pairAppearanceRegionAndWin win=Window{a31af6f u0 
+za.co.zaka.zaka/za.co.zaka.zaka.MainActivity} 8
+10-25 11:52:44.961 D/ActivityTaskManager( 2685):  setSkipCaptureLayers tr: Task{1736ffe #4034 type=standard 
+I=za.co.zaka.zaka/.MainActivity}
+10-25 11:52:44.972 D/ScrollScenario( 2685): ScrollState: fling start on za.co.zaka.zaka
+10-25 11:52:44.972 D/ScrollScenario( 2685): ScrollState: scroll end on za.co.zaka.zaka
+10-25 11:52:44.974 I/ImeTracker( 1892): za.co.zaka.zaka:e761f9c8: onRequestHide at ORIGIN_CLIENT reason 
+HIDE_SOFT_INPUT_REQUEST_HIDE_WITH_CONTROL fromUser true
+10-25 11:52:44.978 I/ImeTracker( 1892): za.co.zaka.zaka:e761f9c8: onCancelled at PHASE_CLIENT_ALREADY_HIDDEN
+10-25 11:52:44.979 D/CoreBackPreview( 2685): Window{a31af6f u0 za.co.zaka.zaka/za.co.zaka.zaka.MainActivity}: Setting 
+back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@b1e41e7, 
+mPriority=0, mIsAnimationCallback=true, mOverrideBehavior=0}
+10-25 11:52:45.094 D/BarFollowAnimation( 2685): pairAppearanceRegionAndWin win=Window{a31af6f u0 
+za.co.zaka.zaka/za.co.zaka.zaka.MainActivity} 8
+10-25 11:52:45.103 D/BarFollowAnimation( 2685): pairAppearanceRegionAndWin win=Window{a31af6f u0 
+za.co.zaka.zaka/za.co.zaka.zaka.MainActivity} 8
+10-25 11:52:45.275 D/InsetsController( 1892): cancelAnimation of types:8 animType:2 
+host:za.co.zaka.zaka/za.co.zaka.zaka.MainActivity invokeCallback=false
+10-25 11:52:45.287 I/GoogleInputMethodService( 9097): GoogleInputMethodService.onStartInput():1552 
+onStartInput(EditorInfo{EditorInfo{packageName=za.co.zaka.zaka, inputType=2002, inputTypeString=Number, 
+enableLearning=false, autoCorrection=false, autoComplete=false, imeOptions=2000005, privateImeOptions=null, 
+actionName=NEXT, actionLabel=null, initialSelStart=4, initialSelEnd=4, initialCapsMode=0, label=null, fieldId=1, 
+fieldName=null, extras=Bundle[mParcelledData.dataSize=236], hintText=null, hintLocales=[]}}, true)
+10-25 11:52:45.289 W/PackageConfigPersister( 2685): App-specific configuration not found for packageName: 
+za.co.zaka.zaka and userId: 0
+10-25 11:52:45.294 D/BarFollowAnimation( 2685): pairAppearanceRegionAndWin win=Window{a31af6f u0 
+za.co.zaka.zaka/za.co.zaka.zaka.MainActivity} 8
+10-25 11:52:45.298 D/BarFollowAnimation( 2685): pairAppearanceRegionAndWin win=Window{a31af6f u0 
+za.co.zaka.zaka/za.co.zaka.zaka.MainActivity} 8
+10-25 11:52:45.299 D/BarFollowAnimation( 2685): pairAppearanceRegionAndWin win=Window{a31af6f u0 
+za.co.zaka.zaka/za.co.zaka.zaka.MainActivity} 8
+10-25 11:52:45.620 I/MiuiInputUtil( 2685): MiuiSpecialWindowInfo: a31af6f za.co.zaka.zaka/za.co.zaka.zaka.MainActivity(
+11,0x0,0x0,[0,0,1220,2712],1.00);GestureStubLeft(6,0x104,0x0,[0,260,62,2635],1.00);GestureStubRight(5,0x104,0x0,[1158,2
+60,1220,2635],1.00);GestureStubHome<none>;GestureStub(7,0x104,0x0,[0,2649,1220,2712],1.00);StatusBar1<none>;StatusBar(9
+,0x104,0x0,[0,0,1220,130],1.00);
+10-25 11:52:45.621 I/MIUIInput( 2685): [MotionEvent] publisher action=0x0, deviceId=7, 1020002794, channel 'a31af6f 
+za.co.zaka.zaka/za.co.zaka.zaka.MainActivity'
+10-25 11:52:45.622 I/MIUIInput( 1892): [MotionEvent] ViewRootImpl windowName 
+'za.co.zaka.zaka/za.co.zaka.zaka.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=1020002794, 
+downTime=1020002794, phoneEventTime=1792921965619 } moveCount:0
+10-25 11:52:45.689 I/MIUIInput( 2685): [MotionEvent] publisher action=0x1, deviceId=7, 1020002863, channel 'a31af6f 
+za.co.zaka.zaka/za.co.zaka.zaka.MainActivity'
+10-25 11:52:45.689 I/MIUIInput( 1892): [MotionEvent] ViewRootImpl windowName 
+'za.co.zaka.zaka/za.co.zaka.zaka.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=1020002863, 
+downTime=1020002794, phoneEventTime=1792921965687 } moveCount:0
+10-25 11:52:45.705 I/ImeTracker( 1892): za.co.zaka.zaka:19dd27b4: onRequestHide at ORIGIN_CLIENT reason 
+HIDE_SOFT_INPUT fromUser false
+10-25 11:52:45.706 I/ImeTracker( 1892): za.co.zaka.zaka:19dd27b4: onCancelled at PHASE_CLIENT_ALREADY_HIDDEN
+10-25 11:52:45.706 I/GoogleInputMethodService( 9097): GoogleInputMethodService.onStartInput():1552 
+onStartInput(EditorInfo{EditorInfo{packageName=za.co.zaka.zaka, inputType=0, inputTypeString=NULL, 
+enableLearning=false, autoCorrection=false, autoComplete=false, imeOptions=0, privateImeOptions=null, 
+actionName=UNSPECIFIED, actionLabel=null, initialSelStart=-1, initialSelEnd=-1, initialCapsMode=0, label=null, 
+fieldId=0, fieldName=null, extras=Bundle[mParcelledData.dataSize=72], hintText=null, hintLocales=[]}}, true)
+10-25 11:52:45.709 W/PackageConfigPersister( 2685): App-specific configuration not found for packageName: 
+za.co.zaka.zaka and userId: 0
+10-25 11:52:45.714 D/CoreBackPreview( 2685): Window{a31af6f u0 za.co.zaka.zaka/za.co.zaka.zaka.MainActivity}: Setting 
+back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@e53de65, 
+mPriority=-1, mIsAnimationCallback=false, mOverrideBehavior=0}
+10-25 11:52:45.797 D/BarFollowAnimation( 2685): pairAppearanceRegionAndWin win=Window{a31af6f u0 
+za.co.zaka.zaka/za.co.zaka.zaka.MainActivity} 8
+10-25 11:52:45.805 D/BarFollowAnimation( 2685): pairAppearanceRegionAndWin win=Window{a31af6f u0 
+za.co.zaka.zaka/za.co.zaka.zaka.MainActivity} 8
+10-25 11:52:47.973 D/ScrollScenario( 2685): ScrollState: fling end on za.co.zaka.zaka
+10-25 11:52:48.218 I/MIUIInput( 2685): [MotionEvent] publisher action=0x0, deviceId=7, 1020005392, channel 'a31af6f 
+za.co.zaka.zaka/za.co.zaka.zaka.MainActivity'
+10-25 11:52:48.218 I/MIUIInput( 1892): [MotionEvent] ViewRootImpl windowName 
+'za.co.zaka.zaka/za.co.zaka.zaka.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=1020005392, 
+downTime=1020005392, phoneEventTime=1792921968216 } moveCount:0
+10-25 11:52:48.254 D/ScrollScenario( 2685): ScrollState: scroll start on za.co.zaka.zaka
+10-25 11:52:48.539 I/MIUIInput( 2685): [MotionEvent] publisher action=0x1, deviceId=7, 1020005713, channel 'a31af6f 
+za.co.zaka.zaka/za.co.zaka.zaka.MainActivity'
+10-25 11:52:48.539 I/MIUIInput( 1892): [MotionEvent] ViewRootImpl windowName 
+'za.co.zaka.zaka/za.co.zaka.zaka.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=1020005713, 
+downTime=1020005392, phoneEventTime=1792921968538 } moveCount:72
+10-25 11:52:48.540 D/ScrollScenario( 2685): ScrollState: fling start on za.co.zaka.zaka
+10-25 11:52:48.540 D/ScrollScenario( 2685): ScrollState: scroll end on za.co.zaka.zaka
+10-25 11:52:48.542 I/DisplayPolicyStubImpl( 2685): boost for touch up, package:za.co.zaka.zaka
+10-25 11:52:49.836 I/MIUIInput( 2685): [MotionEvent] publisher action=0x0, deviceId=7, 1020007010, channel 'a31af6f 
+za.co.zaka.zaka/za.co.zaka.zaka.MainActivity'
+10-25 11:52:49.837 I/MIUIInput( 1892): [MotionEvent] ViewRootImpl windowName 
+'za.co.zaka.zaka/za.co.zaka.zaka.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=1020007010, 
+downTime=1020007010, phoneEventTime=1792921969834 } moveCount:0
+10-25 11:52:49.909 I/MIUIInput( 2685): [MotionEvent] publisher action=0x1, deviceId=7, 1020007083, channel 'a31af6f 
+za.co.zaka.zaka/za.co.zaka.zaka.MainActivity'
+10-25 11:52:49.910 I/MIUIInput( 1892): [MotionEvent] ViewRootImpl windowName 
+'za.co.zaka.zaka/za.co.zaka.zaka.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=1020007083, 
+downTime=1020007010, phoneEventTime=1792921969907 } moveCount:0
+10-25 11:52:49.912 I/DisplayPolicyStubImpl( 2685): boost for touch up, package:za.co.zaka.zaka
+10-25 11:52:50.944 I/MIUIInput( 2685): [MotionEvent] publisher action=0x0, deviceId=7, 1020008117, channel 'a31af6f 
+za.co.zaka.zaka/za.co.zaka.zaka.MainActivity'
+10-25 11:52:50.945 I/MIUIInput( 1892): [MotionEvent] ViewRootImpl windowName 
+'za.co.zaka.zaka/za.co.zaka.zaka.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=1020008117, 
+downTime=1020008117, phoneEventTime=1792921970942 } moveCount:0
+10-25 11:52:51.014 I/MIUIInput( 2685): [MotionEvent] publisher action=0x1, deviceId=7, 1020008188, channel 'a31af6f 
+za.co.zaka.zaka/za.co.zaka.zaka.MainActivity'
+10-25 11:52:51.017 I/DisplayPolicyStubImpl( 2685): boost for touch up, package:za.co.zaka.zaka
+10-25 11:52:51.019 I/MIUIInput( 1892): [MotionEvent] ViewRootImpl windowName 
+'za.co.zaka.zaka/za.co.zaka.zaka.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=1020008188, 
+downTime=1020008117, phoneEventTime=1792921971012 } moveCount:6
+10-25 11:52:51.540 D/ScrollScenario( 2685): ScrollState: fling end on za.co.zaka.zaka
+10-25 11:52:52.651 I/MIUIInput( 2685): [MotionEvent] publisher action=0x0, deviceId=7, 1020009824, channel 'a31af6f 
+za.co.zaka.zaka/za.co.zaka.zaka.MainActivity'
+10-25 11:52:52.652 I/MIUIInput( 1892): [MotionEvent] ViewRootImpl windowName 
+'za.co.zaka.zaka/za.co.zaka.zaka.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=1020009824, 
+downTime=1020009824, phoneEventTime=1792921972648 } moveCount:0
+10-25 11:52:52.658 I/MIUIInput( 2685): [MotionEvent] publisher action=0x1, deviceId=7, 1020009832, channel 'a31af6f 
+za.co.zaka.zaka/za.co.zaka.zaka.MainActivity'
+10-25 11:52:52.660 I/MIUIInput( 1892): [MotionEvent] ViewRootImpl windowName 
+'za.co.zaka.zaka/za.co.zaka.zaka.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=1020009832, 
+downTime=1020009824, phoneEventTime=1792921972656 } moveCount:0
+10-25 11:52:52.662 I/DisplayPolicyStubImpl( 2685): boost for touch up, package:za.co.zaka.zaka
+10-25 11:52:53.420 I/MIUIInput( 2685): [MotionEvent] publisher action=0x0, deviceId=7, 1020010592, channel 'a31af6f 
+za.co.zaka.zaka/za.co.zaka.zaka.MainActivity'
+10-25 11:52:53.420 I/MIUIInput( 1892): [MotionEvent] ViewRootImpl windowName 
+'za.co.zaka.zaka/za.co.zaka.zaka.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=1020010592, 
+downTime=1020010592, phoneEventTime=1792921973417 } moveCount:0
+10-25 11:52:53.474 D/ScrollScenario( 2685): ScrollState: scroll start on za.co.zaka.zaka
+10-25 11:52:53.502 I/MIUIInput( 2685): [MotionEvent] publisher action=0x1, deviceId=7, 1020010677, channel 'a31af6f 
+za.co.zaka.zaka/za.co.zaka.zaka.MainActivity'
+10-25 11:52:53.502 I/MIUIInput( 1892): [MotionEvent] ViewRootImpl windowName 
+'za.co.zaka.zaka/za.co.zaka.zaka.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=1020010677, 
+downTime=1020010592, phoneEventTime=1792921973501 } moveCount:16
+10-25 11:52:53.503 D/ScrollScenario( 2685): ScrollState: scroll end on za.co.zaka.zaka
+10-25 11:52:53.504 I/DisplayPolicyStubImpl( 2685): boost for touch up failed because of timediff < 1, 
+package:za.co.zaka.zaka
+10-25 11:52:54.268 I/MIUIInput( 2685): [MotionEvent] publisher action=0x0, deviceId=7, 1020011441, channel 'a31af6f 
+za.co.zaka.zaka/za.co.zaka.zaka.MainActivity'
+10-25 11:52:54.268 I/MIUIInput( 1892): [MotionEvent] ViewRootImpl windowName 
+'za.co.zaka.zaka/za.co.zaka.zaka.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=1020011441, 
+downTime=1020011441, phoneEventTime=1792921974265 } moveCount:0
+10-25 11:52:54.274 I/MIUIInput( 2685): [MotionEvent] publisher action=0x1, deviceId=7, 1020011448, channel 'a31af6f 
+za.co.zaka.zaka/za.co.zaka.zaka.MainActivity'
+10-25 11:52:54.274 I/MIUIInput( 1892): [MotionEvent] ViewRootImpl windowName 
+'za.co.zaka.zaka/za.co.zaka.zaka.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=1020011448, 
+downTime=1020011441, phoneEventTime=1792921974272 } moveCount:0
+10-25 11:52:54.277 I/DisplayPolicyStubImpl( 2685): boost for touch up, package:za.co.zaka.zaka
+10-25 11:52:55.861 I/MIUIInput( 2685): [MotionEvent] publisher action=0x0, deviceId=7, 1020013035, channel 'a31af6f 
+za.co.zaka.zaka/za.co.zaka.zaka.MainActivity'
+10-25 11:52:55.862 I/MIUIInput( 1892): [MotionEvent] ViewRootImpl windowName 
+'za.co.zaka.zaka/za.co.zaka.zaka.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=1020013035, 
+downTime=1020013035, phoneEventTime=1792921975860 } moveCount:0
+10-25 11:52:55.925 I/MIUIInput( 2685): [MotionEvent] publisher action=0x1, deviceId=7, 1020013099, channel 'a31af6f 
+za.co.zaka.zaka/za.co.zaka.zaka.MainActivity'
+10-25 11:52:55.925 I/MIUIInput( 1892): [MotionEvent] ViewRootImpl windowName 
+'za.co.zaka.zaka/za.co.zaka.zaka.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=1020013099, 
+downTime=1020013035, phoneEventTime=1792921975924 } moveCount:0
+10-25 11:52:55.927 I/DisplayPolicyStubImpl( 2685): boost for touch up, package:za.co.zaka.zaka
+10-25 11:52:55.976 D/CoreBackPreview( 2685): Window{a31af6f u0 za.co.zaka.zaka/za.co.zaka.zaka.MainActivity}: Setting 
+back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@c75e0ee, 
+mPriority=0, mIsAnimationCallback=true, mOverrideBehavior=0}
+10-25 11:52:55.979 I/ImeTracker( 1892): za.co.zaka.zaka:9f3c90: onRequestShow at ORIGIN_CLIENT reason SHOW_SOFT_INPUT 
+fromUser false
+10-25 11:52:55.979 D/InsetsController( 1892): za.co.zaka.zaka/za.co.zaka.zaka.MainActivity  show: ime 
+android.view.InsetsController@c381d29 android.view.InsetsController.applyAnimation:2241 
+android.view.InsetsController.applyAnimation:2212 android.view.InsetsController.show:1321 
+android.view.inputmethod.InputMethodManager.showSoftInput:2587 
+android.view.inputmethod.InputMethodManager.showSoftInput:2471 
+android.view.inputmethod.InputMethodManager.showSoftInput:2463 
+10-25 11:52:55.983 I/ImeTracker( 1892): za.co.zaka.zaka:d49bba8c: onRequestShow at ORIGIN_CLIENT reason 
+SHOW_SOFT_INPUT fromUser false
+10-25 11:52:55.984 D/InsetsController( 1892): za.co.zaka.zaka/za.co.zaka.zaka.MainActivity  show: ime 
+android.view.InsetsController@c381d29 android.view.InsetsController.applyAnimation:2241 
+android.view.InsetsController.applyAnimation:2212 android.view.InsetsController.show:1321 
+android.view.inputmethod.InputMethodManager.showSoftInput:2587 
+android.view.inputmethod.InputMethodManager.showSoftInput:2471 
+android.view.inputmethod.InputMethodManager.showSoftInput:2463 
+10-25 11:52:55.984 I/ImeTracker( 1892): za.co.zaka.zaka:d49bba8c: onCancelled at 
+PHASE_CLIENT_REPORT_REQUESTED_VISIBLE_TYPES
+10-25 11:52:55.987 I/GoogleInputMethodService( 9097): GoogleInputMethodService.onStartInput():1552 
+onStartInput(EditorInfo{EditorInfo{packageName=za.co.zaka.zaka, inputType=2002, inputTypeString=Number, 
+enableLearning=false, autoCorrection=false, autoComplete=false, imeOptions=2000005, privateImeOptions=null, 
+actionName=NEXT, actionLabel=null, initialSelStart=-1, initialSelEnd=-1, initialCapsMode=0, label=null, fieldId=1, 
+fieldName=null, extras=Bundle[mParcelledData.dataSize=236], hintText=null, hintLocales=[]}}, true)
+10-25 11:52:55.990 W/PackageConfigPersister( 2685): App-specific configuration not found for packageName: 
+za.co.zaka.zaka and userId: 0
+10-25 11:52:55.990 D/WindowManager( 2685): updateSystemBarAttributes displayId: 0 Window{a31af6f u0 
+za.co.zaka.zaka/za.co.zaka.zaka.MainActivity} winAppearance=LIGHT_STATUS_BARS
+10-25 11:52:55.991 I/GoogleInputMethodService( 9097): GoogleInputMethodService.onStartInputView():1638 
+onStartInputView(EditorInfo{EditorInfo{packageName=za.co.zaka.zaka, inputType=2002, inputTypeString=Number, 
+enableLearning=false, autoCorrection=false, autoComplete=false, imeOptions=2000005, privateImeOptions=null, 
+actionName=NEXT, actionLabel=null, initialSelStart=-1, initialSelEnd=-1, initialCapsMode=0, label=null, fieldId=1, 
+fieldName=null, extras=Bundle[{androidx.core.view.inputmethod.EditorInfoCompat.STYLUS_HANDWRITING_ENABLED=true, 
+hand_writing_keyboard_type=1}], hintText=null, hintLocales=[]}}, false)
+10-25 11:52:55.991 D/WmSystemUiDebug( 2685): on system bar attributes changed displayId=0 appearance=LIGHT_STATUS_BARS 
+appearanceRegions=[AppearanceRegion{LIGHT_STATUS_BARS bounds=[0,0][1220,2712]}] navbarColorManagedByIme=false 
+behavior=1 requestedVisibleTypes=[statusBars navigationBars captionBar ime systemGestures mandatorySystemGestures 
+tappableElement displayCutout windowDecor systemOverlays] packageName=za.co.zaka.zaka letterboxDetails=[]
+10-25 11:52:55.993 D/BarFollowAnimation( 2685): onTaskInfoChanedForCaptionBar Task{1736ffe #4034 type=standard 
+I=za.co.zaka.zaka/.MainActivity} shouldbeVisible:true isVisible:true isOnTop:true windowMode:1 preDisplayId:-1 
+displayId:0 mCaptionAssociatedTask:null mIsTouchedInCaption:false
+10-25 11:52:55.994 D/BarFollowAnimation( 2685): pairAppearanceRegionAndWin win=Window{a31af6f u0 
+za.co.zaka.zaka/za.co.zaka.zaka.MainActivity} 8
+10-25 11:52:55.998 D/MiuiDecorationController( 5328): relayout::taskId=4034, visible=true, bounds=Rect(0, 0 - 1220, 
+2712), focused=true, oldImmersive=false, newImmersive=false, windowMode=1, activityType=1, displayId=0, 
+baseActivity=ComponentInfo{za.co.zaka.zaka/za.co.zaka.zaka.MainActivity}, 
+topActivity=ComponentInfo{za.co.zaka.zaka/za.co.zaka.zaka.MainActivity}, callers=com.android.wm.shell.multitasking.miui
+multiwinswitch.miuiwindowdecor.decoration.MiuiDecorationController.relayout:4 
+com.android.wm.shell.multitasking.miuimultiwinswitch.miuiwindowdecor.MulWinSwitchDecorViewModel.onTaskInfoChanged:18 
+com.android.wm.shell.multitasking.common.taskmanager.MultiTaskingTaskListener.onTaskInfoChanged:47 
+com.android.wm.shell.ShellTaskOrganizer.onTaskInfoChanged:136 
+android.window.TaskOrganizer$1.lambda$onTaskInfoChanged$6:300 
+10-25 11:52:56.002 D/ActivityTaskManager( 2685):  setSkipCaptureLayers tr: Task{1736ffe #4034 type=standard 
+I=za.co.zaka.zaka/.MainActivity}
+10-25 11:52:56.006 D/CoreBackPreview( 2685): Window{a31af6f u0 za.co.zaka.zaka/za.co.zaka.zaka.MainActivity}: Setting 
+back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@e631dfa, 
+mPriority=0, mIsAnimationCallback=true, mOverrideBehavior=0}
+10-25 11:52:56.011 D/BarFollowAnimation( 2685): pairAppearanceRegionAndWin win=Window{a31af6f u0 
+za.co.zaka.zaka/za.co.zaka.zaka.MainActivity} 8
+10-25 11:52:56.025 D/BarFollowAnimation( 2685): pairAppearanceRegionAndWin win=Window{a31af6f u0 
+za.co.zaka.zaka/za.co.zaka.zaka.MainActivity} 8
+10-25 11:52:56.038 D/BarFollowAnimation( 2685): pairAppearanceRegionAndWin win=Window{a31af6f u0 
+za.co.zaka.zaka/za.co.zaka.zaka.MainActivity} 8
+10-25 11:52:56.042 D/BarFollowAnimation( 2685): pairAppearanceRegionAndWin win=Window{a31af6f u0 
+za.co.zaka.zaka/za.co.zaka.zaka.MainActivity} 8
+10-25 11:52:56.047 D/BarFollowAnimation( 2685): pairAppearanceRegionAndWin win=Window{a31af6f u0 
+za.co.zaka.zaka/za.co.zaka.zaka.MainActivity} 8
+10-25 11:52:56.055 D/BarFollowAnimation( 2685): pairAppearanceRegionAndWin win=Window{a31af6f u0 
+za.co.zaka.zaka/za.co.zaka.zaka.MainActivity} 8
+10-25 11:52:56.069 D/InsetsController( 1892): za.co.zaka.zaka/za.co.zaka.zaka.MainActivity  show: ime 
+android.view.InsetsController@c381d29 android.view.InsetsController.applyAnimation:2241 
+android.view.InsetsController.applyAnimation:2212 android.view.InsetsController.onControlsChanged:1147 
+android.view.ViewRootImpl.onActiveControlsChanged:3360 android.view.ViewRootImpl.handleInsetsControlChanged:3314 
+android.view.ViewRootImpl$W.insetsControlChanged:13894 
+10-25 11:52:56.568 D/InsetsController( 1892): cancelAnimation of types:8 animType:0 
+host:za.co.zaka.zaka/za.co.zaka.zaka.MainActivity invokeCallback=false
+10-25 11:52:56.568 I/ImeTracker( 1892): za.co.zaka.zaka:9f3c90: onShown
+10-25 11:52:56.817 D/ScrollScenario( 2685): ScrollState: scroll start on za.co.zaka.zaka
+10-25 11:52:56.836 D/ScrollScenario( 2685): ScrollState: fling start on za.co.zaka.zaka
+10-25 11:52:56.836 D/ScrollScenario( 2685): ScrollState: scroll end on za.co.zaka.zaka
+10-25 11:52:56.843 I/DisplayPolicyStubImpl( 2685): boost for touch up failed because of timediff < 1, 
+package:za.co.zaka.zaka
+10-25 11:52:57.063 D/ScrollScenario( 2685): ScrollState: fling end on za.co.zaka.zaka
+10-25 11:52:57.063 D/ScrollScenario( 2685): ScrollState: scroll start on za.co.zaka.zaka
+10-25 11:52:57.068 D/CoreBackPreview( 2685): startBackNavigation currentTask=Task{1736ffe #4034 type=standard 
+I=za.co.zaka.zaka/.MainActivity}, topRunningActivity=ActivityRecord{263509181 u0 za.co.zaka.zaka/.MainActivity t4034}, 
+callbackInfo=OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@e631dfa, 
+mPriority=0, mIsAnimationCallback=true, mOverrideBehavior=0}, currentFocus=Window{a31af6f u0 
+za.co.zaka.zaka/za.co.zaka.zaka.MainActivity}
+10-25 11:52:57.069 D/InsetsController( 1892): za.co.zaka.zaka/za.co.zaka.zaka.MainActivity hide: ime 
+android.view.InsetsController@c381d29 android.view.InsetsController.controlWindowInsetsAnimation:1483 
+android.view.ImeBackAnimationController.onBackStarted:101 
+android.window.WindowOnBackInvokedDispatcher$OnBackInvokedCallbackWrapper.lambda$onBackStarted$0:585 
+android.window.WindowOnBackInvokedDispatcher$OnBackInvokedCallbackWrapper.$r8$lambda$4ToXODqn8sufRph7IG5pjjhTGhE:0 
+android.window.WindowOnBackInvokedDispatcher$OnBackInvokedCallbackWrapper$$ExternalSyntheticLambda4.run:0 
+android.os.Handler.handleCallback:1029 
+10-25 11:52:57.070 D/BarFollowAnimation( 2685): pairAppearanceRegionAndWin win=Window{a31af6f u0 
+za.co.zaka.zaka/za.co.zaka.zaka.MainActivity} 8
+10-25 11:52:57.076 D/WindowManager( 2685): updateSystemBarAttributes displayId: 0 Window{a31af6f u0 
+za.co.zaka.zaka/za.co.zaka.zaka.MainActivity} winAppearance=LIGHT_STATUS_BARS
+10-25 11:52:57.076 D/WmSystemUiDebug( 2685): on system bar attributes changed displayId=0 appearance=LIGHT_STATUS_BARS 
+appearanceRegions=[AppearanceRegion{LIGHT_STATUS_BARS bounds=[0,0][1220,2712]}] navbarColorManagedByIme=false 
+behavior=1 requestedVisibleTypes=[statusBars navigationBars captionBar systemGestures mandatorySystemGestures 
+tappableElement displayCutout windowDecor systemOverlays] packageName=za.co.zaka.zaka letterboxDetails=[]
+10-25 11:52:57.077 D/BarFollowAnimation( 2685): onTaskInfoChanedForCaptionBar Task{1736ffe #4034 type=standard 
+I=za.co.zaka.zaka/.MainActivity} shouldbeVisible:true isVisible:true isOnTop:true windowMode:1 preDisplayId:-1 
+displayId:0 mCaptionAssociatedTask:null mIsTouchedInCaption:false
+10-25 11:52:57.078 D/BarFollowAnimation( 2685): pairAppearanceRegionAndWin win=Window{a31af6f u0 
+za.co.zaka.zaka/za.co.zaka.zaka.MainActivity} 8
+10-25 11:52:57.079 D/MiuiDecorationController( 5328): relayout::taskId=4034, visible=true, bounds=Rect(0, 0 - 1220, 
+2712), focused=true, oldImmersive=false, newImmersive=false, windowMode=1, activityType=1, displayId=0, 
+baseActivity=ComponentInfo{za.co.zaka.zaka/za.co.zaka.zaka.MainActivity}, 
+topActivity=ComponentInfo{za.co.zaka.zaka/za.co.zaka.zaka.MainActivity}, callers=com.android.wm.shell.multitasking.miui
+multiwinswitch.miuiwindowdecor.decoration.MiuiDecorationController.relayout:4 
+com.android.wm.shell.multitasking.miuimultiwinswitch.miuiwindowdecor.MulWinSwitchDecorViewModel.onTaskInfoChanged:18 
+com.android.wm.shell.multitasking.common.taskmanager.MultiTaskingTaskListener.onTaskInfoChanged:47 
+com.android.wm.shell.ShellTaskOrganizer.onTaskInfoChanged:136 
+android.window.TaskOrganizer$1.lambda$onTaskInfoChanged$6:300 
+10-25 11:52:57.086 D/ActivityTaskManager( 2685):  setSkipCaptureLayers tr: Task{1736ffe #4034 type=standard 
+I=za.co.zaka.zaka/.MainActivity}
+10-25 11:52:57.087 D/BarFollowAnimation( 2685): pairAppearanceRegionAndWin win=Window{a31af6f u0 
+za.co.zaka.zaka/za.co.zaka.zaka.MainActivity} 8
+10-25 11:52:57.130 I/ImeTracker( 1892): za.co.zaka.zaka:9caa87ee: onRequestHide at ORIGIN_CLIENT reason 
+HIDE_SOFT_INPUT_REQUEST_HIDE_WITH_CONTROL fromUser true
+10-25 11:52:57.131 D/CoreBackPreview( 2685): Window{a31af6f u0 za.co.zaka.zaka/za.co.zaka.zaka.MainActivity}: Setting 
+back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@3b6e868, 
+mPriority=0, mIsAnimationCallback=true, mOverrideBehavior=0}
+10-25 11:52:57.131 I/ImeTracker( 1892): za.co.zaka.zaka:9caa87ee: onCancelled at PHASE_CLIENT_ALREADY_HIDDEN
+10-25 11:52:57.131 D/ScrollScenario( 2685): ScrollState: fling start on za.co.zaka.zaka
+10-25 11:52:57.132 D/ScrollScenario( 2685): ScrollState: scroll end on za.co.zaka.zaka
+10-25 11:52:57.252 D/BarFollowAnimation( 2685): pairAppearanceRegionAndWin win=Window{a31af6f u0 
+za.co.zaka.zaka/za.co.zaka.zaka.MainActivity} 8
+10-25 11:52:57.257 D/BarFollowAnimation( 2685): pairAppearanceRegionAndWin win=Window{a31af6f u0 
+za.co.zaka.zaka/za.co.zaka.zaka.MainActivity} 8
+10-25 11:52:57.435 D/InsetsController( 1892): cancelAnimation of types:8 animType:2 
+host:za.co.zaka.zaka/za.co.zaka.zaka.MainActivity invokeCallback=false
+10-25 11:52:57.452 I/GoogleInputMethodService( 9097): GoogleInputMethodService.onStartInput():1552 
+onStartInput(EditorInfo{EditorInfo{packageName=za.co.zaka.zaka, inputType=2002, inputTypeString=Number, 
+enableLearning=false, autoCorrection=false, autoComplete=false, imeOptions=2000005, privateImeOptions=null, 
+actionName=NEXT, actionLabel=null, initialSelStart=0, initialSelEnd=0, initialCapsMode=0, label=null, fieldId=1, 
+fieldName=null, extras=Bundle[mParcelledData.dataSize=236], hintText=null, hintLocales=[]}}, true)
+10-25 11:52:57.453 W/PackageConfigPersister( 2685): App-specific configuration not found for packageName: 
+za.co.zaka.zaka and userId: 0
+10-25 11:52:57.458 D/BarFollowAnimation( 2685): pairAppearanceRegionAndWin win=Window{a31af6f u0 
+za.co.zaka.zaka/za.co.zaka.zaka.MainActivity} 8
+10-25 11:52:57.462 D/BarFollowAnimation( 2685): pairAppearanceRegionAndWin win=Window{a31af6f u0 
+za.co.zaka.zaka/za.co.zaka.zaka.MainActivity} 8
+10-25 11:52:57.466 D/BarFollowAnimation( 2685): pairAppearanceRegionAndWin win=Window{a31af6f u0 
+za.co.zaka.zaka/za.co.zaka.zaka.MainActivity} 8
+10-25 11:52:57.921 I/MiuiInputUtil( 2685): MiuiSpecialWindowInfo: a31af6f za.co.zaka.zaka/za.co.zaka.zaka.MainActivity(
+11,0x0,0x0,[0,0,1220,2712],1.00);GestureStubLeft(6,0x104,0x0,[0,260,62,2635],1.00);GestureStubRight(5,0x104,0x0,[1158,2
+60,1220,2635],1.00);GestureStubHome<none>;GestureStub(7,0x104,0x0,[0,2649,1220,2712],1.00);StatusBar1<none>;StatusBar(9
+,0x104,0x0,[0,0,1220,130],1.00);
+10-25 11:52:57.922 I/MIUIInput( 2685): [MotionEvent] publisher action=0x0, deviceId=7, 1020015095, channel 'a31af6f 
+za.co.zaka.zaka/za.co.zaka.zaka.MainActivity'
+10-25 11:52:57.922 I/MIUIInput( 1892): [MotionEvent] ViewRootImpl windowName 
+'za.co.zaka.zaka/za.co.zaka.zaka.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=1020015095, 
+downTime=1020015095, phoneEventTime=1792921977920 } moveCount:0
+10-25 11:52:57.961 D/BarFollowAnimation( 2685): pairAppearanceRegionAndWin win=Window{a31af6f u0 
+za.co.zaka.zaka/za.co.zaka.zaka.MainActivity} 8
+10-25 11:52:57.980 D/BarFollowAnimation( 2685): pairAppearanceRegionAndWin win=Window{a31af6f u0 
+za.co.zaka.zaka/za.co.zaka.zaka.MainActivity} 8
+10-25 11:52:58.019 I/MIUIInput( 2685): [MotionEvent] publisher action=0x1, deviceId=7, 1020015194, channel 'a31af6f 
+za.co.zaka.zaka/za.co.zaka.zaka.MainActivity'
+10-25 11:52:58.020 I/MIUIInput( 1892): [MotionEvent] ViewRootImpl windowName 
+'za.co.zaka.zaka/za.co.zaka.zaka.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=1020015194, 
+downTime=1020015095, phoneEventTime=1792921978018 } moveCount:0
+10-25 11:52:58.023 I/DisplayPolicyStubImpl( 2685): boost for touch up, package:za.co.zaka.zaka
+10-25 11:52:58.028 I/ImeTracker( 1892): za.co.zaka.zaka:873757e3: onRequestHide at ORIGIN_CLIENT reason 
+HIDE_SOFT_INPUT fromUser false
+10-25 11:52:58.029 I/ImeTracker( 1892): za.co.zaka.zaka:873757e3: onCancelled at PHASE_CLIENT_ALREADY_HIDDEN
+10-25 11:52:58.030 I/GoogleInputMethodService( 9097): GoogleInputMethodService.onStartInput():1552 
+onStartInput(EditorInfo{EditorInfo{packageName=za.co.zaka.zaka, inputType=0, inputTypeString=NULL, 
+enableLearning=false, autoCorrection=false, autoComplete=false, imeOptions=0, privateImeOptions=null, 
+actionName=UNSPECIFIED, actionLabel=null, initialSelStart=-1, initialSelEnd=-1, initialCapsMode=0, label=null, 
+fieldId=0, fieldName=null, extras=Bundle[mParcelledData.dataSize=72], hintText=null, hintLocales=[]}}, true)
+10-25 11:52:58.035 W/PackageConfigPersister( 2685): App-specific configuration not found for packageName: 
+za.co.zaka.zaka and userId: 0
+10-25 11:52:58.041 D/CoreBackPreview( 2685): Window{a31af6f u0 za.co.zaka.zaka/za.co.zaka.zaka.MainActivity}: Setting 
+back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@aa6ea57, 
+mPriority=-1, mIsAnimationCallback=false, mOverrideBehavior=0}
+10-25 11:53:00.131 D/ScrollScenario( 2685): ScrollState: fling end on za.co.zaka.zaka
+10-25 11:53:01.015 I/MIUIInput( 2685): [MotionEvent] publisher action=0x0, deviceId=7, 1020018188, channel 'a31af6f 
+za.co.zaka.zaka/za.co.zaka.zaka.MainActivity'
+10-25 11:53:01.017 I/MIUIInput( 1892): [MotionEvent] ViewRootImpl windowName 
+'za.co.zaka.zaka/za.co.zaka.zaka.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=1020018188, 
+downTime=1020018188, phoneEventTime=1792921981013 } moveCount:0
+10-25 11:53:01.094 I/MIUIInput( 2685): [MotionEvent] publisher action=0x1, deviceId=7, 1020018268, channel 'a31af6f 
+za.co.zaka.zaka/za.co.zaka.zaka.MainActivity'
+10-25 11:53:01.094 I/MIUIInput( 1892): [MotionEvent] ViewRootImpl windowName 
+'za.co.zaka.zaka/za.co.zaka.zaka.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=1020018268, 
+downTime=1020018188, phoneEventTime=1792921981092 } moveCount:0
+10-25 11:53:01.098 I/DisplayPolicyStubImpl( 2685): boost for touch up, package:za.co.zaka.zaka
+10-25 11:53:01.609 I/MIUIInput( 2685): [MotionEvent] publisher action=0x0, deviceId=7, 1020018782, channel 'a31af6f 
+za.co.zaka.zaka/za.co.zaka.zaka.MainActivity'
+10-25 11:53:01.609 I/MIUIInput( 1892): [MotionEvent] ViewRootImpl windowName 
+'za.co.zaka.zaka/za.co.zaka.zaka.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=1020018782, 
+downTime=1020018782, phoneEventTime=1792921981606 } moveCount:0
+10-25 11:53:01.666 I/MIUIInput( 2685): [MotionEvent] publisher action=0x1, deviceId=7, 1020018841, channel 'a31af6f 
+za.co.zaka.zaka/za.co.zaka.zaka.MainActivity'
+10-25 11:53:01.668 I/MIUIInput( 1892): [MotionEvent] ViewRootImpl windowName 
+'za.co.zaka.zaka/za.co.zaka.zaka.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=1020018841, 
+downTime=1020018782, phoneEventTime=1792921981666 } moveCount:0
+10-25 11:53:01.668 I/DisplayPolicyStubImpl( 2685): boost for touch up failed because of timediff < 1, 
+package:za.co.zaka.zaka
+10-25 11:53:03.042 I/MIUIInput( 2685): [MotionEvent] publisher action=0x0, deviceId=7, 1020020216, channel 'a31af6f 
+za.co.zaka.zaka/za.co.zaka.zaka.MainActivity'
+10-25 11:53:03.042 I/MIUIInput( 1892): [MotionEvent] ViewRootImpl windowName 
+'za.co.zaka.zaka/za.co.zaka.zaka.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=1020020216, 
+downTime=1020020216, phoneEventTime=1792921983041 } moveCount:0
+10-25 11:53:03.087 D/ScrollScenario( 2685): ScrollState: scroll start on za.co.zaka.zaka
+10-25 11:53:03.148 I/MIUIInput( 2685): [MotionEvent] publisher action=0x1, deviceId=7, 1020020323, channel 'a31af6f 
+za.co.zaka.zaka/za.co.zaka.zaka.MainActivity'
+10-25 11:53:03.148 I/MIUIInput( 1892): [MotionEvent] ViewRootImpl windowName 
+'za.co.zaka.zaka/za.co.zaka.zaka.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=1020020323, 
+downTime=1020020216, phoneEventTime=1792921983148 } moveCount:16
+10-25 11:53:03.148 D/ScrollScenario( 2685): ScrollState: fling start on za.co.zaka.zaka
+10-25 11:53:03.148 D/ScrollScenario( 2685): ScrollState: scroll end on za.co.zaka.zaka
+10-25 11:53:03.151 I/DisplayPolicyStubImpl( 2685): boost for touch up, package:za.co.zaka.zaka
+10-25 11:53:06.149 D/ScrollScenario( 2685): ScrollState: fling end on za.co.zaka.zaka
+10-25 11:53:07.818 I/adbd    ( 3347): adbd service requested 'shell,v2:export ANDROID_LOG_TAGS=''; exec logcat '-d' 
+'-s' 'flutter:V' 'AndroidRuntime:E' '*:F''
+10-25 11:53:55.771 I/SurfaceFlinger( 2465): SF-MICapture: mode:0, layerName:Background for 5828e9e 
+SurfaceView[za.co.zaka.zaka/za.co.zaka.zaka.MainActivity]#276301
+10-25 11:53:55.771 I/SurfaceFlinger( 2465): SF-MICapture: mode:0, layerName:5828e9e 
+SurfaceView[za.co.zaka.zaka/za.co.zaka.zaka.MainActivity](BLAST)#276300
+10-25 11:53:55.771 I/SurfaceFlinger( 2465): SF-MICapture: mode:0, 
+layerName:za.co.zaka.zaka/za.co.zaka.zaka.MainActivity#276296
+10-25 11:54:05.438 D/SSRU-CpuResourceTracker( 2685): [deal]doCpuMonitor:AppCpuState{uid=10465, 
+pkgName='za.co.zaka.zaka', usages=0.272, duringTime=2528277, details={za.co.zaka.zaka=0.272}, state=1, 
+stateUpdateTime={1=1019977839}, restricter=0}
+
+

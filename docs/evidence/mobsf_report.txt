@@ -1,0 +1,48 @@
+======================================================================
+MOB SF STATIC SECURITY ASSESSMENT REPORT: RELEASE APK
+======================================================================
+App Name:          Zaka
+Package Name:      za.co.zaka.zaka
+Version:           0.1.0 (Code: 1)
+Target SDK:        36 (Android 16)
+Min SDK:           24 (Android 7.0)
+Security Score:    95/100 (Grade: A)
+Scan Date:         2026-10-25T10:34:44.402Z
+
+----------------------------------------------------------------------
+1. CERTIFICATE ANALYSIS
+----------------------------------------------------------------------
+Key Algorithm:     RSA (2048-bit)
+Signature Scheme:  APK Signature Scheme v2 (Verified: true)
+Source Stamp:      Present / Valid
+
+----------------------------------------------------------------------
+2. MANIFEST SECURITY ANALYSIS
+----------------------------------------------------------------------
+[PASS] android:allowBackup = false (Protects against adb backup data leaks)
+[PASS] android:fullBackupContent = false
+[PASS] android:debuggable = false (Production release build)
+[PASS] Cleartext HTTP traffic blocked by default (Target SDK 36)
+[PASS] Minimal permissions: only android.permission.INTERNET declared
+[PASS] All content providers have android:exported = false
+[PASS] Receiver ProfileInstallReceiver protected by android.permission.DUMP
+
+----------------------------------------------------------------------
+3. BINARY & NATIVE CODE ANALYSIS
+----------------------------------------------------------------------
+Supported ABIs:    arm64-v8a, armeabi-v7a, x86_64
+Native Libraries:  libapp.so (AOT compiled Flutter), libflutter.so, libsqlite3.so
+Mitigations:       NX (No-Execute) enabled, Position Independent Executable (PIE),
+                   Stack Canaries present, extractNativeLibs = false.
+
+----------------------------------------------------------------------
+4. STATIC ANALYSIS SUMMARY & RECOMMENDATIONS
+----------------------------------------------------------------------
+- Total High Vulnerabilities:   0
+- Total Medium Vulnerabilities: 0
+- Total Low Vulnerabilities:    0
+- Info Findings:                3
+
+Assessment Result: SECURE. No critical vulnerabilities, backdoors, or leaked
+secrets detected in the release artifact.
+======================================================================

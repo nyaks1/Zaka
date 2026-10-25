@@ -13,10 +13,9 @@ compatibility_date = "2026-10-01"
 #
 # Per-install daily limiting and the budget alert need a KV namespace:
 #   wrangler kv namespace create ADVISOR_RATE_LIMIT
-# Then uncomment the binding and paste the id:
-# [[kv_namespaces]]
-# binding = "ADVISOR_RATE_LIMIT"
-# id = "replace-with-your-kv-id"
+[[kv_namespaces]]
+binding = "ADVISOR_RATE_LIMIT"
+id = "ADVISOR_RATE_LIMIT"
 
 [vars]
 DAILY_LIMIT = "20"

@@ -1,0 +1,101 @@
+﻿=== 1. Valid Request (Expected 200) ===
+HTTP/1.1 200 OK
+access-control-allow-headers: Content-Type, X-Install-Token
+access-control-allow-methods: POST, OPTIONS
+access-control-allow-origin: *
+access-control-max-age: 86400
+cache-control: no-store
+content-type: application/json; charset=utf-8
+vary: Origin
+Date: Sun, 25 Oct 2026 10:52:26 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+Content-Length: 56
+
+{"tips":["Keep taxi fares steady.","Watch food spend."]}
+
+
+=== 2. Extra field (Expected 400) ===
+HTTP/1.1 400 Bad Request
+access-control-allow-headers: Content-Type, X-Install-Token
+access-control-allow-methods: POST, OPTIONS
+access-control-allow-origin: *
+access-control-max-age: 86400
+cache-control: no-store
+content-type: application/json; charset=utf-8
+vary: Origin
+Date: Sun, 25 Oct 2026 10:52:27 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+Content-Length: 52
+
+{"error":"Only the four summary fields are allowed"}
+
+
+=== 3. Missing token (Expected 401) ===
+HTTP/1.1 401 Unauthorized
+access-control-allow-headers: Content-Type, X-Install-Token
+access-control-allow-methods: POST, OPTIONS
+access-control-allow-origin: *
+access-control-max-age: 86400
+cache-control: no-store
+content-type: application/json; charset=utf-8
+vary: Origin
+Date: Sun, 25 Oct 2026 10:52:28 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+Content-Length: 44
+
+{"error":"Missing or invalid install token"}
+
+
+=== 4. GET (Expected 405) ===
+HTTP/1.1 405 Method Not Allowed
+access-control-allow-headers: Content-Type, X-Install-Token
+access-control-allow-methods: POST, OPTIONS
+access-control-allow-origin: *
+access-control-max-age: 86400
+cache-control: no-store
+content-type: application/json; charset=utf-8
+vary: Origin
+Date: Sun, 25 Oct 2026 10:52:28 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+Content-Length: 30
+
+{"error":"Method not allowed"}
+
+
+=== 5. Oversized body (Expected 413) ===
+HTTP/1.1 413 Payload Too Large
+access-control-allow-headers: Content-Type, X-Install-Token
+access-control-allow-methods: POST, OPTIONS
+access-control-allow-origin: *
+access-control-max-age: 86400
+cache-control: no-store
+content-type: application/json; charset=utf-8
+vary: Origin
+Date: Sun, 25 Oct 2026 10:52:28 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+Content-Length: 37
+
+{"error":"Request body is too large"}
+
+
+=== 6. Rate Limit / 429 Test (DAILY_LIMIT=2, 3rd call expected 429) ===
+HTTP/1.1 429 Too Many Requests
+access-control-allow-headers: Content-Type, X-Install-Token
+access-control-allow-methods: POST, OPTIONS
+access-control-allow-origin: *
+access-control-max-age: 86400
+cache-control: no-store
+content-type: application/json; charset=utf-8
+vary: Origin
+Date: Sun, 25 Oct 2026 10:52:29 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+Content-Length: 31
+
+{"error":"Daily limit reached"}
+

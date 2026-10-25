@@ -65,7 +65,7 @@ class AdvisorSummary {
 
     return AdvisorSummary(
       runwayDays: forecast.daysRemaining,
-      dailyBurnRand: forecast.dailyBurnCents / 100,
+      dailyBurnRand: (forecast.dailyBurnCents / 100).roundToDouble(),
       categoryPercent: {for (final entry in sorted) entry.key: entry.value},
       periodDays: days,
     );

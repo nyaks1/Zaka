@@ -85,19 +85,27 @@ export default {
       return json({ error: 'Advisor is not configured' }, 500, cors);
     }
 
+    const promptSummary = {
+      ...summary,
+      dailyBurnRand: Math.round(summary.dailyBurnRand),
+    };
+
     let upstream;
     try {
       upstream = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(apiKey)}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`,
         {
           method: 'POST',
-          headers: { 'content-type': 'application/json' },
+          headers: {
+            'content-type': 'application/json',
+            'x-goog-api-key': apiKey,
+          },
           body: JSON.stringify({
             contents: [
               {
                 parts: [
                   {
-                    text: `${PROMPT}\n\nSummary JSON:\n${JSON.stringify(summary)}`,
+                    text: `${PROMPT}\n\nSummary JSON:\n${JSON.stringify(promptSummary)}`,
                   },
                 ],
               },

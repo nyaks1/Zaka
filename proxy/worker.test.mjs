@@ -124,9 +124,13 @@ test('a model that says "financial advice" is rejected', async () => {
   assert.equal(response.status, 502);
 });
 
-test('the Gemini request contains only the four-field summary', async () => {
+test('the Gemini request contains only the four-field summary and uses x-goog-api-key header', async () => {
   let captured;
-  globalThis.fetch = async (_url, init) => {
+  let capturedUrl;
+  let capturedHeaders;
+  globalThis.fetch = async (url, init) => {
+    capturedUrl = url;
+    capturedHeaders = init.headers;
     captured = JSON.parse(init.body);
     return new Response(
       JSON.stringify({
@@ -145,6 +149,13 @@ test('the Gemini request contains only the four-field summary', async () => {
   const response = await worker.fetch(request(VALID), env);
   assert.equal(response.status, 200);
 
+  assert.equal(
+    capturedUrl,
+    'https://generativelanguage.googleapis.com/v1beta/models/test-model:generateContent',
+  );
+  assert.doesNotMatch(capturedUrl, /[?&]key=/);
+  assert.equal(capturedHeaders['x-goog-api-key'], 'test-key');
+
   const prompt = captured.contents[0].parts[0].text;
   assert.match(prompt, /"runwayDays":3/);
   assert.match(prompt, /"dailyBurnRand":90/);
@@ -152,3 +163,32 @@ test('the Gemini request contains only the four-field summary', async () => {
   assert.match(prompt, /"periodDays":14/);
   assert.doesNotMatch(prompt, /Sipho/);
 });
+
+test('dailyBurnRand is rounded to the nearest whole rand for the prompt', async () => {
+  let captured;
+  globalThis.fetch = async (_url, init) => {
+    captured = JSON.parse(init.body);
+    return new Response(
+      JSON.stringify({
+        candidates: [
+          {
+            content: {
+              parts: [{ text: JSON.stringify({ tips: ['One tip.'] }) }],
+            },
+          },
+        ],
+      }),
+      { status: 200, headers: { 'content-type': 'application/json' } },
+    );
+  };
+
+  const response = await worker.fetch(
+    request({ ...VALID, dailyBurnRand: 89.6 }),
+    env,
+  );
+  assert.equal(response.status, 200);
+
+  const prompt = captured.contents[0].parts[0].text;
+  assert.match(prompt, /"dailyBurnRand":90/);
+});
+
