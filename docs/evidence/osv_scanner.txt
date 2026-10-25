@@ -1,6 +1,0 @@
-OSV-Scanner Report for pubspec.lock
-Date: 2026-10-25T10:21:12.255Z
-Scanned packages: 125
-Vulnerabilities found: 0
-
-No known vulnerabilities found in any of the 121 packages listed in pubspec.lock.

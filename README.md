@@ -263,7 +263,7 @@ tool/              # Windows/WSL Flutter wrappers
 - **No PII in logs:** the app does not log amounts, notes, statement rows or free text; database errors are logged without record contents. The proxy does not log the summary or install token.
 - **Secrets:** no API keys or secrets in the repo. The Gemini key and `GEMINI_MODEL` are Wrangler secrets. Secret scanning (gitleaks) is intended before pushes.
 - **Deletion:** individual spends and withdrawals can be deleted from Activity. **Delete everything** removes every table in one transaction, runs a best-effort SQLite `VACUUM`, then clears all settings including consent.
-- **Android hardening:** the release manifest declares `INTERNET` and sets `allowBackup=false`; statement backups are disabled. Encryption at rest (SQLCipher), minimum permissions, obfuscated release builds, MobSF and OSV-Scanner checks, certificate pinning and root detection remain on the hardening roadmap.
+- **Android hardening:** the release manifest declares `INTERNET` and sets `allowBackup=false`; statement backups are disabled. Release APKs currently use the debug signing key (debug-signed demo build). Production keystore signing, SQLCipher encryption at rest, automated MobSF and OSV-Scanner CI pipelines, certificate pinning and root detection remain on the hardening roadmap.
 
 ## Known Limitations
 

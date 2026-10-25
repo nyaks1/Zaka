@@ -1,8 +1,8 @@
 # Synthetic demo statement
 
-`synthetic-fnb-statement.csv` is fake data for testing the CSV/PDF import path.
-Every name, description and amount is invented. It is not a real FNB statement
-and contains no customer data.
+`synthetic-fnb-statement.csv` and `synthetic-statement.pdf` are fake data for
+testing the CSV/PDF import path. Every name, description and amount is invented.
+It is not a real bank statement and contains no customer data.
 
 To try it:
 
