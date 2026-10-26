@@ -65,8 +65,9 @@ npm test
 
 The tests cover POST-only, the exact four-field allowlist, extra fields,
 unknown categories, the install token, the 1 KB cap, content type, the
-"financial advice" output filter, and the Gemini prompt containing only the
-four summary fields.
+"financial advice" and product/provider output filter, and the Gemini request
+keeping the prompt in `systemInstruction` with only the four summary fields in
+`contents`.
 
 ## curl checks
 
@@ -131,6 +132,7 @@ Expected: `413`.
 ## Wording boundary
 
 The prompt and the app use “tips” and “insights”, not “financial advice”. The
-prompt forbids product recommendations. The app shows “Tips, not financial
+prompt forbids product recommendations, and the Worker rejects a tip that names
+a product, insurer, bank or provider. The app shows “Tips, not financial
 advice.” This is a wording boundary, not a FAIS licence. Get South African
 legal review before adding referrals, product comparisons or provider links.

@@ -65,6 +65,20 @@ test('a valid summary returns tips', async () => {
   });
 });
 
+test('a clean projection tip is returned', async () => {
+  const tip = 'At R80 a day your cash lasts 5 days; Taxi is 60% of spend.';
+  stubGemini([tip]);
+  const response = await worker.fetch(request(VALID), env);
+  assert.equal(response.status, 200);
+  assert.deepEqual(await response.json(), { tips: [tip] });
+});
+
+test('a tip that names a bank or product is rejected', async () => {
+  stubGemini(['Move your money to Capitec.']);
+  const response = await worker.fetch(request(VALID), env);
+  assert.equal(response.status, 502);
+});
+
 test('an extra field is rejected', async () => {
   const response = await worker.fetch(
     request({ ...VALID, note: "Sipho's tuckshop" }),
@@ -156,12 +170,18 @@ test('the Gemini request contains only the four-field summary and uses x-goog-ap
   assert.doesNotMatch(capturedUrl, /[?&]key=/);
   assert.equal(capturedHeaders['x-goog-api-key'], 'test-key');
 
-  const prompt = captured.contents[0].parts[0].text;
-  assert.match(prompt, /"runwayDays":3/);
-  assert.match(prompt, /"dailyBurnRand":90/);
-  assert.match(prompt, /"categoryPercent":\{"Taxi":48,"Food":52\}/);
-  assert.match(prompt, /"periodDays":14/);
-  assert.doesNotMatch(prompt, /Sipho/);
+  const systemPrompt = captured.systemInstruction.parts[0].text;
+  assert.match(systemPrompt, /You are Zaka/);
+  assert.match(systemPrompt, /Phrase tips as projections/);
+  assert.doesNotMatch(systemPrompt, /"runwayDays":3/);
+
+  const summaryText = captured.contents[0].parts[0].text;
+  assert.match(summaryText, /"runwayDays":3/);
+  assert.match(summaryText, /"dailyBurnRand":90/);
+  assert.match(summaryText, /"categoryPercent":\{"Taxi":48,"Food":52\}/);
+  assert.match(summaryText, /"periodDays":14/);
+  assert.doesNotMatch(summaryText, /You are Zaka/);
+  assert.doesNotMatch(summaryText, /Sipho/);
 });
 
 test('dailyBurnRand is rounded to the nearest whole rand for the prompt', async () => {
@@ -188,7 +208,7 @@ test('dailyBurnRand is rounded to the nearest whole rand for the prompt', async 
   );
   assert.equal(response.status, 200);
 
-  const prompt = captured.contents[0].parts[0].text;
-  assert.match(prompt, /"dailyBurnRand":90/);
+  const summaryText = captured.contents[0].parts[0].text;
+  assert.match(summaryText, /"dailyBurnRand":90/);
 });
 

@@ -89,7 +89,14 @@ Gemini key. It enforces:
   percentages;
 - an `X-Install-Token` header (24–128 URL-safe characters);
 - an optional per-install daily rate limit in Cloudflare KV;
-- an optional daily usage webhook for the budget alert.
+- an optional daily usage webhook for the budget alert;
+- an output denylist for “financial advice”, products, insurers, banks and
+  other providers. A blocked tip becomes a `502` and the app shows the offline
+  tip.
+
+The instructions and the data are separate parts of the Gemini request: the
+fixed prompt goes in `systemInstruction`, and only the four-field summary goes
+in `contents`. A summary value cannot rewrite the prompt.
 
 The install token is a per-install rate-limit key, not a shared secret. The app
 generates it on the phone and the worker only checks its shape, so it does not
@@ -120,7 +127,9 @@ the offline tip. The app refuses a non-HTTPS proxy (except `localhost` for
 
 The app and the prompt use “tips” and “insights”, not “financial advice”. The
 prompt forbids loans, credit, insurance, investments, product recommendations
-and provider recommendations. The app shows “Tips, not financial advice.”
+and provider recommendations. The proxy also rejects output that names a
+product, insurer, bank or provider, and the app shows “Tips, not financial
+advice.”
 
 This is a wording and product-design boundary, not a FAIS licence. Do not add
 referrals, product comparisons, provider links, or personalised investment

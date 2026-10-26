@@ -26,6 +26,12 @@ const MAX_BODY_BYTES = 1024;
 const MAX_BODY_CHARS = 1000;
 const MAX_TIPS = 3;
 
+// A model can ignore the prompt. Block common product, provider and advice
+// terms before they reach the app; a blocklist reduces risk, it is not a
+// guarantee that every unsafe sentence is caught.
+const FORBIDDEN =
+  /\b(financial advice|invest\w*|loans?|credit|insurance|polic(?:y|ies)|unit trusts?|savings account|fnb|capitec|absa|nedbank|standard bank|tymebank|discovery|mashonisa)\b/i;
+
 export default {
   async fetch(request, env) {
     const cors = corsHeaders(request, env);
@@ -101,11 +107,14 @@ export default {
             'x-goog-api-key': apiKey,
           },
           body: JSON.stringify({
+            systemInstruction: {
+              parts: [{ text: PROMPT }],
+            },
             contents: [
               {
                 parts: [
                   {
-                    text: `${PROMPT}\n\nSummary JSON:\n${JSON.stringify(promptSummary)}`,
+                    text: `Summary JSON:\n${JSON.stringify(promptSummary)}`,
                   },
                 ],
               },
@@ -159,7 +168,7 @@ export default {
 const PROMPT = `You are Zaka, a cash-flow tips assistant for a South African cash tracker.
 You receive only this privacy-safe summary: runwayDays (days until cash runs out, or null if it lasts beyond the forecast), dailyBurnRand (average spend per day in rand), categoryPercent (share of spending by category over periodDays), and periodDays.
 Do not ask for or infer names, notes, account numbers, banks, locations, exact dates, or individual transactions.
-Write 2 short, practical tips in plain language. Use "tips" or "insights", never "financial advice". Do not recommend loans, credit, insurance, investments, or any financial product or provider. If runwayDays is low, suggest reducing the largest category or pausing non-essential spend. If runwayDays is null, say cash lasts beyond the forecast window.
+Write 2 short, practical tips in plain language. Use "tips" or "insights", never "financial advice". Do not recommend loans, credit, insurance, investments, or any financial product or provider. Phrase tips as projections ("at this pace…"), never as instructions about products, providers, banks or accounts. If runwayDays is low, suggest reducing the largest category or pausing non-essential spend. If runwayDays is null, say cash lasts beyond the forecast window.
 Return strict JSON only: {"tips":["...","..."]}. Each tip must be under 240 characters. No markdown.`;
 
 function validateSummary(value) {
@@ -293,8 +302,8 @@ function parseTips(raw) {
     .map((value) => value.slice(0, 240));
 
   // Defence in depth: the app labels tips, but a model that ignores the
-  // prompt must not put the phrase "financial advice" into the UI.
-  if (tips.some((tip) => /\bfinancial advice\b/i.test(tip))) return null;
+  // prompt must not put "financial advice", a product or a bank into the UI.
+  if (tips.some((tip) => FORBIDDEN.test(tip))) return null;
 
   return tips.length > 0 ? tips : null;
 }

@@ -10,8 +10,8 @@ evidence of one run, not a CI gate.
 | `flutter_test.txt` | `flutter test` passed all 77 tests. | Ends with `+77: All tests passed!`. |
 | `gitleaks.txt`, `gitleaks.json` | `gitleaks detect` scanned 17 commits and found no leaks. | History scan for this revision. |
 | `osv_scanner.txt` | OSV scanned 126 packages from `pubspec.lock`; no known vulnerabilities. | Run through the `/home/nyaks/src/github/Zaka` symlink to this checkout. |
-| `proxy_tests.txt` | The Cloudflare Worker test suite passed 11/11. | Includes allowlist, install token, rate limit, body cap and content-type checks. |
-| `curl_checks.txt` | Live requests to a temporary Worker returned `405`, `401`, `400`, `415`, `413` and `500` as expected. | Host is redacted. The `500` is the keyless build saying the Gemini secret is not configured, not a successful tip. |
+| `proxy_tests.txt` | The Cloudflare Worker test suite passed 13/13. | Includes allowlist, install token, rate limit, body cap, content-type checks, the product/provider output filter and the `systemInstruction`/`contents` split. |
+| `curl_checks.txt` | Live requests to a temporary Worker returned `405`, `401`, `400`, `415`, `413` and `500` as expected. | Host is redacted. The `500` is the keyless temporary build saying the Gemini secret is not configured, not a successful tip. |
 | `apk_build.txt` | `flutter build apk --release` produced a 60.3 MB APK. | Includes Gradle/DWARF warnings, not failures. |
 | `apk_manifest.txt` | Release manifest: package `za.co.zaka.zaka`, `INTERNET`, `allowBackup=false`, target SDK 36. | Also shows the launcher activity and supported ABIs. |
 | `apk_signing.txt` | The release APK is signed with the Android debug certificate. | This is a demo build, not a Play Store signing key. |

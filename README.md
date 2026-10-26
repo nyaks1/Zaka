@@ -131,7 +131,9 @@ create a token or make an HTTP call. The proxy holds the Gemini key, accepts
 POST only, caps the body at 1 KB / 1,000 characters, rejects extra fields and
 can rate-limit per install. If the network or proxy is unavailable, the card
 falls back to the same on-device tip. Output is labelled **tips and insights,
-not financial advice**; the prompt forbids product recommendations. See
+not financial advice**; the prompt forbids product recommendations, and the
+proxy rejects a tip that names a product, provider or bank before it reaches
+the card. See
 [`docs/advisor.md`](docs/advisor.md) and [`proxy/README.md`](proxy/README.md).
 
 The **Delete everything** control removes every money table — accounts, entries,
@@ -268,7 +270,7 @@ default model name.
 ```bash
 flutter analyze     # no issues
 flutter test        # 77 tests
-cd proxy && npm test  # 11 tests
+cd proxy && npm test  # 13 tests
 ```
 
 Verified on this machine for this revision:
@@ -281,7 +283,7 @@ Verified on this machine for this revision:
 - `gitleaks detect` — 17 commits, no leaks.
 - `osv-scanner scan source -L pubspec.lock` — 126 packages, no known
   vulnerabilities.
-- `cd proxy && npm test` — 11 Node tests.
+- `cd proxy && npm test` — 13 Node tests.
 - Live advisor proxy curls against a temporary Cloudflare Worker: `405` for GET,
   `401` without an install token, `400` for an extra field or unknown category,
   `415` for the wrong content type, `413` for an oversized body, and `500` for a
