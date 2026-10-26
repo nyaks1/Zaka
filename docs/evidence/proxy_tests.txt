@@ -6,133 +6,133 @@ TAP version 13
 # Subtest: GET is rejected
 ok 1 - GET is rejected
   ---
-  duration_ms: 86.8697
+  duration_ms: 134.6993
   type: 'test'
   ...
 # Subtest: a valid summary returns tips
 ok 2 - a valid summary returns tips
   ---
-  duration_ms: 8.1146
+  duration_ms: 11.6138
   type: 'test'
   ...
 # Subtest: a clean projection tip is returned
 ok 3 - a clean projection tip is returned
   ---
-  duration_ms: 3.1565
+  duration_ms: 4.2338
   type: 'test'
   ...
 # Subtest: a tip that names a bank or product is rejected
 ok 4 - a tip that names a bank or product is rejected
   ---
-  duration_ms: 2.5412
+  duration_ms: 3.9469
   type: 'test'
   ...
 # Subtest: an extra field is rejected
 ok 5 - an extra field is rejected
   ---
-  duration_ms: 2.2571
+  duration_ms: 3.9386
   type: 'test'
   ...
 # Subtest: an unknown category is rejected
 ok 6 - an unknown category is rejected
   ---
-  duration_ms: 2.0825
+  duration_ms: 3.677
   type: 'test'
   ...
 # Subtest: a missing install token is rejected
 ok 7 - a missing install token is rejected
   ---
-  duration_ms: 2.5431
+  duration_ms: 2.1927
   type: 'test'
   ...
 # Subtest: an oversized body is rejected
 ok 8 - an oversized body is rejected
   ---
-  duration_ms: 1.6557
+  duration_ms: 1.5406
   type: 'test'
   ...
 # Subtest: the wrong content type is rejected
 ok 9 - the wrong content type is rejected
   ---
-  duration_ms: 2.4758
+  duration_ms: 1.8403
   type: 'test'
   ...
 # Subtest: the per-install daily limit returns 429
 ok 10 - the per-install daily limit returns 429
   ---
-  duration_ms: 4.5705
+  duration_ms: 14.5828
   type: 'test'
   ...
 # Subtest: a model that says "financial advice" is rejected
 ok 11 - a model that says "financial advice" is rejected
   ---
-  duration_ms: 1.2574
+  duration_ms: 1.9374
   type: 'test'
   ...
 # Subtest: the Gemini request contains only the four-field summary and uses x-goog-api-key header
 ok 12 - the Gemini request contains only the four-field summary and uses x-goog-api-key header
   ---
-  duration_ms: 2.367
+  duration_ms: 3.1087
   type: 'test'
   ...
 # Subtest: dailyBurnRand is rounded to the nearest whole rand for the prompt
 ok 13 - dailyBurnRand is rounded to the nearest whole rand for the prompt
   ---
-  duration_ms: 1.8781
+  duration_ms: 2.7271
   type: 'test'
   ...
 # Subtest: valid feedback is forwarded to the webhook and accepted
 ok 14 - valid feedback is forwarded to the webhook and accepted
   ---
-  duration_ms: 2.2392
+  duration_ms: 6.7009
   type: 'test'
   ...
 # Subtest: feedback with an extra field is rejected
 ok 15 - feedback with an extra field is rejected
   ---
-  duration_ms: 0.8375
+  duration_ms: 1.4386
   type: 'test'
   ...
 # Subtest: feedback without a message is rejected
 ok 16 - feedback without a message is rejected
   ---
-  duration_ms: 2.8243
+  duration_ms: 2.86
   type: 'test'
   ...
 # Subtest: feedback without an install token is rejected
 ok 17 - feedback without an install token is rejected
   ---
-  duration_ms: 0.7034
+  duration_ms: 1.0976
   type: 'test'
   ...
 # Subtest: oversized feedback is rejected before delivery
 ok 18 - oversized feedback is rejected before delivery
   ---
-  duration_ms: 0.5325
+  duration_ms: 1.0444
   type: 'test'
   ...
 # Subtest: feedback returns 503 when no webhook is configured
 ok 19 - feedback returns 503 when no webhook is configured
   ---
-  duration_ms: 0.6219
+  duration_ms: 1.5115
   type: 'test'
   ...
 # Subtest: an invalid reply-to email is rejected
 ok 20 - an invalid reply-to email is rejected
   ---
-  duration_ms: 0.8642
+  duration_ms: 1.3715
   type: 'test'
   ...
 # Subtest: the feedback route has its own daily limit
 ok 21 - the feedback route has its own daily limit
   ---
-  duration_ms: 2.2241
+  duration_ms: 5.5142
   type: 'test'
   ...
 # Subtest: GET on the feedback route is rejected
 ok 22 - GET on the feedback route is rejected
   ---
-  duration_ms: 0.456
+  duration_ms: 0.8774
   type: 'test'
   ...
 1..22
@@ -143,4 +143,4 @@ ok 22 - GET on the feedback route is rejected
 # cancelled 0
 # skipped 0
 # todo 0
-# duration_ms 415.1408
+# duration_ms 685.3219

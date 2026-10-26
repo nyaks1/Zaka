@@ -231,7 +231,7 @@ test('valid feedback is forwarded to the webhook and accepted', async () => {
   const captured = stubWebhook();
   const response = await worker.fetch(
     feedback({
-      message: 'The import preview was hard to read.',
+      message: 'The import preview was hard to read @everyone and @here.',
       appVersion: '0.1.0+1',
       androidVersion: 'Android 16 (SDK 36)',
       replyTo: 'tester@example.com',
@@ -246,6 +246,10 @@ test('valid feedback is forwarded to the webhook and accepted', async () => {
   assert.match(captured[0].body.text, /import preview/);
   assert.match(captured[0].body.text, /tester@example\.com/);
   assert.match(captured[0].body.text, /Android 16/);
+  assert.doesNotMatch(captured[0].body.text, /@everyone/);
+  assert.doesNotMatch(captured[0].body.text, /@here/);
+  assert.match(captured[0].body.text, /@\u200beveryone/);
+  assert.deepEqual(captured[0].body.allowed_mentions, { parse: [] });
 });
 
 test('feedback with an extra field is rejected', async () => {

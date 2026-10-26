@@ -21,7 +21,9 @@ product path. Use these six beats, in this order.
    shown before consent. Turning it on sends only `runwayDays`,
    `dailyBurnRand`, `categoryPercent` and `periodDays` to the Worker; Google may
    process them outside South Africa. The card always has an on-device tip if
-   the network or proxy fails.
+   the network or proxy fails (in this public build without baked-in secret proxy
+   credentials, it runs the privacy-first on-device tip; the live Gemini demo is
+   the screen recording).
 6. **Account, privacy and support.** Create a local account, turn on **App
    lock** (PIN), open **Privacy policy**, and use **Send feedback or a
    complaint**. Tapping the contact copies it; the in-app form posts to the
@@ -34,6 +36,8 @@ product path. Use these six beats, in this order.
 - Cash-first, not bank-feed-first: the ATM withdrawal is the product's starting
   point.
 - Four fields leave the phone, with consent, and only for optional tips.
+- The public build runs the privacy-first on-device tip; the live Gemini demo is
+  the screen recording.
 - No central money database, no bank login, no ads, no tracking.
 - The honest gaps are on the slide: no encrypted export yet, English-only UI,
   PIN-only lock, local accounts, debug-signed hackathon APK.

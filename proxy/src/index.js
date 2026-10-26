@@ -293,7 +293,10 @@ async function handleFeedback(request, env, cors) {
     return json({ error: 'Feedback is not configured' }, 503, cors);
   }
 
-  const lines = ['New Zaka feedback', '', validation.message];
+  // Defang broadcast mentions so webhooks (e.g. Discord, Slack) cannot be
+  // exploited for channel-wide pings, and disable Discord mention parsing.
+  const cleanMessage = validation.message.replace(/@(everyone|here)/gi, '@\u200b$1');
+  const lines = ['New Zaka feedback', '', cleanMessage];
   if (validation.replyTo) lines.push('', `Reply-to: ${validation.replyTo}`);
   if (validation.appVersion) {
     lines.push(`App version: ${validation.appVersion}`);
@@ -308,8 +311,12 @@ async function handleFeedback(request, env, cors) {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       // `text` works with Slack-style webhooks; `content` with Discord-style
-      // ones. Whichever the destination ignores is harmless.
-      body: JSON.stringify({ text, content: text }),
+      // ones. `allowed_mentions` prevents Discord mention pings.
+      body: JSON.stringify({
+        text,
+        content: text,
+        allowed_mentions: { parse: [] },
+      }),
     });
     if (!response.ok) {
       return json({ error: 'Could not deliver feedback' }, 502, cors);

@@ -68,10 +68,12 @@ shows a tip generated on the phone.
 ### Feedback (optional)
 
 If you use the in-app feedback form in a build with a Worker URL, the message you
-type is sent to the Zaka Worker and forwarded to the project webhook. The Worker
-does not store it. An optional reply email and the optional app version and
-Android version are sent only when you provide or tick them. Do not include
-money data, bank details, card numbers, ID numbers or statements.
+type is sent to the Zaka Worker and forwarded to the project webhook (a third-party
+destination such as Discord or Slack). The Worker does not store the message and
+defangs broadcast mentions (such as `@everyone` and `@here`). An optional reply email
+and the optional app version and Android version pass through to the webhook only
+when you provide or tick them to allow follow-up. Do not include money data, bank
+details, card numbers, ID numbers or statements.
 
 The public hackathon APK is built without a Worker URL, so its form points at
 the public GitHub Issues page instead of posting the message. That page is
@@ -105,8 +107,10 @@ third-party tracking SDK.
   and request tips. Google may process them outside South Africa.
 - **Cloudflare** hosts the Worker and may process request metadata outside South
   Africa as the infrastructure provider.
-- **The project webhook** receives a feedback message you choose to send. The
-  webhook provider may keep it under its own policy.
+- **The project webhook** (a third-party service such as Discord or Slack)
+  receives a feedback message and any optional reply-to email you choose to
+  send. The webhook provider may process and store it under its own privacy
+  policy.
 - **GitHub** hosts the public issue tracker and this repository.
 - **No one else.** We do not sell personal information or share it for
   advertising.
