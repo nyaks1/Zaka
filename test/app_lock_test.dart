@@ -53,4 +53,46 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('home'), findsOneWidget);
   });
+
+  testWidgets('the gate closes pushed screens when the app is backgrounded', (
+    tester,
+  ) async {
+    final service = AppLockService();
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [appLockServiceProvider.overrideWithValue(service)],
+        child: MaterialApp(
+          home: AppLockGate(
+            child: Builder(
+              builder: (context) => Scaffold(
+                body: TextButton(
+                  onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (_) => const Scaffold(body: Text('sub-screen')),
+                    ),
+                  ),
+                  child: const Text('open sub-screen'),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('Zaka is locked'), findsNothing);
+
+    await tester.tap(find.text('open sub-screen'));
+    await tester.pumpAndSettle();
+    expect(find.text('sub-screen'), findsOneWidget);
+
+    await service.setPin('1234');
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Zaka is locked'), findsOneWidget);
+    expect(find.text('sub-screen'), findsNothing);
+  });
 }

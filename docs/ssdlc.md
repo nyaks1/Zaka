@@ -80,7 +80,7 @@ Africa as the hosting provider.
 | Check | Result | Evidence |
 |---|---|---|
 | `flutter analyze` | No issues | `docs/evidence/flutter_analyze.txt` |
-| `flutter test` | 80 tests pass | `docs/evidence/flutter_test.txt` |
+| `flutter test` | 81 tests pass | `docs/evidence/flutter_test.txt` |
 | Worker `npm test` | 22 tests pass | `docs/evidence/proxy_tests.txt` |
 | Release APK builds | Yes, debug-signed demo | `docs/evidence/apk_build.txt` |
 | Secrets scan | gitleaks, no leaks | `docs/evidence/gitleaks.txt` |

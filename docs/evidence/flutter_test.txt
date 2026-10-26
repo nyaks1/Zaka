@@ -1,82 +1,83 @@
 00:00 +0: loading C:/src/projects/Zaka/test/accounts_test.dart
 00:00 +0: C:/src/projects/Zaka/test/accounts_test.dart: every new database starts with a cash account
-00:00 +1: C:/src/projects/Zaka/test/advisor_screen_test.dart: consent screen shows the live summary and the privacy limits
+00:01 +1: C:/src/projects/Zaka/test/accounts_test.dart: transfers move value without counting as income or spending
 00:01 +2: C:/src/projects/Zaka/test/advisor_screen_test.dart: consent screen shows the live summary and the privacy limits
 00:01 +3: C:/src/projects/Zaka/test/advisor_screen_test.dart: consent screen shows the live summary and the privacy limits
 00:01 +4: C:/src/projects/Zaka/test/advisor_screen_test.dart: consent screen shows the live summary and the privacy limits
-00:01 +5: C:/src/projects/Zaka/test/advisor_screen_test.dart: consent screen shows the live summary and the privacy limits
-00:01 +6: C:/src/projects/Zaka/test/advisor_screen_test.dart: consent screen shows the live summary and the privacy limits
-00:04 +7: C:/src/projects/Zaka/test/advisor_screen_test.dart: consent screen shows the live summary and the privacy limits
-00:04 +8: C:/src/projects/Zaka/test/advisor_screen_test.dart: consent screen shows the live summary and the privacy limits
-00:04 +9: C:/src/projects/Zaka/test/advisor_screen_test.dart: consent screen shows the live summary and the privacy limits
-00:04 +10: C:/src/projects/Zaka/test/advisor_screen_test.dart: consent screen shows the live summary and the privacy limits
-00:04 +11: C:/src/projects/Zaka/test/advisor_screen_test.dart: consent screen shows the live summary and the privacy limits
-00:05 +12: C:/src/projects/Zaka/test/advisor_screen_test.dart: consent screen shows the live summary and the privacy limits
-00:05 +13: C:/src/projects/Zaka/test/advisor_screen_test.dart: consent screen shows the live summary and the privacy limits
-00:05 +14: C:/src/projects/Zaka/test/advisor_test.dart: AdvisorService consent gate uses the offline tip when no proxy is configured
-00:05 +15: C:/src/projects/Zaka/test/advisor_test.dart: AdvisorService consent gate refuses a non-HTTPS proxy before creating a token
-00:05 +16: C:/src/projects/Zaka/test/advisor_test.dart: AdvisorService consent gate sends exactly the summary JSON and the install token
-00:05 +17: C:/src/projects/Zaka/test/advisor_test.dart: AdvisorService consent gate falls back to the offline tip when the proxy fails
-00:08 +18: C:/src/projects/Zaka/test/app_flow_test.dart: adds money and logs a spend with the live balance
-00:12 +19: C:/src/projects/Zaka/test/app_flow_test.dart: adds money and logs a spend with the live balance
-00:17 +20: C:/src/projects/Zaka/test/app_lock_test.dart: the gate asks for the PIN and opens on success
-00:19 +21: C:/src/projects/Zaka/test/app_lock_test.dart: the gate asks for the PIN and opens on success
-00:19 +22: C:/src/projects/Zaka/test/app_flow_test.dart: the whole Ask Zaka card opens the privacy screen
-00:19 +23: C:/src/projects/Zaka/test/app_flow_test.dart: creates the creator account and opens the user console
-00:22 +24: C:/src/projects/Zaka/test/app_flow_test.dart: creates the creator account and opens the user console
-00:22 +25: C:/src/projects/Zaka/test/app_flow_test.dart: creates the creator account and opens the user console
-00:22 +26: C:/src/projects/Zaka/test/app_flow_test.dart: creates the creator account and opens the user console
-00:22 +27: C:/src/projects/Zaka/test/app_flow_test.dart: creates the creator account and opens the user console
-00:22 +28: C:/src/projects/Zaka/test/app_flow_test.dart: creates the creator account and opens the user console
-00:22 +29: C:/src/projects/Zaka/test/app_flow_test.dart: creates the creator account and opens the user console
-00:22 +30: C:/src/projects/Zaka/test/app_flow_test.dart: creates the creator account and opens the user console
-00:23 +31: C:/src/projects/Zaka/test/app_flow_test.dart: logs a weekday taxi once and shows it under Recurring
-00:24 +32: C:/src/projects/Zaka/test/app_flow_test.dart: logs a weekday taxi once and shows it under Recurring
-00:25 +33: C:/src/projects/Zaka/test/app_flow_test.dart: logs a weekday taxi once and shows it under Recurring
-00:25 +34: C:/src/projects/Zaka/test/app_flow_test.dart: logs a weekday taxi once and shows it under Recurring
-00:26 +35: C:/src/projects/Zaka/test/demo_statement_test.dart: the synthetic demo CSV parses and keeps its ATM rows
-00:27 +36: C:/src/projects/Zaka/test/feedback_contact_test.dart: the feedback row shows the contact and copies it
-00:29 +37: C:/src/projects/Zaka/test/feedback_contact_test.dart: the feedback row shows the contact and copies it
-00:29 +38: C:/src/projects/Zaka/test/feedback_contact_test.dart: the feedback row shows the contact and copies it
-00:29 +39: C:/src/projects/Zaka/test/feedback_contact_test.dart: the feedback row shows the contact and copies it
-00:29 +40: C:/src/projects/Zaka/test/feedback_contact_test.dart: the feedback row shows the contact and copies it
-00:29 +41: C:/src/projects/Zaka/test/feedback_contact_test.dart: the feedback row shows the contact and copies it
-00:29 +42: C:/src/projects/Zaka/test/feedback_contact_test.dart: the feedback row shows the contact and copies it
-00:29 +43: C:/src/projects/Zaka/test/feedback_contact_test.dart: the feedback row shows the contact and copies it
-00:29 +44: C:/src/projects/Zaka/test/feedback_contact_test.dart: the feedback row shows the contact and copies it
-00:31 +45: C:/src/projects/Zaka/test/migration_test.dart: upgrades a v1 cash-only database without losing entries
-00:32 +46: C:/src/projects/Zaka/test/money_test.dart: parseRandToCents parses whole rands
-00:32 +47: C:/src/projects/Zaka/test/money_test.dart: parseRandToCents parses rands and cents
-00:32 +48: C:/src/projects/Zaka/test/money_test.dart: parseRandToCents strips currency symbols and thousands separators
-00:32 +49: C:/src/projects/Zaka/test/money_test.dart: parseRandToCents rejects empty, zero and junk input
-00:32 +50: C:/src/projects/Zaka/test/money_test.dart: formatCents formats cents as rands
-00:34 +51: C:/src/projects/Zaka/test/pdf_statement_test.dart: extracts text and transactions from a text PDF
-00:34 +52: C:/src/projects/Zaka/test/pdf_statement_test.dart: rejects a PDF with no selectable text
-00:35 +53: C:/src/projects/Zaka/test/privacy_test.dart: deleteEverything empties every table and clears preferences
-00:36 +54: C:/src/projects/Zaka/test/privacy_test.dart: a blank cash account can be recreated after deletion
-00:37 +55: C:/src/projects/Zaka/test/privacy_test.dart: recreating the cash account updates account streams
-00:37 +56: C:/src/projects/Zaka/test/recurrence_test.dart: occurrenceDates expands a Monday to Friday taxi across a weekend
-00:37 +57: C:/src/projects/Zaka/test/recurrence_test.dart: occurrenceDates never repeats the day after which it starts
-00:37 +58: C:/src/projects/Zaka/test/recurrence_test.dart: occurrenceDates stops at the end date
-00:37 +59: C:/src/projects/Zaka/test/recurrence_test.dart: occurrenceDates returns nothing for an empty weekday set
-00:37 +60: C:/src/projects/Zaka/test/recurrence_test.dart: weekday encoding round-trips a set of weekdays
-00:37 +61: C:/src/projects/Zaka/test/recurrence_test.dart: weekday encoding ignores invalid values
-00:37 +62: C:/src/projects/Zaka/test/recurrence_test.dart: weekday encoding describes common patterns
-00:37 +63: C:/src/projects/Zaka/test/recurrence_test.dart: nextOccurrence moves from Friday to the next Monday
-00:37 +64: C:/src/projects/Zaka/test/recurrence_test.dart: nextOccurrence returns null after the end date
-00:37 +65: C:/src/projects/Zaka/test/recurrence_test.dart: upcomingRecurringByDay groups due amounts inside the horizon
-00:37 +66: C:/src/projects/Zaka/test/recurrence_test.dart: upcomingRecurringByDay ignores paused rules
-00:39 +67: C:/src/projects/Zaka/test/sample_data_test.dart: sample data uses the R900 piece-job payment, not a salary
-00:39 +68: C:/src/projects/Zaka/test/sample_data_test.dart: sample import leaves about five days of runway
-00:39 +69: C:/src/projects/Zaka/test/statement_test.dart: parseStatementCsv reads an FNB-style date, description, amount, balance export
-00:39 +70: C:/src/projects/Zaka/test/statement_test.dart: parseStatementCsv reads separate debit and credit columns
-00:40 +71: C:/src/projects/Zaka/test/statement_test.dart: parseStatementCsv skips preamble rows before the header
-00:40 +72: C:/src/projects/Zaka/test/statement_test.dart: parseStatementCsv keeps identical same-day rows distinct and repeatable
-00:40 +73: C:/src/projects/Zaka/test/statement_test.dart: parseStatementCsv rejects a file without a date and amount header
-00:40 +74: C:/src/projects/Zaka/test/statement_test.dart: parseStatementAmountCents handles Rand symbols, signs, thousands and parentheses
-00:40 +75: C:/src/projects/Zaka/test/statement_test.dart: parseStatementText reconstructs rows from a text-based PDF statement
-00:40 +76: C:/src/projects/Zaka/test/statement_test.dart: parseStatementText uses debit and credit columns when present
-00:40 +77: C:/src/projects/Zaka/test/statement_test.dart: parseStatementText infers the direction from the description when no balance exists
-00:40 +78: C:/src/projects/Zaka/test/statement_test.dart: parseStatementText rejects text with no transactions
-00:40 +79: C:/src/projects/Zaka/test/statement_test.dart: parseStatementDate reads common South African bank date formats
-00:40 +80: All tests passed!
+00:02 +5: C:/src/projects/Zaka/test/advisor_screen_test.dart: consent screen shows the live summary and the privacy limits
+00:02 +6: C:/src/projects/Zaka/test/advisor_screen_test.dart: consent screen shows the live summary and the privacy limits
+00:07 +7: C:/src/projects/Zaka/test/advisor_test.dart: AdvisorSummary contains only the four allowed fields
+00:07 +8: C:/src/projects/Zaka/test/advisor_test.dart: AdvisorSummary never includes a spend note, import key, or account name
+00:07 +9: C:/src/projects/Zaka/test/advisor_test.dart: AdvisorSummary uses the requested period and ignores old or negative spends
+00:07 +10: C:/src/projects/Zaka/test/advisor_test.dart: AdvisorSummary keeps runway unknown when cash lasts past the forecast
+00:07 +11: C:/src/projects/Zaka/test/advisor_test.dart: offlineTip matches the deterministic demo sentence
+00:07 +12: C:/src/projects/Zaka/test/advisor_test.dart: offlineTip handles a missing runway and missing categories
+00:07 +13: C:/src/projects/Zaka/test/advisor_test.dart: AdvisorService consent gate throws before any HTTP call when consent is off
+00:07 +14: C:/src/projects/Zaka/test/advisor_test.dart: AdvisorService consent gate uses the offline tip when no proxy is configured
+00:07 +15: C:/src/projects/Zaka/test/advisor_test.dart: AdvisorService consent gate refuses a non-HTTPS proxy before creating a token
+00:07 +16: C:/src/projects/Zaka/test/advisor_test.dart: AdvisorService consent gate sends exactly the summary JSON and the install token
+00:07 +17: C:/src/projects/Zaka/test/advisor_test.dart: AdvisorService consent gate falls back to the offline tip when the proxy fails
+00:11 +18: C:/src/projects/Zaka/test/app_flow_test.dart: adds money and logs a spend with the live balance
+00:16 +19: C:/src/projects/Zaka/test/app_flow_test.dart: adds money and logs a spend with the live balance
+00:22 +20: C:/src/projects/Zaka/test/app_lock_test.dart: the gate asks for the PIN and opens on success
+00:24 +21: C:/src/projects/Zaka/test/app_lock_test.dart: the gate asks for the PIN and opens on success
+00:26 +22: C:/src/projects/Zaka/test/app_lock_test.dart: the gate asks for the PIN and opens on success
+00:26 +23: C:/src/projects/Zaka/test/app_flow_test.dart: creates the creator account and opens the user console
+00:31 +24: C:/src/projects/Zaka/test/app_flow_test.dart: creates the creator account and opens the user console
+00:31 +25: C:/src/projects/Zaka/test/app_flow_test.dart: logs a weekday taxi once and shows it under Recurring
+00:35 +26: C:/src/projects/Zaka/test/auth_test.dart: a new email account gets a 90-day trial and signs in
+00:36 +27: C:/src/projects/Zaka/test/auth_test.dart: duplicate emails are rejected
+00:36 +28: C:/src/projects/Zaka/test/auth_test.dart: sign-in checks the password and updates last sign-in
+00:36 +29: C:/src/projects/Zaka/test/auth_test.dart: the configured creator email gets lifetime access automatically
+00:36 +30: C:/src/projects/Zaka/test/auth_test.dart: when a creator code is set, email alone is not enough
+00:37 +31: C:/src/projects/Zaka/test/auth_test.dart: only the creator can grant a plan
+00:37 +32: C:/src/projects/Zaka/test/auth_test.dart: an expired trial falls back to the free plan, not a lockout
+00:37 +33: C:/src/projects/Zaka/test/database_test.dart: logs a withdrawal and a spend into the live balance
+00:38 +34: C:/src/projects/Zaka/test/database_test.dart: a Mon–Fri taxi posts once per weekday and never duplicates
+00:38 +35: C:/src/projects/Zaka/test/database_test.dart: paused rules do not post
+00:40 +36: C:/src/projects/Zaka/test/demo_statement_test.dart: the synthetic demo CSV parses and keeps its ATM rows
+00:41 +37: C:/src/projects/Zaka/test/feedback_contact_test.dart: the feedback row shows the contact and copies it
+00:44 +38: C:/src/projects/Zaka/test/feedback_contact_test.dart: the feedback row shows the contact and copies it
+00:44 +39: C:/src/projects/Zaka/test/feedback_contact_test.dart: the feedback row shows the contact and copies it
+00:44 +40: C:/src/projects/Zaka/test/feedback_contact_test.dart: the feedback row shows the contact and copies it
+00:44 +41: C:/src/projects/Zaka/test/feedback_contact_test.dart: the feedback row shows the contact and copies it
+00:44 +42: C:/src/projects/Zaka/test/feedback_contact_test.dart: the feedback row shows the contact and copies it
+00:44 +43: C:/src/projects/Zaka/test/feedback_contact_test.dart: the feedback row shows the contact and copies it
+00:44 +44: C:/src/projects/Zaka/test/feedback_contact_test.dart: the feedback row shows the contact and copies it
+00:44 +45: C:/src/projects/Zaka/test/feedback_contact_test.dart: the feedback row shows the contact and copies it
+00:47 +46: C:/src/projects/Zaka/test/migration_test.dart: upgrades a v1 cash-only database without losing entries
+00:49 +47: C:/src/projects/Zaka/test/money_test.dart: parseRandToCents parses whole rands
+00:49 +48: C:/src/projects/Zaka/test/money_test.dart: parseRandToCents parses rands and cents
+00:49 +49: C:/src/projects/Zaka/test/money_test.dart: parseRandToCents strips currency symbols and thousands separators
+00:49 +50: C:/src/projects/Zaka/test/money_test.dart: parseRandToCents rejects empty, zero and junk input
+00:49 +51: C:/src/projects/Zaka/test/money_test.dart: formatCents formats cents as rands
+00:51 +52: C:/src/projects/Zaka/test/pdf_statement_test.dart: extracts text and transactions from a text PDF
+00:52 +53: C:/src/projects/Zaka/test/pdf_statement_test.dart: rejects a PDF with no selectable text
+00:53 +54: C:/src/projects/Zaka/test/privacy_test.dart: deleteEverything empties every table and clears preferences
+00:56 +55: C:/src/projects/Zaka/test/privacy_test.dart: a blank cash account can be recreated after deletion
+00:56 +56: C:/src/projects/Zaka/test/privacy_test.dart: recreating the cash account updates account streams
+00:56 +57: C:/src/projects/Zaka/test/recurrence_test.dart: occurrenceDates expands a Monday to Friday taxi across a weekend
+00:57 +58: C:/src/projects/Zaka/test/recurrence_test.dart: occurrenceDates never repeats the day after which it starts
+00:57 +59: C:/src/projects/Zaka/test/recurrence_test.dart: occurrenceDates stops at the end date
+00:57 +60: C:/src/projects/Zaka/test/recurrence_test.dart: occurrenceDates returns nothing for an empty weekday set
+00:57 +61: C:/src/projects/Zaka/test/recurrence_test.dart: weekday encoding round-trips a set of weekdays
+00:57 +62: C:/src/projects/Zaka/test/recurrence_test.dart: weekday encoding ignores invalid values
+00:57 +63: C:/src/projects/Zaka/test/recurrence_test.dart: weekday encoding describes common patterns
+00:57 +64: C:/src/projects/Zaka/test/recurrence_test.dart: nextOccurrence moves from Friday to the next Monday
+00:57 +65: C:/src/projects/Zaka/test/recurrence_test.dart: nextOccurrence returns null after the end date
+00:57 +66: C:/src/projects/Zaka/test/recurrence_test.dart: upcomingRecurringByDay groups due amounts inside the horizon
+00:57 +67: C:/src/projects/Zaka/test/recurrence_test.dart: upcomingRecurringByDay ignores paused rules
+01:00 +68: C:/src/projects/Zaka/test/sample_data_test.dart: sample data uses the R900 piece-job payment, not a salary
+01:01 +69: C:/src/projects/Zaka/test/sample_data_test.dart: sample import leaves about five days of runway
+01:01 +70: C:/src/projects/Zaka/test/sample_data_test.dart: sample import leaves about five days of runway
+01:01 +71: C:/src/projects/Zaka/test/statement_test.dart: parseStatementCsv reads separate debit and credit columns
+01:01 +72: C:/src/projects/Zaka/test/statement_test.dart: parseStatementCsv skips preamble rows before the header
+01:01 +73: C:/src/projects/Zaka/test/statement_test.dart: parseStatementCsv keeps identical same-day rows distinct and repeatable
+01:01 +74: C:/src/projects/Zaka/test/statement_test.dart: parseStatementCsv rejects a file without a date and amount header
+01:01 +75: C:/src/projects/Zaka/test/statement_test.dart: parseStatementAmountCents handles Rand symbols, signs, thousands and parentheses
+01:01 +76: C:/src/projects/Zaka/test/statement_test.dart: parseStatementText reconstructs rows from a text-based PDF statement
+01:01 +77: C:/src/projects/Zaka/test/statement_test.dart: parseStatementText uses debit and credit columns when present
+01:02 +78: C:/src/projects/Zaka/test/statement_test.dart: parseStatementText infers the direction from the description when no balance exists
+01:02 +79: C:/src/projects/Zaka/test/statement_test.dart: parseStatementText rejects text with no transactions
+01:02 +80: C:/src/projects/Zaka/test/statement_test.dart: parseStatementDate reads common South African bank date formats
+01:02 +81: All tests passed!

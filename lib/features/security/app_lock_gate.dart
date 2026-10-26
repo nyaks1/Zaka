@@ -6,6 +6,9 @@ import 'lock_screen.dart';
 
 /// Shows the home shell, or a PIN screen when an app lock is configured and the
 /// app has just launched or come back from the background.
+///
+/// Pushed sub-screens are closed on lock so they cannot sit above the PIN
+/// screen when the app is resumed.
 class AppLockGate extends ConsumerStatefulWidget {
   const AppLockGate({super.key, required this.child});
 
@@ -56,6 +59,12 @@ class _AppLockGateState extends ConsumerState<AppLockGate>
     final hasPin = await ref.read(appLockServiceProvider).hasPin();
     if (!mounted) return;
     if (!hasPin) return;
+    // Sub-screens are pushed on the root navigator, above this gate. Close
+    // them so the lock screen is what the user sees when they come back.
+    final navigator = Navigator.of(context);
+    if (navigator.canPop()) {
+      navigator.popUntil((route) => route.isFirst);
+    }
     setState(() {
       _hasPin = true;
       _locked = true;

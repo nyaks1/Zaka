@@ -36,7 +36,7 @@ apps” is allowed for a different app than the one holding the APK. Open
 **Settings → Apps → Special app access → Install unknown apps** and allow the
 browser or file manager you actually used.
 
-`SHA256 (zaka-0.1.0.apk)`: `4df7bcd176a578f05bb5de32983d84faf7f980ac0b80cbb2a1c605dd94ae78e2`
+`SHA256 (zaka-0.1.0.apk)`: `1c46a1683c81107ef40833a47e65fc8b710e9456c562af66f1a50a251fdb118c`
 
 This public APK is built **without** a proxy URL or feedback alias. Ask Zaka
 therefore shows its on-device tip, and the feedback form points at the public
@@ -338,14 +338,14 @@ default model name.
 
 ```bash
 flutter analyze     # no issues
-flutter test        # 80 tests
+flutter test        # 81 tests
 cd proxy && npm test  # 22 tests
 ```
 
 Verified for this revision:
 
 - `flutter analyze` — no issues.
-- `flutter test` — 80 tests passed.
+- `flutter test` — 81 tests passed.
 - `flutter build apk --release` — output at
   `build/app/outputs/flutter-apk/app-release.apk`; the manifest was checked for
   `INTERNET` and `allowBackup=false`.
@@ -357,11 +357,14 @@ Verified for this revision:
   `415` for the wrong content type, `413` for an oversized body, and `500` for a
   valid request on the keyless temporary build. The host is redacted in
   `docs/evidence/curl_checks.txt`.
-- On-device smoke test on a 1220×2712 Android 16 phone: cleared data, loaded the
-  sample statement, added R100, logged a R35 taxi, opened the Ask Zaka card,
-  created the creator account and saw it in the Users console. The app-lock and
-  feedback screens were added after that device run and are covered by widget
-  tests, not by this log. The flow is in `docs/evidence/logcat_clean.txt`.
+- On-device smoke test on a 1220×2712 Android 16 phone with the release APK:
+  cleared data, loaded the sample statement (R625, five-day runway), added R100,
+  logged a R35 taxi, opened Activity, Accounts, the Account screen, the feedback
+  form (correctly refused to send without an endpoint and copied the GitHub
+  contact), Privacy policy, About/Licences and Privacy & Ask Zaka. With a PIN
+  set, backgrounding from the Account sub-screen re-locked and discarded that
+  screen; Delete everything emptied the dashboard and removed the PIN. Raw
+  filtered log: `docs/evidence/logcat_clean.txt`.
   `device_screenshot.png` is the R625, five-day-runway portrait;
   `device_light.png` and `device_dark.png` show the same build after the add and
   spend in both themes.
