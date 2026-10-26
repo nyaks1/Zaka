@@ -49,3 +49,6 @@ app.*.map.json
 
 # Windows download markers copied into generated template files
 *:Zone.Identifier
+
+# Private build values (owner email, creator code, feedback alias, proxy URL)
+build.local.json

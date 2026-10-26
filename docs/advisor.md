@@ -123,6 +123,14 @@ If the define is absent, the app never calls the network for Ask Zaka and uses
 the offline tip. The app refuses a non-HTTPS proxy (except `localhost` for
 `wrangler dev`) before creating an install token.
 
+The same build can set a monitored feedback alias with
+`--dart-define=FEEDBACK_EMAIL=...`. Keep the real value in the gitignored
+`build.local.json` and the release helper rather than a public command. If it is
+unset, the feedback row falls back to the public GitHub Issues page. The
+feedback form posts to `/feedback` on the same Worker; set `FEEDBACK_WEBHOOK`
+as a Wrangler secret. The form never attaches money data, and the optional
+diagnostics are limited to the app version and Android version.
+
 ## FAIS / FSCA boundary
 
 The app and the prompt use “tips” and “insights”, not “financial advice”. The
@@ -139,8 +147,14 @@ licence/representative arrangements.
 ## Delete everything
 
 `PrivacyService.deleteEverything()` calls `AppDatabase.deleteEverything()`,
-which deletes every table in one transaction, then runs a best-effort `VACUUM`
-so SQLite does not keep old rows in free pages, then clears all
-`shared_preferences`. The UI recreates a blank Cash account afterwards so the
-app remains usable. The test `deleteEverything empties every table and clears
-preferences` checks every table and the preference clear.
+which deletes every money table in one transaction. It then deletes every local
+Zaka account, removes the signed-in user id, clears the app-lock PIN and clears
+the advisor consent and install token. Finally it runs a best-effort `VACUUM` so
+SQLite does not keep old rows in free pages. The UI recreates a blank Cash
+account afterwards so the app remains usable. The tests in
+`test/privacy_test.dart` check every table, the local user, the sign-in id, the
+PIN and the preference clear.
+
+There is no encrypted export or backup yet. That is a known POPIA access gap: a
+lost phone loses the data and the project cannot produce a portable copy.
+Encrypted export is on the roadmap.

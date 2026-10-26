@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'core/theme.dart';
+import 'features/security/app_lock_gate.dart';
 import 'features/shell/home_shell.dart';
 import 'providers.dart';
 
@@ -55,7 +56,7 @@ class _ZakaAppState extends ConsumerState<ZakaApp> with WidgetsBindingObserver {
       theme: ZakaTheme.light(),
       darkTheme: ZakaTheme.dark(),
       themeMode: ThemeMode.system,
-      home: const HomeShell(),
+      home: const AppLockGate(child: HomeShell()),
     );
   }
 }

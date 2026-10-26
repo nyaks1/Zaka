@@ -52,6 +52,17 @@ void main() {
     expect(find.text('Delete everything'), findsOneWidget);
 
     await tester.scrollUntilVisible(
+      find.text('Send feedback or a complaint'),
+      300,
+      scrollable: scrollable,
+    );
+    expect(find.text('Send feedback or a complaint'), findsOneWidget);
+    expect(
+      find.text('Please don’t send bank details or statements.'),
+      findsOneWidget,
+    );
+
+    await tester.scrollUntilVisible(
       find.textContaining('not financial advice'),
       300,
       scrollable: scrollable,

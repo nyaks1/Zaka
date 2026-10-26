@@ -5,6 +5,9 @@ import 'package:flutter_boxicons/flutter_boxicons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../providers.dart';
+import '../support/contact.dart';
+import '../support/feedback_contact_tile.dart';
+import '../support/privacy_policy_screen.dart';
 import 'advisor_service.dart';
 import 'advisor_summary.dart';
 
@@ -82,7 +85,8 @@ class _AdvisorScreenState extends ConsumerState<AdvisorScreen> {
         title: const Text('Delete everything?'),
         content: const Text(
           'This deletes every account, entry, recurring rule and import key, '
-          'plus the Ask Zaka consent, from this phone. It cannot be undone.',
+          'your local Zaka account and sign-in, the app-lock PIN, and the Ask '
+          'Zaka consent from this phone. It cannot be undone.',
         ),
         actions: [
           TextButton(
@@ -108,6 +112,8 @@ class _AdvisorScreenState extends ConsumerState<AdvisorScreen> {
       await ref.read(databaseProvider).ensureDefaultAccount();
       if (!mounted) return;
       ref.invalidate(advisorConsentProvider);
+      ref.invalidate(currentUserProvider);
+      ref.invalidate(localUsersProvider);
       setState(() {
         _deleting = false;
         _reply = null;
@@ -116,8 +122,8 @@ class _AdvisorScreenState extends ConsumerState<AdvisorScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text(
-            'Everything deleted. A blank Cash account is ready if you want '
-            'to start again.',
+            'Everything deleted. You are signed out. A blank Cash account is '
+            'ready if you want to start again.',
           ),
         ),
       );
@@ -324,7 +330,9 @@ class _AdvisorScreenState extends ConsumerState<AdvisorScreen> {
           const SizedBox(height: 8),
           Text(
             'Delete every account, entry, rule and import key from this phone, '
-            'and clear the Ask Zaka consent flag.',
+            'your local Zaka account and sign-in, the app-lock PIN, and the '
+            'Ask Zaka consent flag. This is the fastest way to exercise your '
+            'POPIA deletion right for data on this phone.',
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
               height: 1.45,
@@ -347,6 +355,37 @@ class _AdvisorScreenState extends ConsumerState<AdvisorScreen> {
             label: const Text('Delete everything'),
           ),
           const SizedBox(height: 18),
+          Card(
+            clipBehavior: Clip.antiAlias,
+            child: ListTile(
+              leading: const Icon(Boxicons.bx_shield),
+              title: const Text('Read the full privacy policy'),
+              subtitle: const Text(
+                'Responsible party, retention, cross-border processing and '
+                'complaints',
+              ),
+              trailing: const Icon(Boxicons.bx_chevron_right),
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => const PrivacyPolicyScreen(),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 14),
+          const FeedbackContactCard(),
+          const SizedBox(height: 16),
+          Text(
+            'To delete your data, use Delete everything above. To ask us about '
+            'data we hold, contact us at $feedbackContactLabel. The Worker '
+            'stores no personal data; its rate-limit keys expire after 2 days.',
+            textAlign: TextAlign.center,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+              height: 1.45,
+            ),
+          ),
+          const SizedBox(height: 14),
           Text(
             'Ask Zaka gives tips and insights, not financial advice.',
             textAlign: TextAlign.center,

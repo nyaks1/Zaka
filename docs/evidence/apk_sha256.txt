@@ -1,1 +1,1 @@
-03c564fd7435a09036e76f8c9b4172bfecd16440076714d5aa6ad95b00ca60c6  build/app/outputs/flutter-apk/app-release.apk
+4df7bcd176a578f05bb5de32983d84faf7f980ac0b80cbb2a1c605dd94ae78e2  release/zaka-0.1.0.apk

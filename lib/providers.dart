@@ -14,6 +14,8 @@ import 'features/advisor/advisor_service.dart';
 import 'features/advisor/advisor_summary.dart';
 import 'features/advisor/privacy_service.dart';
 import 'features/auth/auth_service.dart';
+import 'features/security/app_lock_service.dart';
+import 'features/support/feedback_service.dart';
 
 final databaseProvider = Provider<AppDatabase>((ref) {
   final database = AppDatabase();
@@ -248,8 +250,24 @@ final privacyServiceProvider = Provider<PrivacyService>(
   (ref) => PrivacyService(
     ref.watch(databaseProvider),
     ref.watch(advisorPreferencesProvider),
+    ref.watch(authServiceProvider),
+    ref.watch(appLockServiceProvider),
   ),
 );
+
+final appLockServiceProvider = Provider<AppLockService>(
+  (ref) => AppLockService(),
+);
+
+final feedbackServiceProvider = Provider<FeedbackService>((ref) {
+  final client = http.Client();
+  ref.onDispose(client.close);
+  return FeedbackService(
+    ref.watch(advisorPreferencesProvider),
+    client,
+    const String.fromEnvironment('ADVISOR_PROXY_URL'),
+  );
+});
 
 final authServiceProvider = Provider<AuthService>(
   (ref) => AuthService(ref.watch(databaseProvider)),

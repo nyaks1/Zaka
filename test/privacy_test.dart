@@ -1,20 +1,28 @@
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:zaka/data/cash_repository.dart';
 import 'package:zaka/data/database.dart';
 import 'package:zaka/features/advisor/advisor_service.dart';
 import 'package:zaka/features/advisor/privacy_service.dart';
+import 'package:zaka/features/auth/auth_service.dart';
+import 'package:zaka/features/security/app_lock_service.dart';
 
 void main() {
   late AppDatabase database;
   late CashRepository repository;
   late _FakeStore store;
+  late AuthService auth;
+  late AppLockService appLock;
 
   setUp(() {
+    SharedPreferences.setMockInitialValues({});
     database = AppDatabase.forTesting(NativeDatabase.memory());
     repository = CashRepository(database);
     store = _FakeStore();
+    auth = AuthService(database, pbkdf2Iterations: 1);
+    appLock = AppLockService();
   });
 
   tearDown(() async {
@@ -63,18 +71,31 @@ void main() {
           ),
         );
 
-    await PrivacyService(database, store).deleteEverything();
+    final user = await auth.register(
+      email: 'tester@zaka.test',
+      password: 'correct horse battery',
+      displayName: 'Tester',
+    );
+    expect(user.email, 'tester@zaka.test');
+    await appLock.setPin('1234');
+    final prefs = await SharedPreferences.getInstance();
+    expect(prefs.getInt(AuthService.currentUserKey) != null, isTrue);
+
+    await PrivacyService(database, store, auth, appLock).deleteEverything();
 
     expect(await database.select(database.transfers).get(), isEmpty);
     expect(await database.select(database.spends).get(), isEmpty);
     expect(await database.select(database.withdrawals).get(), isEmpty);
     expect(await database.select(database.recurringRules).get(), isEmpty);
     expect(await database.select(database.accounts).get(), isEmpty);
+    expect(await database.select(database.localUsers).get(), isEmpty);
+    expect(await appLock.hasPin(), isFalse);
+    expect(prefs.getInt(AuthService.currentUserKey) == null, isTrue);
     expect(store.cleared, isTrue);
   });
 
   test('a blank cash account can be recreated after deletion', () async {
-    await PrivacyService(database, store).deleteEverything();
+    await PrivacyService(database, store, auth, appLock).deleteEverything();
     await database.ensureDefaultAccount();
 
     final accounts = await database.select(database.accounts).get();
@@ -90,7 +111,7 @@ void main() {
     );
     await Future<void>.delayed(const Duration(milliseconds: 10));
 
-    await PrivacyService(database, store).deleteEverything();
+    await PrivacyService(database, store, auth, appLock).deleteEverything();
     await database.ensureDefaultAccount();
     await Future<void>.delayed(const Duration(milliseconds: 10));
 

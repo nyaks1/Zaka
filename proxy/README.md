@@ -15,6 +15,14 @@ The worker rejects anything else, caps the body at 1 KB / 1,000 characters,
 checks a per-install token, and calls Gemini. It never logs the summary or the
 token.
 
+The same Worker also has an optional **`/feedback`** route for the in-app form.
+It accepts `message` (required), and optional `replyTo`, `appVersion` and
+`androidVersion`; rejects any other field; caps the body at 4 KB / 4,000
+characters and the message at 2,000; and forwards the message to
+`FEEDBACK_WEBHOOK`. The Worker stores no feedback. Rate limiting reuses the KV
+binding with a separate 3-per-day default (`FEEDBACK_DAILY_LIMIT`) and a
+2-day key TTL.
+
 ## Deploy (Cloudflare Workers)
 
 ```sh
@@ -24,6 +32,8 @@ npx wrangler secret put GEMINI_API_KEY
 npx wrangler secret put GEMINI_MODEL
 # Optional alert webhook:
 npx wrangler secret put BUDGET_ALERT_WEBHOOK
+# In-app feedback destination (Slack/Discord-style incoming webhook):
+npx wrangler secret put FEEDBACK_WEBHOOK
 npx wrangler deploy
 ```
 
@@ -65,9 +75,24 @@ npm test
 
 The tests cover POST-only, the exact four-field allowlist, extra fields,
 unknown categories, the install token, the 1 KB cap, content type, the
-"financial advice" and product/provider output filter, and the Gemini request
+"financial advice" and product/provider output filter, the Gemini request
 keeping the prompt in `systemInstruction` with only the four summary fields in
-`contents`.
+`contents`, and the `/feedback` route: valid forwarding, extra fields, empty
+message, missing token, 4 KB cap, missing webhook, invalid reply-to, its own
+daily limit and GET rejection. The suite has 22 tests.
+
+## Feedback curl check
+
+```sh
+curl -i -X POST "$ADVISOR_URL/feedback" \
+  -H 'content-type: application/json' \
+  -H "x-install-token: $TOKEN" \
+  --data '{"message":"The import preview was hard to read."}'
+```
+
+Expected on a configured Worker: `202` with `{"ok":true}`. Without
+`FEEDBACK_WEBHOOK` it returns `503`. The message is forwarded to the webhook and
+not stored by the Worker.
 
 ## curl checks
 

@@ -8,6 +8,47 @@ It now also tracks the rest of your money. Add your FNB, Capitec, ABSA, Standard
 
 Built for the **FNB App of the Year Hackathon 2026** — theme: *Financial inclusion and money confidence.*
 
+Zaka is for people aged **18 and over**. It gives tips and insights, not
+financial advice.
+
+---
+
+## Install it in 60 seconds
+
+1. **Download the APK on the phone:** [zaka-0.1.0.apk](release/zaka-0.1.0.apk)
+   (about 61 MB). The SHA-256 is printed next to the file and below.
+2. **Check the phone:** Android **7.0 (API 24) or later**. This is a
+   debug-signed hackathon build, not a Play Store release.
+3. **Open the downloaded file.** Android will ask you to allow installs from
+   the browser or file manager you used. Allow **that one app**, then tap
+   **Install**. You do not need to enable “install unknown apps” for every app.
+4. **Play Protect may warn you.** A debug-signed APK from outside the Play Store
+   can trigger “Unsafe app blocked” or “App scan”. Tap **More details** (or
+   **Details**) and then **Install anyway**. The exact words vary by Android
+   version. Do **not** turn Play Protect off globally; if you are not happy with
+   the warning, build from source or stop here.
+5. **Open Zaka and tap “Try with sample data”** on the first screen. That loads
+   the R900 piece-job statement, the R500 ATM transfer and the five-day runway.
+   No account or bank login is needed for the demo.
+
+If the install button is greyed out, the usual cause is that “install unknown
+apps” is allowed for a different app than the one holding the APK. Open
+**Settings → Apps → Special app access → Install unknown apps** and allow the
+browser or file manager you actually used.
+
+`SHA256 (zaka-0.1.0.apk)`: `4df7bcd176a578f05bb5de32983d84faf7f980ac0b80cbb2a1c605dd94ae78e2`
+
+This public APK is built **without** a proxy URL or feedback alias. Ask Zaka
+therefore shows its on-device tip, and the feedback form points at the public
+GitHub Issues page instead of posting to a Worker. The online Gemini path and
+the `/feedback` route ship in the source and work when a build supplies
+`ADVISOR_PROXY_URL`, a deployed Worker with `FEEDBACK_WEBHOOK`, and a monitored
+contact alias. Nothing in the cash tracker needs either.
+
+The APK is also reproducible from source; see
+[Build a release APK](#build-a-release-apk). The public repository is
+<https://github.com/nyaks1/Zaka>.
+
 ---
 
 ## The Problem
@@ -30,7 +71,10 @@ The villain isn't cash. It's **invisible money**: the bank sees the withdrawal, 
 | Recurring cash | A Mon–Fri taxi is logged once and posted automatically on the days you choose | Done |
 | Cash-runway forecast | Daily burn rate × remaining money = the day your money runs out | Done |
 | Ask Zaka tips | Optional Gemini tips from a four-field, privacy-safe summary, with an on-device fallback | Done |
-| Consent + delete-all | Explicit consent before any AI call; wipe every money table and advisor setting in one tap | Done |
+| Consent + delete-all | Explicit consent before any AI call; one tap wipes every money table, the local account and sign-in, the app-lock PIN and advisor settings | Done |
+| App lock | Optional 4–8 digit PIN, re-lock after backgrounding, Android recents preview hidden | Done |
+| Privacy policy + About | Readable in-app policy, Information Officer/contact, version, licences | Done |
+| Feedback + complaints | Copyable contact in Privacy and Account, in-app form, Worker route, GitHub Issues warning | Done |
 | Email/password accounts | Local account, PBKDF2 password hash, 3-month trial on sign-up | Done |
 | Creator console | Owner sees accounts on this device and can grant lifetime access | Done (this device) |
 | Google sign-in | Continue with a Google account | Roadmap |
@@ -41,6 +85,11 @@ The villain isn't cash. It's **invisible money**: the bank sees the withdrawal, 
 **Done** means the feature is in this build and is covered by the evidence in
 [`docs/evidence/`](docs/evidence/). **Roadmap** is not a feature: it has no
 shipped screen or working backend, and the README says so below.
+
+**What happens on day 91:** the account label changes from “Trial” to “Free
+plan”. The cash tracker, imports and on-device Ask Zaka tip keep working. No paid
+feature is switched on yet, so nothing is locked and nothing is charged. The
+90-day date is real, but the trial is not a paywall in this build.
 
 ### Sample data
 
@@ -71,12 +120,16 @@ feature is switched on yet.
 
 The account layer is local-first: the user row lives in the same on-device
 SQLite database, the password is stored as a salted PBKDF2-HMAC-SHA256 hash, and
-money data is never uploaded by signing in. The creator email is
-`OWNER_EMAIL` (default `nyakallomasiu@gmail.com`). Sign up with it and the
-account is created as **owner + lifetime**; the **Users** console then lists
-every account on that device and can grant lifetime access, reset a trial or
-move someone to free. Add `--dart-define=OWNER_ACCESS_CODE=...` to require a
-one-time code before the owner role is granted.
+money data is never uploaded by signing in. A public checkout has **no default
+creator email**: `OWNER_EMAIL` is empty unless a private build config supplies
+it. To create a creator build, copy `build.local.example.json` to
+`build.local.json`, set `ownerEmail` and an optional `ownerAccessCode`, and run
+`tool/build-release.ps1`. The file is gitignored, so the real address and code
+never appear in the public README or APK build command. With an owner email
+configured, signing up with it creates an **owner + lifetime** account; the
+**Users** console then lists every account on that device and can grant lifetime
+access, reset a trial or move someone to free. If `ownerAccessCode` is set, the
+account must also enter that code once.
 
 Google sign-in and a central user directory are **Roadmap**, not features. A
 real Google button needs an OAuth client for the Android package and signing
@@ -136,11 +189,19 @@ proxy rejects a tip that names a product, provider or bank before it reaches
 the card. See
 [`docs/advisor.md`](docs/advisor.md) and [`proxy/README.md`](proxy/README.md).
 
+**Cross-border processing:** when you turn Ask Zaka on and request tips, the
+Worker sends those four fields to **Google Gemini**, and **Google may process
+them outside South Africa**. The consent switch is the consent point for that
+transfer. This is also stated on the in-app privacy screen and in the SSDLC
+form. Cloudflare may process request metadata outside South Africa as the
+hosting provider. If you leave Ask Zaka off, nothing is sent.
+
 The **Delete everything** control removes every money table — accounts, entries,
-recurring rules and import keys — in one transaction, then clears the Ask Zaka
+recurring rules and import keys — in one transaction. It also deletes every
+local Zaka account, the signed-in user id, the app-lock PIN and the Ask Zaka
 consent and install token. A blank Cash account is recreated so the app still
-opens. Your Zaka sign-in is not money data, so it stays signed in; deleting the
-account itself is not shipped yet.
+opens. The control now really does remove the local account and sign-in; it
+does not leave your email behind.
 
 ### Recurring taxi, explained
 
@@ -202,26 +263,22 @@ Flutter app (Riverpod)
 
 ## Running it (Windows + WSL)
 
-This project is deliberately kept on the **Windows** filesystem:
-
-```
-Windows:  C:\src\projects\Zaka
-WSL:      /mnt/c/src/projects/Zaka
-          /home/nyaks/src/github/Zaka  → symlink to the same folder
-```
-
-Flutter is installed on Windows (`C:\src\flutter_windows_3.47.0-stable`). Windows Flutter cannot reliably build a project stored on the WSL filesystem because it fails to create plugin symlinks there, so keep the project on the Windows drive.
+The examples assume the checkout is on the **Windows** filesystem and that
+Flutter is installed on Windows. Windows Flutter cannot reliably build a
+project stored on the WSL filesystem because it fails to create plugin symlinks
+there, so keep the project on a Windows drive. Your own paths will differ from
+the examples below.
 
 ### From Windows (PowerShell or cmd)
 
 ```powershell
-cd C:\src\projects\Zaka
+cd <path-to-Zaka>
 flutter pub get
 dart run build_runner build --delete-conflicting-outputs   # generates Drift code
 flutter run -d chrome                                     # fastest way to see it
 ```
 
-- `flutter run -d windows` needs the **“Desktop development with C++”** workload in Visual Studio. It is not installed on this machine yet.
+- `flutter run -d windows` needs the **“Desktop development with C++”** workload in Visual Studio.
 - The `file_selector` plugin needs Windows **Developer Mode** for plugin symlinks (`start ms-settings:developers`). Web and Android builds do not need it.
 - Android: accept the SDK licences with `flutter doctor --android-licenses`, plug in a device, then `flutter run -d <device>`.
 
@@ -244,21 +301,33 @@ A Windows equivalent is `tool\flutter-win.cmd`.
 
 ### Build a release APK
 
-The release manifest now declares `android.permission.INTERNET` and sets
-`android:allowBackup="false"`. Build with the advisor proxy URL if you want the
-optional Gemini tips; without it the app uses the on-device fallback:
+The release manifest declares `android.permission.INTERNET` and sets
+`android:allowBackup="false"`. Real values stay out of public build commands:
+copy `build.local.example.json` to `build.local.json`, fill in the proxy URL,
+owner email, creator code and feedback alias, then run the PowerShell helper:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File tool/build-release.ps1
+```
+
+`build.local.json` is gitignored, so the real owner address and code never
+appear in this README or in a shell history. The helper runs:
 
 ```bash
 flutter build apk --release --obfuscate --split-debug-info=build/symbols \
-  --dart-define=ADVISOR_PROXY_URL=https://zaka-advisor.<subdomain>.workers.dev \
-  --dart-define=OWNER_EMAIL=nyakallomasiu@gmail.com \
-  --dart-define=OWNER_ACCESS_CODE='use-a-long-random-phrase'
+  --dart-define=ADVISOR_PROXY_URL=... \
+  --dart-define=OWNER_EMAIL=... \
+  --dart-define=OWNER_ACCESS_CODE=... \
+  --dart-define=FEEDBACK_EMAIL=...
 ```
 
 Omit `ADVISOR_PROXY_URL` to ship the on-device Ask Zaka tip only. Omit
-`OWNER_ACCESS_CODE` if the creator email alone should unlock lifetime access;
-the default `OWNER_EMAIL` is already the project author. See
-[`docs/accounts.md`](docs/accounts.md).
+`OWNER_ACCESS_CODE` if the creator email alone should unlock lifetime access.
+A public checkout has an empty `OWNER_EMAIL`, so no one is the creator until a
+private build config supplies an address. If `FEEDBACK_EMAIL` is unset, the app
+points people at the public GitHub Issues page instead of shipping a dead or
+personal address. See [`docs/accounts.md`](docs/accounts.md) and
+[`build.local.example.json`](build.local.example.json).
 
 Deploy the proxy with [`proxy/README.md`](proxy/README.md). Set
 `GEMINI_MODEL` from the current list at
@@ -269,32 +338,33 @@ default model name.
 
 ```bash
 flutter analyze     # no issues
-flutter test        # 77 tests
-cd proxy && npm test  # 13 tests
+flutter test        # 80 tests
+cd proxy && npm test  # 22 tests
 ```
 
-Verified on this machine for this revision:
+Verified for this revision:
 
 - `flutter analyze` — no issues.
-- `flutter test` — 77 tests passed.
+- `flutter test` — 80 tests passed.
 - `flutter build apk --release` — output at
   `build/app/outputs/flutter-apk/app-release.apk`; the manifest was checked for
   `INTERNET` and `allowBackup=false`.
-- `gitleaks detect` — 17 commits, no leaks.
-- `osv-scanner scan source -L pubspec.lock` — 126 packages, no known
-  vulnerabilities.
-- `cd proxy && npm test` — 13 Node tests.
+- `gitleaks detect` — no leaks.
+- `osv-scanner scan source -L pubspec.lock` — no known vulnerabilities.
+- `cd proxy && npm test` — 22 Node tests, including the feedback route.
 - Live advisor proxy curls against a temporary Cloudflare Worker: `405` for GET,
   `401` without an install token, `400` for an extra field or unknown category,
   `415` for the wrong content type, `413` for an oversized body, and `500` for a
   valid request on the keyless temporary build. The host is redacted in
   `docs/evidence/curl_checks.txt`.
-- On-device smoke test on a Xiaomi 24115RA8EG (Android 16, 1220×2712): cleared
-  data, loaded the sample statement, added R100, logged a R35 taxi, opened the
-  Ask Zaka card, created the creator account and saw it in the Users console.
-  The flow is in `docs/evidence/logcat_clean.txt`. `device_screenshot.png` is
-  the R625, five-day-runway portrait; `device_light.png` and `device_dark.png`
-  show the same build after the add and spend in both themes.
+- On-device smoke test on a 1220×2712 Android 16 phone: cleared data, loaded the
+  sample statement, added R100, logged a R35 taxi, opened the Ask Zaka card,
+  created the creator account and saw it in the Users console. The app-lock and
+  feedback screens were added after that device run and are covered by widget
+  tests, not by this log. The flow is in `docs/evidence/logcat_clean.txt`.
+  `device_screenshot.png` is the R625, five-day-runway portrait;
+  `device_light.png` and `device_dark.png` show the same build after the add and
+  spend in both themes.
 
 The web build is not re-verified in this revision; the Windows desktop target
 still needs the Visual Studio C++ workload. Raw outputs are indexed in
@@ -315,7 +385,9 @@ Coverage:
 - **Migration** — a v1 cash-only database upgrades through v2 to v3, keeps its entries attached to the cash account, and creates the local user table.
 - **Advisor privacy** — exactly four JSON fields; a `Sipho's tuckshop` note, import key and account name never appear; period filtering; missing-runway handling.
 - **Consent gate** — no consent throws `StateError('No consent')` before any HTTP call; the request body is exactly `summary.toJson()`; no proxy or network failure falls back to the deterministic tip.
-- **Delete-all** — every money table is emptied in one transaction and the advisor preferences are cleared; a blank Cash account can be recreated.
+- **Delete-all** — every money table is emptied in one transaction, every local account and the sign-in are removed, the app-lock PIN and advisor preferences are cleared, and a blank Cash account can be recreated.
+- **App lock** — PINs are validated, hashed, verified and cleared; the lock gate shows the PIN screen and opens only on the right PIN.
+- **Feedback** — the feedback row exists, shows the warning and copies the configured contact; the Worker forwards a valid message and rejects extra fields, a missing token, an invalid reply-to, an oversized body, a missing webhook and a rate-limited caller.
 - **Accounts** — 90-day trial, normalised unique emails, PBKDF2 hashes, wrong-password rejection, owner-by-email lifetime, optional creator code, owner-only plan changes, expired trial falling back to free.
 - **Sample data** — the R900 piece-job statement (no salary) imports one ATM transfer, leaves a R625 total, and forecasts five days.
 - **UI flows** — add money, log a preset spend, see the live balance, add a bank account and see the combined total, set up a weekday taxi and find it under Recurring, tap anywhere on the Ask Zaka card, create the creator account and open the user console.
@@ -327,7 +399,7 @@ Feature-first layout:
 ```
 lib/
   core/            # theme, money, dates, forecast, recurrence,
-                   # accounting, statement parsing
+                   # accounting, statement parsing, PBKDF2 helpers
   data/            # Drift database, repository, recurring service,
                    # statement importer, PDF extraction, BankProvider seam
   features/
@@ -338,6 +410,8 @@ lib/
     dashboard/     # total balance, runway, category breakdown, Ask Zaka card
     advisor/       # summary allowlist, consent gate, offline tip, privacy screen
     auth/          # local accounts, 90-day trial, creator user console
+    security/      # PIN app lock and the launch/background lock gate
+    support/       # About, privacy policy, feedback form and shared contact
     activity/      # full timeline, delete an entry
     shell/         # bottom navigation
   widgets/         # shared UI pieces
@@ -345,34 +419,50 @@ docs/
   accounts.md      # local accounts, trial, creator access, Google/backend plan
   advisor.md       # data allowlist, consent gate, proxy, FAIS boundary
   bank-sync.md     # Stitch/backend design for live bank sync
+  accessibility.md # language status, Semantics gap, contrast check
+  ssdlc.md         # SSDLC answers, data map, complaints and known gaps
+  deck-user-journey.md # the six-beat journey mirrored in the pitch deck
   evidence/        # analyze, tests, gitleaks, OSV, logcat, screenshots
-proxy/             # Cloudflare Worker: Gemini key, allowlist, rate limit
-tool/              # Windows/WSL Flutter wrappers
+proxy/             # Cloudflare Worker: Gemini key, tips and feedback routes
+tool/              # Windows/WSL Flutter wrappers and the private release build
 ```
 
 ## Security & POPIA
 
 - **Data minimisation:** cash and imported bank records stay on-device; no backend receives them. PDF and CSV files are parsed in the app and never uploaded. Ask Zaka can send only `runwayDays`, `dailyBurnRand`, `categoryPercent` and `periodDays`. A local account stores a name, email, salted password hash and plan on the phone; it does not upload them.
-- **Consent:** Ask Zaka is off by default. `askAdvisor` checks the stored `consentAdvisor` flag before any token creation or HTTP call. Turning it off stops all sends.
+- **Consent and cross-border processing:** Ask Zaka is off by default. `askAdvisor` checks the stored `consentAdvisor` flag before any token creation or HTTP call. Turning it off stops all sends. When it is on, the four fields go to the Worker and then to **Google Gemini, which may process them outside South Africa**. The switch is the consent point for that transfer. Cloudflare may process request metadata outside South Africa as the host.
+- **Feedback:** in a build with a Worker URL compiled in, the in-app form posts one message to the Worker `/feedback` route, which forwards it to the project webhook and stores nothing. Diagnostics are opt-in and limited to the Zaka version and Android version. The form and the privacy screen say **Please don’t send bank details or statements**. GitHub Issues is a public channel with the same warning. The Worker enforces a 4 KB cap, a 2,000-character message, a token shape check and a 3-per-day default limit; KV keys expire after 2 days. The public APK has no Worker URL, so its feedback row copies the GitHub Issues link.
 - **No banking credentials:** Zaka never asks for an internet-banking username, password or OTP. A PDF password is used in memory for extraction and is not saved. Live sync, when it ships, will use a provider consent screen and a backend that holds tokens.
-- **No PII in logs:** the app does not log amounts, notes, statement rows or free text; database errors are logged without record contents. The proxy does not log the summary or install token.
-- **Secrets:** no API keys or secrets in the repo. The Gemini key and `GEMINI_MODEL` are Wrangler secrets. `gitleaks detect` was run on the full history for this revision: 17 commits, no leaks (see `docs/evidence/gitleaks.json`). It is not yet a CI gate.
-- **Deletion:** individual spends and withdrawals can be deleted from Activity. **Delete everything** removes every money table in one transaction, runs a best-effort SQLite `VACUUM`, then clears the advisor consent and install token. It does not delete the local Zaka account; account deletion is roadmap.
-- **Local account limits:** passwords are PBKDF2-HMAC-SHA256 hashed, but there is no email verification, password reset, session expiry, server-side owner role or encrypted-at-rest database. A local owner flag is a demo convenience, not a security boundary. See [`docs/accounts.md`](docs/accounts.md).
-- **Android hardening:** the release manifest declares `INTERNET` and sets `allowBackup=false`; statement backups are disabled. Release APKs currently use the debug signing key (debug-signed demo build). Production keystore signing, SQLCipher encryption at rest, automated gitleaks/OSV/MobSF CI, certificate pinning and root detection remain on the hardening roadmap.
+- **No PII in logs:** the app does not log amounts, notes, statement rows or free text; database errors are logged without record contents. The proxy does not log the summary, feedback message or install token.
+- **Secrets:** no API keys or secrets in the repo. The Gemini key, feedback webhook and `GEMINI_MODEL` are Wrangler secrets. The owner email, creator code and feedback alias come from the gitignored `build.local.json`. `gitleaks detect` is run for each revision (see `docs/evidence/gitleaks.json`), but it is not yet a CI gate.
+- **Deletion:** individual spends and withdrawals can be deleted from Activity. **Delete everything** removes every money table in one transaction, every local Zaka account and the signed-in user id, the app-lock PIN, and the advisor consent and install token. It runs a best-effort SQLite `VACUUM`. **There is no encrypted export or backup yet**; that is a known POPIA access gap and a roadmap item, because a lost or replaced phone loses the data.
+- **Local account limits:** passwords and PINs are PBKDF2-HMAC-SHA256 hashed, but there is no email verification, password reset, session expiry, server-side owner role or encrypted-at-rest database. A local owner flag is a demo convenience, not a security boundary. See [`docs/accounts.md`](docs/accounts.md).
+- **No crash reporting, ads or analytics.** This is a deliberate privacy choice, not an omission.
+- **Age:** Zaka is for people aged **18 and over**; it is not directed at children.
+- **Android hardening:** the release manifest declares `INTERNET` and sets `allowBackup=false`. `FLAG_SECURE` hides balances from the recents preview and screenshots. The optional app lock is PIN-only; biometric unlock is roadmap. Release APKs currently use the debug signing key (debug-signed demo build). Production keystore signing, SQLCipher encryption at rest, automated gitleaks/OSV/MobSF CI, certificate pinning and root detection remain on the hardening roadmap.
+
+The readable policy is [`PRIVACY.md`](PRIVACY.md) and the in-app **Privacy policy**
+screen. It names the responsible party and Information Officer, retention,
+cross-border processing and the complaints route to the Information Regulator.
+The SSDLC answers and data map are in [`docs/ssdlc.md`](docs/ssdlc.md).
 
 ## Known Limitations
 
-- **Accounts are local to one phone.** There is no central user directory, so the creator console cannot see users on another device. There is no email verification, password reset, account deletion or session expiry. The creator role is a local build-time convention; production roles must be server-side. Google sign-in is not implemented; the button explains the missing OAuth client instead of faking a login.
+- **Accounts are local to one phone.** There is no central user directory, so the creator console cannot see users on another device. There is no email verification, password reset or session expiry. The creator role is a local build-time convention; production roles must be server-side. Google sign-in is not implemented; the button explains the missing OAuth client instead of faking a login.
 - **The trial is a label, not a paywall.** Every account gets 90 days of trial status and then falls back to the free plan. No paid feature is switched on and no payment provider is integrated, so nothing stops working at the end of the trial.
+- **No encrypted export or backup.** This is the largest POPIA access gap: a lost or replaced phone loses the data, and we cannot hand you a portable file. Encrypted JSON/CSV export with a user passphrase, plus opt-in encrypted backup, is on the roadmap.
+- **The local database is plain SQLite, not encrypted at rest yet.** The PIN lock and `FLAG_SECURE` hide the screen and the recents preview, but they do not encrypt the database file.
+- **App lock is PIN-only.** Biometric unlock needs a native plugin and permission, so it is roadmap. If you forget the PIN, clearing Android app data also removes the money data.
+- **English-only UI, no Semantics coverage.** The UI is not localised and the custom cards, charts and icon buttons do not have reliable screen-reader labels. The first targets are **isiZulu, Setswana and Sesotho**, with first-language review. A monochrome contrast check is recorded in [`docs/accessibility.md`](docs/accessibility.md), but it is not a full accessibility audit.
 - **Live bank sync is not implemented.** PDF and CSV import are manual. The PDF parser is heuristic: it needs a text layer, and bank-specific layouts may need the preview checked or a CSV fallback. Scanned/image-only PDFs need OCR (roadmap), and other banks' CSV/PDF layouts are not verified. OFX and direct bank APIs remain roadmap.
 - Only ATM/cash-withdrawal descriptions are auto-classified as transfers. Zaka does not offer manual account-to-account transfers; import each bank's statement into its own account.
 - Accounts cannot be edited yet; remove an empty account and add it again. An account with entries cannot be removed, and the last account is protected.
 - Credit accounts use a signed balance only; credit limits, minimum payments and interest are not modelled.
-- Ask Zaka needs the proxy deployed and `ADVISOR_PROXY_URL` set at build time for online tips. Without it, the app is fully usable and shows the on-device tip. The proxy's rate limit and budget alert need the optional Cloudflare KV binding.
-- The local database is plain SQLite, not encrypted at rest yet.
-- Windows desktop builds require Visual Studio C++ tooling, which is not installed on this machine. The `file_selector` plugin also needs Windows Developer Mode for plugin symlinks; web and Android builds are unaffected.
+- Ask Zaka needs the proxy deployed and `ADVISOR_PROXY_URL` set at build time for online tips. Without it, the app is fully usable and shows the on-device tip. The proxy's rate limits and budget alert need the optional Cloudflare KV binding. The Worker stores no summaries or feedback, but the Gemini and webhook providers may process or keep data under their own policies.
+- There is **no crash reporting**. That is deliberate: no analytics, ads, tracking SDK or crash upload is included, so a crash gives you no automatic diagnostic and us no stack trace.
+- Windows desktop builds require Visual Studio C++ tooling. The `file_selector` plugin also needs Windows Developer Mode for plugin symlinks; web and Android builds are unaffected.
 - The web build stores data in the browser's origin storage; it is a demo target, not the shipping target.
+- The APK is debug-signed and distributed from this repository, so Android Play Protect may warn. It is not a Play Store release and production signing is roadmap.
 
 ## Roadmap & Business Model
 
@@ -394,9 +484,23 @@ No ads, ever.
   roles, payments, stokvel group features, opt-in product referrals with
   explicit consent, anonymised aggregate insights, and the categorisation
   engine as an SDK for other SA fintechs.
+- **Privacy and access roadmap:** encrypted export/backup with a user
+  passphrase, biometric unlock, SQLCipher at rest, localisation (isiZulu,
+  Setswana, Sesotho) and a full accessibility audit.
 
 Prices are hypotheses to be validated with pilot users. Payments are not
 implemented; nobody can be charged in this build.
+
+## Licence
+
+Zaka's source code is released under the [MIT licence](LICENSE). The **Zaka**
+name, the **Z logo** and the launcher icon are product marks of the project
+author and are **not** covered by the MIT licence. Third-party packages,
+including `flutter_boxicons` (MIT), are credited in
+[`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md); the app also shows their
+licence texts under **About → Licences** (`showLicensePage`). No trademark
+registration is claimed, so confirm ownership or assignment of the artwork
+before a commercial launch.
 
 ## Author
 

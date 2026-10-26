@@ -26,6 +26,16 @@ const MAX_BODY_BYTES = 1024;
 const MAX_BODY_CHARS = 1000;
 const MAX_TIPS = 3;
 
+const FEEDBACK_KEYS = new Set([
+  'message',
+  'appVersion',
+  'androidVersion',
+  'replyTo',
+]);
+const MAX_FEEDBACK_BYTES = 4096;
+const MAX_FEEDBACK_CHARS = 4000;
+const MAX_FEEDBACK_MESSAGE = 2000;
+
 // A model can ignore the prompt. Block common product, provider and advice
 // terms before they reach the app; a blocklist reduces risk, it is not a
 // guarantee that every unsafe sentence is caught.
@@ -41,6 +51,11 @@ export default {
     }
     if (request.method !== 'POST') {
       return json({ error: 'Method not allowed' }, 405, cors);
+    }
+
+    const path = new URL(request.url).pathname.replace(/\/+$/, '');
+    if (path === '/feedback') {
+      return handleFeedback(request, env, cors);
     }
 
     const contentType = (request.headers.get('content-type') || '').toLowerCase();
@@ -224,6 +239,147 @@ function validateSummary(value) {
     }
   }
 
+  return { ok: true };
+}
+
+async function handleFeedback(request, env, cors) {
+  const contentType = (request.headers.get('content-type') || '').toLowerCase();
+  if (!contentType.startsWith('application/json')) {
+    return json({ error: 'Content-Type must be application/json' }, 415, cors);
+  }
+
+  const declaredLength = Number(request.headers.get('content-length') || 0);
+  if (declaredLength > MAX_FEEDBACK_BYTES) {
+    return json({ error: 'Feedback is too large' }, 413, cors);
+  }
+
+  let raw;
+  try {
+    raw = await request.text();
+  } catch {
+    return json({ error: 'Could not read feedback' }, 400, cors);
+  }
+  if (
+    raw.length > MAX_FEEDBACK_CHARS ||
+    new TextEncoder().encode(raw).length > MAX_FEEDBACK_BYTES
+  ) {
+    return json({ error: 'Feedback is too large' }, 413, cors);
+  }
+
+  let value;
+  try {
+    value = JSON.parse(raw);
+  } catch {
+    return json({ error: 'Body must be valid JSON' }, 400, cors);
+  }
+
+  const validation = validateFeedback(value);
+  if (!validation.ok) {
+    return json({ error: validation.error }, 400, cors);
+  }
+
+  const token = request.headers.get('x-install-token') || '';
+  if (!/^[A-Za-z0-9_-]{24,128}$/.test(token)) {
+    return json({ error: 'Missing or invalid install token' }, 401, cors);
+  }
+
+  const rate = await checkFeedbackRateLimit(env, token);
+  if (!rate.ok) {
+    return json({ error: rate.error }, 429, cors);
+  }
+
+  const webhook = String(env.FEEDBACK_WEBHOOK || '').trim();
+  if (!webhook) {
+    return json({ error: 'Feedback is not configured' }, 503, cors);
+  }
+
+  const lines = ['New Zaka feedback', '', validation.message];
+  if (validation.replyTo) lines.push('', `Reply-to: ${validation.replyTo}`);
+  if (validation.appVersion) {
+    lines.push(`App version: ${validation.appVersion}`);
+  }
+  if (validation.androidVersion) {
+    lines.push(`Android: ${validation.androidVersion}`);
+  }
+  const text = lines.join('\n');
+
+  try {
+    const response = await fetch(webhook, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      // `text` works with Slack-style webhooks; `content` with Discord-style
+      // ones. Whichever the destination ignores is harmless.
+      body: JSON.stringify({ text, content: text }),
+    });
+    if (!response.ok) {
+      return json({ error: 'Could not deliver feedback' }, 502, cors);
+    }
+  } catch {
+    return json({ error: 'Could not deliver feedback' }, 502, cors);
+  }
+
+  return json({ ok: true }, 202, cors);
+}
+
+function validateFeedback(value) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return { ok: false, error: 'Body must be a JSON object' };
+  }
+
+  const keys = Object.keys(value);
+  if (!keys.every((key) => FEEDBACK_KEYS.has(key))) {
+    return { ok: false, error: 'Unexpected feedback field' };
+  }
+
+  const message = typeof value.message === 'string' ? value.message.trim() : '';
+  if (!message) {
+    return { ok: false, error: 'Message is required' };
+  }
+  if (message.length > MAX_FEEDBACK_MESSAGE) {
+    return { ok: false, error: 'Message is too long' };
+  }
+
+  const appVersion =
+    typeof value.appVersion === 'string' ? value.appVersion.trim() : '';
+  const androidVersion =
+    typeof value.androidVersion === 'string'
+      ? value.androidVersion.trim()
+      : '';
+  if (appVersion.length > 64 || androidVersion.length > 64) {
+    return { ok: false, error: 'Version field is too long' };
+  }
+
+  const replyTo = typeof value.replyTo === 'string' ? value.replyTo.trim() : '';
+  if (replyTo) {
+    if (
+      replyTo.length > 254 ||
+      !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(replyTo)
+    ) {
+      return { ok: false, error: 'Reply-to email is invalid' };
+    }
+  }
+
+  return {
+    ok: true,
+    message,
+    appVersion: appVersion || null,
+    androidVersion: androidVersion || null,
+    replyTo: replyTo || null,
+  };
+}
+
+async function checkFeedbackRateLimit(env, token) {
+  const kv = env.ADVISOR_RATE_LIMIT;
+  if (!kv) return { ok: true };
+
+  const limit = Number(env.FEEDBACK_DAILY_LIMIT || 3);
+  const day = new Date().toISOString().slice(0, 10);
+  const key = `feedback:${token}:${day}`;
+  const current = Number(await kv.get(key)) || 0;
+  if (current >= limit) {
+    return { ok: false, error: 'Daily feedback limit reached' };
+  }
+  await kv.put(key, String(current + 1), { expirationTtl: 172800 });
   return { ok: true };
 }
 

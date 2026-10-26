@@ -7,7 +7,7 @@ abstract final class ZakaTheme {
   static const Color white = Color(0xFFFFFFFF);
   static const Color lightBorder = Color(0xFFE4E4E7);
   static const Color darkBorder = Color(0xFF27272A);
-  static const Color lightMuted = Color(0xFF71717A);
+  static const Color lightMuted = Color(0xFF6B6B73);
   static const Color darkMuted = Color(0xFFA1A1AA);
 
   static ThemeData light() => _build(Brightness.light);
@@ -45,7 +45,7 @@ abstract final class ZakaTheme {
             surface: Colors.white,
             onSurface: Color(0xFF09090B),
             surfaceContainerHighest: Color(0xFFF4F4F5),
-            onSurfaceVariant: Color(0xFF71717A),
+            onSurfaceVariant: Color(0xFF6B6B73),
             outline: Color(0xFFE4E4E7),
             outlineVariant: Color(0xFFE4E4E7),
             error: Color(0xFFDC2626),
@@ -205,12 +205,12 @@ abstract final class ZakaTheme {
         iconTheme: WidgetStateProperty.resolveWith((states) => IconThemeData(
           color: states.contains(WidgetState.selected)
               ? (isDark ? Colors.white : Colors.black)
-              : (isDark ? Colors.white54 : Colors.black45),
+              : (isDark ? Colors.white54 : Colors.black54),
         )),
         labelTextStyle: WidgetStateProperty.resolveWith((states) => TextStyle(
           color: states.contains(WidgetState.selected)
               ? (isDark ? Colors.white : Colors.black)
-              : (isDark ? Colors.white54 : Colors.black45),
+              : (isDark ? Colors.white54 : Colors.black54),
           fontWeight: states.contains(WidgetState.selected)
               ? FontWeight.w600
               : FontWeight.w500,

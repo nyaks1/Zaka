@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:zaka/app.dart';
 import 'package:zaka/data/database.dart';
+import 'package:zaka/features/auth/auth_service.dart';
 import 'package:zaka/providers.dart';
 
 void main() {
@@ -35,7 +36,12 @@ void main() {
 
     await tester.pumpWidget(
       ProviderScope(
-        overrides: [databaseProvider.overrideWithValue(database)],
+        overrides: [
+          databaseProvider.overrideWithValue(database),
+          authServiceProvider.overrideWithValue(
+            AuthService(database, ownerEmail: 'creator@zaka.test'),
+          ),
+        ],
         child: const ZakaApp(),
       ),
     );
@@ -154,7 +160,7 @@ void main() {
 
     final fields = find.byType(TextFormField);
     await tester.enterText(fields.at(0), 'Nyakallo Masiu');
-    await tester.enterText(fields.at(1), 'nyakallomasiu@gmail.com');
+    await tester.enterText(fields.at(1), 'creator@zaka.test');
     await tester.enterText(fields.at(2), 'correct horse battery');
     await tester.enterText(fields.at(3), 'correct horse battery');
     await tester.tap(find.widgetWithText(FilledButton, 'Create free account'));
@@ -167,7 +173,7 @@ void main() {
     await tester.tap(find.text('Users'));
     await settle(tester);
     expect(find.textContaining('on this device'), findsOneWidget);
-    expect(find.text('nyakallomasiu@gmail.com'), findsWidgets);
+    expect(find.text('creator@zaka.test'), findsWidgets);
 
     await disposeApp(tester);
   });

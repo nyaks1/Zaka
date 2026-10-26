@@ -13,3 +13,4 @@
 *.png binary
 *.ico binary
 *.wasm binary
+*.apk binary

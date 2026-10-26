@@ -1,11 +1,8 @@
-import 'dart:convert';
-import 'dart:math';
-
-import 'package:crypto/crypto.dart';
 import 'package:drift/drift.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../core/dates.dart';
+import '../../core/passwords.dart';
 import '../../data/database.dart';
 
 class AuthException implements Exception {
@@ -63,25 +60,23 @@ extension LocalUserPlan on LocalUser {
 /// the signed-in user id lives in shared preferences. That keeps the existing
 /// privacy promise: money data never leaves the phone.
 ///
-/// The creator is the email in `--dart-define=OWNER_EMAIL=...` (defaulting to
-/// the project author). If `OWNER_ACCESS_CODE` is set, the creator must also
+/// The creator is the email in `--dart-define=OWNER_EMAIL=...`. The default is
+/// empty on purpose: a public checkout has no owner until a private build
+/// config supplies one. If `OWNER_ACCESS_CODE` is set, the creator must also
 /// enter that code once to claim lifetime access. Production roles must live
 /// on a server; a local role is a demo convenience, not a security boundary.
 class AuthService {
   AuthService(
     this._db, {
     this.trialDays = 90,
-    this.pbkdf2Iterations = 60000,
+    this.pbkdf2Iterations = defaultPbkdf2Iterations,
     String? ownerEmail,
     String? ownerAccessCode,
   }) : ownerEmail =
            (ownerEmail ?? defaultOwnerEmail).trim().toLowerCase(),
        ownerAccessCode = ownerAccessCode ?? defaultOwnerAccessCode;
 
-  static const defaultOwnerEmail = String.fromEnvironment(
-    'OWNER_EMAIL',
-    defaultValue: 'nyakallomasiu@gmail.com',
-  );
+  static const defaultOwnerEmail = String.fromEnvironment('OWNER_EMAIL');
   static const defaultOwnerAccessCode = String.fromEnvironment(
     'OWNER_ACCESS_CODE',
   );
@@ -191,6 +186,14 @@ class AuthService {
   }
 
   Future<void> signOut() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(currentUserKey);
+  }
+
+  /// Removes every local Zaka account and the signed-in user id. Called by
+  /// "Delete everything" so the control really does delete the account too.
+  Future<void> deleteAllLocalUsers() async {
+    await _db.delete(_db.localUsers).go();
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(currentUserKey);
   }
@@ -333,86 +336,9 @@ class AuthService {
     }
   }
 
-  String _hashPassword(String password) {
-    final salt = _randomBytes(16);
-    final digest = _pbkdf2(
-      password: password,
-      salt: salt,
-      iterations: pbkdf2Iterations,
-      keyLength: 32,
-    );
-    return 'pbkdf2_sha256\$$pbkdf2Iterations\$'
-        '${base64UrlEncode(salt)}\$${base64UrlEncode(digest)}';
-  }
+  String _hashPassword(String password) =>
+      hashPassword(password, iterations: pbkdf2Iterations);
 
-  bool _verifyPassword(String password, String stored) {
-    final parts = stored.split(r'$');
-    if (parts.length != 4 || parts.first != 'pbkdf2_sha256') return false;
-
-    final iterations = int.tryParse(parts[1]);
-    if (iterations == null || iterations < 1) return false;
-
-    try {
-      final salt = base64Url.decode(parts[2]);
-      final expected = base64Url.decode(parts[3]);
-      final actual = _pbkdf2(
-        password: password,
-        salt: salt,
-        iterations: iterations,
-        keyLength: expected.length,
-      );
-      return _constantTimeEquals(actual, expected);
-    } on FormatException {
-      return false;
-    }
-  }
-
-  static List<int> _randomBytes(int length) {
-    final random = Random.secure();
-    return List<int>.generate(length, (_) => random.nextInt(256));
-  }
-
-  /// PBKDF2-HMAC-SHA256, implemented here so account creation works on every
-  /// Flutter target without a native dependency.
-  static List<int> _pbkdf2({
-    required String password,
-    required List<int> salt,
-    required int iterations,
-    required int keyLength,
-  }) {
-    final hmac = Hmac(sha256, utf8.encode(password));
-    final output = <int>[];
-    var block = 1;
-
-    while (output.length < keyLength) {
-      var u = hmac.convert([...salt, ..._intToBytes(block)]).bytes;
-      final t = List<int>.from(u);
-      for (var i = 1; i < iterations; i++) {
-        u = hmac.convert(u).bytes;
-        for (var j = 0; j < t.length; j++) {
-          t[j] ^= u[j];
-        }
-      }
-      output.addAll(t);
-      block++;
-    }
-
-    return output.sublist(0, keyLength);
-  }
-
-  static List<int> _intToBytes(int value) => [
-    (value >> 24) & 0xff,
-    (value >> 16) & 0xff,
-    (value >> 8) & 0xff,
-    value & 0xff,
-  ];
-
-  static bool _constantTimeEquals(List<int> a, List<int> b) {
-    if (a.length != b.length) return false;
-    var diff = 0;
-    for (var i = 0; i < a.length; i++) {
-      diff |= a[i] ^ b[i];
-    }
-    return diff == 0;
-  }
+  bool _verifyPassword(String password, String stored) =>
+      verifyPassword(password, stored);
 }

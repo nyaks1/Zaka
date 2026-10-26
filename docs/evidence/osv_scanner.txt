@@ -1,5 +1,7 @@
+# OSV scanner: public lockfile copied to /src (neutral container path)
+# Date: 2026-10-26T03:45:54Z
 Starting filesystem walk for root: /
-Scanned /home/nyaks/src/github/Zaka/pubspec.lock file and found 126 packages
-End status: 0 dirs visited, 1 inodes visited, 1 Extract calls, 40.839364ms elapsed, 40.841519ms wall time
+Scanned /src/pubspec.lock file and found 126 packages
+End status: 0 dirs visited, 1 inodes visited, 1 Extract calls, 237.97145ms elapsed, 237.972046ms wall time
 
 No issues found

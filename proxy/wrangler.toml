@@ -6,6 +6,7 @@ compatibility_date = "2026-10-01"
 #   wrangler secret put GEMINI_API_KEY
 #   wrangler secret put GEMINI_MODEL
 #   wrangler secret put BUDGET_ALERT_WEBHOOK   # optional
+#   wrangler secret put FEEDBACK_WEBHOOK       # in-app feedback destination
 #
 # GEMINI_MODEL must be a model ID from the current list at
 # https://ai.google.dev/gemini-api/docs/models. Do not hardcode a remembered
@@ -21,4 +22,5 @@ compatibility_date = "2026-10-01"
 [vars]
 DAILY_LIMIT = "20"
 DAILY_ALERT_CALLS = "100"
+FEEDBACK_DAILY_LIMIT = "3"
 ALLOWED_ORIGIN = "*"

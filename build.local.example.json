@@ -1,0 +1,6 @@
+{
+  "advisorProxyUrl": "https://zaka-advisor.example.workers.dev",
+  "ownerEmail": "creator@example.com",
+  "ownerAccessCode": "use-a-long-random-phrase",
+  "feedbackEmail": "zaka.feedback@example.com"
+}

@@ -5,6 +5,10 @@ import 'package:intl/intl.dart';
 
 import '../../data/database.dart';
 import '../../providers.dart';
+import '../support/about_screen.dart';
+import '../support/feedback_contact_tile.dart';
+import '../support/privacy_policy_screen.dart';
+import '../security/app_lock_service.dart';
 import 'admin_users_screen.dart';
 import 'auth_screen.dart';
 import 'auth_service.dart';
@@ -109,8 +113,6 @@ class AccountScreen extends ConsumerWidget {
                 user: user,
                 onSignOut: () => _signOut(context, ref),
               ),
-            const SizedBox(height: 14),
-            _TrialExplainer(user: user),
             if (user != null && user.isOwner) ...[
               const SizedBox(height: 14),
               Card(
@@ -131,6 +133,45 @@ class AccountScreen extends ConsumerWidget {
                 ),
               ),
             ],
+            const SizedBox(height: 14),
+            _TrialExplainer(user: user),
+            const SizedBox(height: 14),
+            const _AppLockCard(),
+            const SizedBox(height: 14),
+            const FeedbackContactCard(),
+            const SizedBox(height: 14),
+            Card(
+              clipBehavior: Clip.antiAlias,
+              child: Column(
+                children: [
+                  ListTile(
+                    leading: const Icon(Boxicons.bx_shield),
+                    title: const Text('Privacy policy'),
+                    subtitle: const Text(
+                      'What stays on the phone, retention and your rights',
+                    ),
+                    trailing: const Icon(Boxicons.bx_chevron_right),
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                        builder: (_) => const PrivacyPolicyScreen(),
+                      ),
+                    ),
+                  ),
+                  const Divider(height: 1),
+                  ListTile(
+                    leading: const Icon(Boxicons.bx_info_circle),
+                    title: const Text('About Zaka'),
+                    subtitle: const Text('Version, licences and credit'),
+                    trailing: const Icon(Boxicons.bx_chevron_right),
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                        builder: (_) => const AboutScreen(),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
             if (user != null &&
                 !user.isLifetime &&
                 user.email == ref.read(authServiceProvider).ownerEmail &&
@@ -417,6 +458,196 @@ class _Pill extends StatelessWidget {
               ? theme.colorScheme.surface
               : theme.colorScheme.onSurface,
         ),
+      ),
+    );
+  }
+}
+
+class _AppLockCard extends ConsumerStatefulWidget {
+  const _AppLockCard();
+
+  @override
+  ConsumerState<_AppLockCard> createState() => _AppLockCardState();
+}
+
+class _AppLockCardState extends ConsumerState<_AppLockCard> {
+  bool? _hasPin;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    final hasPin = await ref.read(appLockServiceProvider).hasPin();
+    if (!mounted) return;
+    setState(() => _hasPin = hasPin);
+  }
+
+  Future<String?> _askPin({
+    required String title,
+    required String action,
+    String? helper,
+  }) async {
+    final controller = TextEditingController();
+    final value = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(title),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (helper != null) ...[
+              Text(helper),
+              const SizedBox(height: 12),
+            ],
+            TextField(
+              controller: controller,
+              autofocus: true,
+              obscureText: true,
+              keyboardType: TextInputType.number,
+              maxLength: 8,
+              decoration: const InputDecoration(
+                labelText: 'PIN',
+                counterText: '',
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(controller.text),
+            child: Text(action),
+          ),
+        ],
+      ),
+    );
+    controller.dispose();
+    return value;
+  }
+
+  Future<bool> _confirmCurrentPin() async {
+    final pin = await _askPin(
+      title: 'Enter your current PIN',
+      action: 'Continue',
+    );
+    if (pin == null) return false;
+    final ok = await ref.read(appLockServiceProvider).verifyPin(pin);
+    if (!ok && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('That PIN is not correct.')),
+      );
+    }
+    return ok;
+  }
+
+  Future<void> _setPin() async {
+    if (_hasPin == true && !await _confirmCurrentPin()) return;
+
+    final first = await _askPin(
+      title: 'Set an app-lock PIN',
+      action: 'Next',
+      helper: 'Use 4 to 8 digits. Zaka stores only a salted hash, never the '
+          'PIN. If you forget it, clearing app data also removes your money '
+          'data.',
+    );
+    if (first == null || !mounted) return;
+    if (!AppLockService.isValidPin(first)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Use 4 to 8 digits.')),
+      );
+      return;
+    }
+
+    final second = await _askPin(
+      title: 'Confirm the PIN',
+      action: 'Save',
+    );
+    if (second == null || !mounted) return;
+    if (first != second) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('The PINs did not match.')),
+      );
+      return;
+    }
+
+    await ref.read(appLockServiceProvider).setPin(first);
+    if (!mounted) return;
+    setState(() => _hasPin = true);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('App lock is on.')),
+    );
+  }
+
+  Future<void> _disable() async {
+    if (!await _confirmCurrentPin()) return;
+    await ref.read(appLockServiceProvider).clearPin();
+    if (!mounted) return;
+    setState(() => _hasPin = false);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('App lock is off.')),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final hasPin = _hasPin;
+
+    return Card(
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        children: [
+          ListTile(
+            leading: Icon(
+              hasPin == true ? Boxicons.bx_lock_alt : Boxicons.bx_lock_open_alt,
+            ),
+            title: const Text('App lock'),
+            subtitle: Text(
+              hasPin == null
+                  ? 'Checking…'
+                  : hasPin
+                  ? 'On. Zaka asks for your PIN after you leave the app.'
+                  : 'Off. Add a 4–8 digit PIN so balances are not visible '
+                        'when someone picks up your phone.',
+            ),
+            trailing: Switch(
+              value: hasPin ?? false,
+              onChanged: hasPin == null
+                  ? null
+                  : (value) => value ? _setPin() : _disable(),
+            ),
+          ),
+          if (hasPin == true)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(18, 0, 18, 14),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      'PIN only in this build. Biometrics are roadmap. The '
+                      'Android recents preview is hidden with FLAG_SECURE.',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                        height: 1.4,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  TextButton(
+                    onPressed: _setPin,
+                    child: const Text('Change'),
+                  ),
+                ],
+              ),
+            ),
+        ],
       ),
     );
   }

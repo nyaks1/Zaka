@@ -1,3 +1,9 @@
-1:38AM INF 17 commits scanned.
-1:38AM INF scanned ~1156175 bytes (1.16 MB) in 3.77s
-1:38AM INF no leaks found
+# gitleaks detect (git history)
+5:02AM INF 19 commits scanned.
+5:02AM INF scanned ~1821451 bytes (1.82 MB) in 6.37s
+5:02AM INF no leaks found
+
+# gitleaks protect --staged (this change set, text files)
+5:54AM INF 0 commits scanned.
+5:54AM INF scanned ~126702 bytes (126.70 KB) in 1.85s
+5:54AM INF no leaks found

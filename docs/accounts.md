@@ -13,6 +13,8 @@ backend version that does not.
 | Creator lifetime access | Done, local build | `OWNER_EMAIL`, optional `OWNER_ACCESS_CODE` |
 | Creator user list | Done, this device only | Account → Users |
 | Grant lifetime / reset trial / move to free | Done, this device only | Account → Users |
+| App-lock PIN | Done | Account → App lock |
+| Delete every local account | Done | Privacy & Ask Zaka → Delete everything |
 | Google sign-in | Roadmap | Button explains the missing OAuth client |
 | Central user directory (all phones) | Roadmap | Needs the backend below |
 | Email verification, password reset | Roadmap | Needs the backend below |
@@ -24,6 +26,11 @@ SQLite database. The password is stored as
 16-byte random salt). The signed-in user id is kept in shared preferences.
 Money data is still only in the local database and is never uploaded by
 signing in.
+
+**Delete everything** on the Privacy & Ask Zaka screen now deletes every local
+account, the sign-in id and the app-lock PIN as well as the money data. An
+individual account cannot be deleted on its own yet; deleting everything is the
+current path.
 
 That also means:
 
@@ -48,24 +55,20 @@ The creator account gets `plan = lifetime` and no trial end.
 
 ## How the creator gives themselves lifetime access
 
-The creator email is a build-time value:
+A public checkout has **no default creator email**. The owner is whatever
+private build config supplies; the value is empty unless you set it. Keep it
+out of public files:
 
-```bash
-flutter build apk --release \
-  --dart-define=OWNER_EMAIL=nyakallomasiu@gmail.com
-```
+1. Copy `build.local.example.json` to `build.local.json` (gitignored).
+2. Set `ownerEmail` and, if you want a second factor, `ownerAccessCode`.
+3. Run `tool/build-release.ps1`, or pass the same values as
+   `--dart-define=OWNER_EMAIL=...` and `--dart-define=OWNER_ACCESS_CODE=...` to
+   your own private build command.
 
-`nyakallomasiu@gmail.com` is the default, so the normal build already recognises
-it. Sign up with that email and the account is created with `role = owner`,
-`plan = lifetime`, and the **Users** console appears under **Account**.
+Do not put the real address or code in `README.md`, an issue or a screenshot.
 
-To require a second factor, add a creator code at build time:
-
-```bash
-flutter build apk --release \
-  --dart-define=OWNER_EMAIL=nyakallomasiu@gmail.com \
-  --dart-define=OWNER_ACCESS_CODE='use-a-long-random-phrase'
-```
+Sign up with the configured email and the account is created with `role =
+owner`, `plan = lifetime`, and the **Users** console appears under **Account**.
 
 With a code configured, signing up with the creator email starts as a normal
 trial. Open **Account → Unlock creator access**, enter the code once, and the

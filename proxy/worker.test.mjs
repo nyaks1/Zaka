@@ -17,6 +17,8 @@ const env = {
   DAILY_LIMIT: '20',
   DAILY_ALERT_CALLS: '100',
   ALLOWED_ORIGIN: '*',
+  FEEDBACK_WEBHOOK: 'https://hooks.example.test/feedback',
+  FEEDBACK_DAILY_LIMIT: '3',
 };
 
 const originalFetch = globalThis.fetch;
@@ -25,10 +27,10 @@ afterEach(() => {
   globalThis.fetch = originalFetch;
 });
 
-function request(body, { method = 'POST', token = TOKEN, type = 'application/json' } = {}) {
+function request(body, { method = 'POST', token = TOKEN, type = 'application/json', path = '/tips' } = {}) {
   const headers = { 'content-type': type };
   if (token) headers['x-install-token'] = token;
-  return new Request('https://proxy.example.test/tips', {
+  return new Request(`https://proxy.example.test${path}`, {
     method,
     headers,
     body: method === 'GET' ? undefined : typeof body === 'string' ? body : JSON.stringify(body),
@@ -210,5 +212,112 @@ test('dailyBurnRand is rounded to the nearest whole rand for the prompt', async 
 
   const summaryText = captured.contents[0].parts[0].text;
   assert.match(summaryText, /"dailyBurnRand":90/);
+});
+
+function feedback(body, options = {}) {
+  return request(body, { path: '/feedback', ...options });
+}
+
+function stubWebhook() {
+  const captured = [];
+  globalThis.fetch = async (url, init) => {
+    captured.push({ url, body: JSON.parse(init.body) });
+    return new Response('ok', { status: 200 });
+  };
+  return captured;
+}
+
+test('valid feedback is forwarded to the webhook and accepted', async () => {
+  const captured = stubWebhook();
+  const response = await worker.fetch(
+    feedback({
+      message: 'The import preview was hard to read.',
+      appVersion: '0.1.0+1',
+      androidVersion: 'Android 16 (SDK 36)',
+      replyTo: 'tester@example.com',
+    }),
+    env,
+  );
+
+  assert.equal(response.status, 202);
+  assert.deepEqual(await response.json(), { ok: true });
+  assert.equal(captured.length, 1);
+  assert.equal(captured[0].url, env.FEEDBACK_WEBHOOK);
+  assert.match(captured[0].body.text, /import preview/);
+  assert.match(captured[0].body.text, /tester@example\.com/);
+  assert.match(captured[0].body.text, /Android 16/);
+});
+
+test('feedback with an extra field is rejected', async () => {
+  const response = await worker.fetch(
+    feedback({ message: 'Hello', bank: 'FNB' }),
+    env,
+  );
+  assert.equal(response.status, 400);
+});
+
+test('feedback without a message is rejected', async () => {
+  const response = await worker.fetch(feedback({ message: '   ' }), env);
+  assert.equal(response.status, 400);
+});
+
+test('feedback without an install token is rejected', async () => {
+  const response = await worker.fetch(
+    feedback({ message: 'Hello' }, { token: '' }),
+    env,
+  );
+  assert.equal(response.status, 401);
+});
+
+test('oversized feedback is rejected before delivery', async () => {
+  const response = await worker.fetch(
+    feedback({ message: 'x'.repeat(5000) }),
+    env,
+  );
+  assert.equal(response.status, 413);
+});
+
+test('feedback returns 503 when no webhook is configured', async () => {
+  const response = await worker.fetch(
+    feedback({ message: 'Hello' }),
+    { ...env, FEEDBACK_WEBHOOK: '' },
+  );
+  assert.equal(response.status, 503);
+});
+
+test('an invalid reply-to email is rejected', async () => {
+  const response = await worker.fetch(
+    feedback({ message: 'Hello', replyTo: 'not-an-email' }),
+    env,
+  );
+  assert.equal(response.status, 400);
+});
+
+test('the feedback route has its own daily limit', async () => {
+  stubWebhook();
+  const values = new Map();
+  const kv = {
+    get: async (key) => values.get(key) ?? null,
+    put: async (key, value) => values.set(key, value),
+  };
+  const limitedEnv = {
+    ...env,
+    ADVISOR_RATE_LIMIT: kv,
+    FEEDBACK_DAILY_LIMIT: '1',
+  };
+
+  const first = await worker.fetch(feedback({ message: 'One' }), limitedEnv);
+  const second = await worker.fetch(feedback({ message: 'Two' }), limitedEnv);
+
+  assert.equal(first.status, 202);
+  assert.equal(second.status, 429);
+});
+
+test('GET on the feedback route is rejected', async () => {
+  const response = await worker.fetch(
+    feedback(null, { method: 'GET' }),
+    env,
+  );
+  assert.equal(response.status, 405);
 });
 
