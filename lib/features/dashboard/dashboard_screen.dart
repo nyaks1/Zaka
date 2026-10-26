@@ -13,6 +13,7 @@ import '../../widgets/common.dart';
 import '../../widgets/runway_sparkline.dart';
 import '../activity/activity_tile.dart';
 import '../advisor/advisor_screen.dart';
+import '../auth/account_screen.dart';
 import '../advisor/advisor_service.dart';
 import '../advisor/advisor_summary.dart';
 import '../spending/quick_log_screen.dart';
@@ -36,6 +37,11 @@ class DashboardScreen extends ConsumerWidget {
   void _openAdvisor(BuildContext context) {
     Navigator.of(context)
         .push(MaterialPageRoute<void>(builder: (_) => const AdvisorScreen()));
+  }
+
+  void _openAccount(BuildContext context) {
+    Navigator.of(context)
+        .push(MaterialPageRoute<void>(builder: (_) => const AccountScreen()));
   }
 
   @override
@@ -103,6 +109,11 @@ class DashboardScreen extends ConsumerWidget {
           ],
         ),
         actions: [
+          IconButton(
+            tooltip: 'Account',
+            onPressed: () => _openAccount(context),
+            icon: const Icon(Boxicons.bx_user_circle),
+          ),
           IconButton(
             tooltip: 'Privacy & Ask Zaka',
             onPressed: () => _openAdvisor(context),
@@ -616,64 +627,76 @@ class _AdvisorDispatch extends StatelessWidget {
               'cash-flow tip.'
         : offlineTip(summary.value!);
 
-    return Container(
-      decoration: BoxDecoration(
-        color: bg,
+    return Material(
+      color: bg,
+      shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: border, width: 1),
+        side: BorderSide(color: border, width: 1),
       ),
-      padding: const EdgeInsets.fromLTRB(18, 16, 18, 14),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onOpen,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(18, 16, 18, 14),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(Boxicons.bx_star, size: 18, color: fg),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  'Ask Zaka',
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w700,
+              Row(
+                children: [
+                  Icon(Boxicons.bx_star, size: 18, color: fg),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Ask Zaka',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
                   ),
-                ),
-              ),
-              _TagBadge(
-                label: consented ? 'Tips on' : 'Tips off',
-                alert: false,
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          Text(
-            tip,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              height: 1.5,
-              color: fg,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  'Tips, not financial advice.',
-                  style: theme.textTheme.bodySmall?.copyWith(
+                  _TagBadge(
+                    label: consented ? 'Tips on' : 'Tips off',
+                    alert: false,
+                  ),
+                  const SizedBox(width: 6),
+                  Icon(
+                    Boxicons.bx_chevron_right,
+                    size: 18,
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Text(
+                tip,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  height: 1.5,
+                  color: fg,
                 ),
               ),
-              TextButton(
-                onPressed: onOpen,
-                style: TextButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  minimumSize: const Size(0, 36),
-                ),
-                child: Text(consented ? 'Get tips' : 'Set up'),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      'Tips, not financial advice.',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: onOpen,
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      minimumSize: const Size(0, 36),
+                    ),
+                    child: Text(consented ? 'Get tips' : 'Set up'),
+                  ),
+                ],
               ),
             ],
           ),
-        ],
+        ),
       ),
     );
   }

@@ -2,6 +2,7 @@ import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:zaka/app.dart';
 import 'package:zaka/data/database.dart';
 import 'package:zaka/providers.dart';
@@ -10,6 +11,7 @@ void main() {
   late AppDatabase database;
 
   setUp(() {
+    SharedPreferences.setMockInitialValues({});
     database = AppDatabase.forTesting(NativeDatabase.memory());
   });
 
@@ -114,6 +116,58 @@ void main() {
     await settle(tester);
     expect(find.text('Across 2 accounts'), findsOneWidget);
     expect(find.text('R1,000.00'), findsWidgets);
+
+    await disposeApp(tester);
+  });
+
+  testWidgets('the whole Ask Zaka card opens the privacy screen', (
+    tester,
+  ) async {
+    await pumpApp(tester);
+
+    await tester.scrollUntilVisible(
+      find.text('Ask Zaka'),
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await settle(tester);
+    await tester.tap(find.text('Ask Zaka'));
+    await settle(tester);
+
+    expect(find.text('Privacy & Ask Zaka'), findsOneWidget);
+    expect(find.text('What Ask Zaka does'), findsOneWidget);
+
+    await disposeApp(tester);
+  });
+
+  testWidgets('creates the creator account and opens the user console', (
+    tester,
+  ) async {
+    await pumpApp(tester);
+
+    await tester.tap(find.byTooltip('Account'));
+    await settle(tester);
+    expect(find.text('Start your 3-month trial'), findsOneWidget);
+
+    await tester.tap(find.text('Create free account'));
+    await settle(tester);
+
+    final fields = find.byType(TextFormField);
+    await tester.enterText(fields.at(0), 'Nyakallo Masiu');
+    await tester.enterText(fields.at(1), 'nyakallomasiu@gmail.com');
+    await tester.enterText(fields.at(2), 'correct horse battery');
+    await tester.enterText(fields.at(3), 'correct horse battery');
+    await tester.tap(find.widgetWithText(FilledButton, 'Create free account'));
+    await tester.pump(const Duration(seconds: 2));
+    await settle(tester);
+
+    expect(find.text('Nyakallo Masiu'), findsOneWidget);
+    expect(find.text('Creator · lifetime'), findsOneWidget);
+
+    await tester.tap(find.text('Users'));
+    await settle(tester);
+    expect(find.textContaining('on this device'), findsOneWidget);
+    expect(find.text('nyakallomasiu@gmail.com'), findsWidgets);
 
     await disposeApp(tester);
   });

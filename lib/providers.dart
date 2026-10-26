@@ -13,6 +13,7 @@ import 'data/statement_importer.dart';
 import 'features/advisor/advisor_service.dart';
 import 'features/advisor/advisor_summary.dart';
 import 'features/advisor/privacy_service.dart';
+import 'features/auth/auth_service.dart';
 
 final databaseProvider = Provider<AppDatabase>((ref) {
   final database = AppDatabase();
@@ -248,4 +249,16 @@ final privacyServiceProvider = Provider<PrivacyService>(
     ref.watch(databaseProvider),
     ref.watch(advisorPreferencesProvider),
   ),
+);
+
+final authServiceProvider = Provider<AuthService>(
+  (ref) => AuthService(ref.watch(databaseProvider)),
+);
+
+final currentUserProvider = FutureProvider<LocalUser?>(
+  (ref) => ref.watch(authServiceProvider).currentUser(),
+);
+
+final localUsersProvider = StreamProvider<List<LocalUser>>(
+  (ref) => ref.watch(authServiceProvider).watchUsers(),
 );

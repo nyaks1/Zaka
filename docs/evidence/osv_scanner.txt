@@ -1,0 +1,5 @@
+Starting filesystem walk for root: /
+Scanned /home/nyaks/src/github/Zaka/pubspec.lock file and found 126 packages
+End status: 0 dirs visited, 1 inodes visited, 1 Extract calls, 40.839364ms elapsed, 40.841519ms wall time
+
+No issues found

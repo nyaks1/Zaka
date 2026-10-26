@@ -66,8 +66,10 @@ void main() {
     final withdrawals = await database.select(database.withdrawals).get();
     final spends = await database.select(database.spends).get();
     final rules = await database.select(database.recurringRules).get();
+    final users = await database.select(database.localUsers).get();
 
     expect(accounts, hasLength(1));
+    expect(users, isEmpty);
     expect(accounts.single.name, 'Cash');
     expect(withdrawals.single.amountCents, 50000);
     expect(withdrawals.single.accountId, accounts.single.id);

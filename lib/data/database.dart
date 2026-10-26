@@ -137,8 +137,44 @@ class RecurringRules extends Table {
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
 }
 
+/// A Zaka sign-in on this device. Money data stays in the tables above; this
+/// table only holds the minimum needed to sign in, run the trial and show the
+/// creator's local user list.
+@DataClassName('LocalUser')
+class LocalUsers extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get email => text().withLength(min: 3, max: 254)();
+  TextColumn get displayName => text().withLength(min: 1, max: 80)();
+
+  /// `pbkdf2_sha256$iterations$salt$hash`, or null for a Google-only account.
+  TextColumn get passwordHash => text().nullable()();
+
+  /// `email` or `google`.
+  TextColumn get authProvider => text().withDefault(const Constant('email'))();
+
+  /// `user` or `owner`.
+  TextColumn get role => text().withDefault(const Constant('user'))();
+
+  /// `trial`, `lifetime` or `free`.
+  TextColumn get plan => text().withDefault(const Constant('trial'))();
+
+  DateTimeColumn get trialEndsAt => dateTime().nullable()();
+  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+  DateTimeColumn get lastSignInAt => dateTime().nullable()();
+
+  @override
+  List<String> get customConstraints => const ['UNIQUE (email)'];
+}
+
 @DriftDatabase(
-  tables: [Accounts, Withdrawals, Spends, Transfers, RecurringRules],
+  tables: [
+    Accounts,
+    Withdrawals,
+    Spends,
+    Transfers,
+    RecurringRules,
+    LocalUsers,
+  ],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
@@ -147,7 +183,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -165,6 +201,9 @@ class AppDatabase extends _$AppDatabase {
         await m.addColumn(spends, spends.importKey);
         await m.addColumn(spends, spends.source);
         await m.addColumn(recurringRules, recurringRules.accountId);
+      }
+      if (from < 3) {
+        await m.createTable(localUsers);
       }
     },
     beforeOpen: (details) async {

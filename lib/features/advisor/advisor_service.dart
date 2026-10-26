@@ -50,7 +50,10 @@ class AdvisorPreferences implements AdvisorConsentStore {
   @override
   Future<void> clear() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.clear();
+    // Remove only the advisor's own settings. Deleting everything should not
+    // sign the user out of their Zaka account or wipe unrelated preferences.
+    await prefs.remove(consentKey);
+    await prefs.remove(installTokenKey);
   }
 }
 

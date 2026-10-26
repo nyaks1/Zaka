@@ -2776,6 +2776,634 @@ class TransfersCompanion extends UpdateCompanion<Transfer> {
   }
 }
 
+class $LocalUsersTable extends LocalUsers
+    with TableInfo<$LocalUsersTable, LocalUser> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $LocalUsersTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _emailMeta = const VerificationMeta('email');
+  @override
+  late final GeneratedColumn<String> email = GeneratedColumn<String>(
+    'email',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 3,
+      maxTextLength: 254,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _displayNameMeta = const VerificationMeta(
+    'displayName',
+  );
+  @override
+  late final GeneratedColumn<String> displayName = GeneratedColumn<String>(
+    'display_name',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 1,
+      maxTextLength: 80,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _passwordHashMeta = const VerificationMeta(
+    'passwordHash',
+  );
+  @override
+  late final GeneratedColumn<String> passwordHash = GeneratedColumn<String>(
+    'password_hash',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _authProviderMeta = const VerificationMeta(
+    'authProvider',
+  );
+  @override
+  late final GeneratedColumn<String> authProvider = GeneratedColumn<String>(
+    'auth_provider',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('email'),
+  );
+  static const VerificationMeta _roleMeta = const VerificationMeta('role');
+  @override
+  late final GeneratedColumn<String> role = GeneratedColumn<String>(
+    'role',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('user'),
+  );
+  static const VerificationMeta _planMeta = const VerificationMeta('plan');
+  @override
+  late final GeneratedColumn<String> plan = GeneratedColumn<String>(
+    'plan',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('trial'),
+  );
+  static const VerificationMeta _trialEndsAtMeta = const VerificationMeta(
+    'trialEndsAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> trialEndsAt = GeneratedColumn<DateTime>(
+    'trial_ends_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  static const VerificationMeta _lastSignInAtMeta = const VerificationMeta(
+    'lastSignInAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> lastSignInAt = GeneratedColumn<DateTime>(
+    'last_sign_in_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    email,
+    displayName,
+    passwordHash,
+    authProvider,
+    role,
+    plan,
+    trialEndsAt,
+    createdAt,
+    lastSignInAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'local_users';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<LocalUser> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('email')) {
+      context.handle(
+        _emailMeta,
+        email.isAcceptableOrUnknown(data['email']!, _emailMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_emailMeta);
+    }
+    if (data.containsKey('display_name')) {
+      context.handle(
+        _displayNameMeta,
+        displayName.isAcceptableOrUnknown(
+          data['display_name']!,
+          _displayNameMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_displayNameMeta);
+    }
+    if (data.containsKey('password_hash')) {
+      context.handle(
+        _passwordHashMeta,
+        passwordHash.isAcceptableOrUnknown(
+          data['password_hash']!,
+          _passwordHashMeta,
+        ),
+      );
+    }
+    if (data.containsKey('auth_provider')) {
+      context.handle(
+        _authProviderMeta,
+        authProvider.isAcceptableOrUnknown(
+          data['auth_provider']!,
+          _authProviderMeta,
+        ),
+      );
+    }
+    if (data.containsKey('role')) {
+      context.handle(
+        _roleMeta,
+        role.isAcceptableOrUnknown(data['role']!, _roleMeta),
+      );
+    }
+    if (data.containsKey('plan')) {
+      context.handle(
+        _planMeta,
+        plan.isAcceptableOrUnknown(data['plan']!, _planMeta),
+      );
+    }
+    if (data.containsKey('trial_ends_at')) {
+      context.handle(
+        _trialEndsAtMeta,
+        trialEndsAt.isAcceptableOrUnknown(
+          data['trial_ends_at']!,
+          _trialEndsAtMeta,
+        ),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    if (data.containsKey('last_sign_in_at')) {
+      context.handle(
+        _lastSignInAtMeta,
+        lastSignInAt.isAcceptableOrUnknown(
+          data['last_sign_in_at']!,
+          _lastSignInAtMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  LocalUser map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return LocalUser(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      email: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}email'],
+      )!,
+      displayName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}display_name'],
+      )!,
+      passwordHash: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}password_hash'],
+      ),
+      authProvider: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}auth_provider'],
+      )!,
+      role: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}role'],
+      )!,
+      plan: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}plan'],
+      )!,
+      trialEndsAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}trial_ends_at'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      lastSignInAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}last_sign_in_at'],
+      ),
+    );
+  }
+
+  @override
+  $LocalUsersTable createAlias(String alias) {
+    return $LocalUsersTable(attachedDatabase, alias);
+  }
+}
+
+class LocalUser extends DataClass implements Insertable<LocalUser> {
+  final int id;
+  final String email;
+  final String displayName;
+
+  /// `pbkdf2_sha256$iterations$salt$hash`, or null for a Google-only account.
+  final String? passwordHash;
+
+  /// `email` or `google`.
+  final String authProvider;
+
+  /// `user` or `owner`.
+  final String role;
+
+  /// `trial`, `lifetime` or `free`.
+  final String plan;
+  final DateTime? trialEndsAt;
+  final DateTime createdAt;
+  final DateTime? lastSignInAt;
+  const LocalUser({
+    required this.id,
+    required this.email,
+    required this.displayName,
+    this.passwordHash,
+    required this.authProvider,
+    required this.role,
+    required this.plan,
+    this.trialEndsAt,
+    required this.createdAt,
+    this.lastSignInAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['email'] = Variable<String>(email);
+    map['display_name'] = Variable<String>(displayName);
+    if (!nullToAbsent || passwordHash != null) {
+      map['password_hash'] = Variable<String>(passwordHash);
+    }
+    map['auth_provider'] = Variable<String>(authProvider);
+    map['role'] = Variable<String>(role);
+    map['plan'] = Variable<String>(plan);
+    if (!nullToAbsent || trialEndsAt != null) {
+      map['trial_ends_at'] = Variable<DateTime>(trialEndsAt);
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    if (!nullToAbsent || lastSignInAt != null) {
+      map['last_sign_in_at'] = Variable<DateTime>(lastSignInAt);
+    }
+    return map;
+  }
+
+  LocalUsersCompanion toCompanion(bool nullToAbsent) {
+    return LocalUsersCompanion(
+      id: Value(id),
+      email: Value(email),
+      displayName: Value(displayName),
+      passwordHash: passwordHash == null && nullToAbsent
+          ? const Value.absent()
+          : Value(passwordHash),
+      authProvider: Value(authProvider),
+      role: Value(role),
+      plan: Value(plan),
+      trialEndsAt: trialEndsAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(trialEndsAt),
+      createdAt: Value(createdAt),
+      lastSignInAt: lastSignInAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastSignInAt),
+    );
+  }
+
+  factory LocalUser.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return LocalUser(
+      id: serializer.fromJson<int>(json['id']),
+      email: serializer.fromJson<String>(json['email']),
+      displayName: serializer.fromJson<String>(json['displayName']),
+      passwordHash: serializer.fromJson<String?>(json['passwordHash']),
+      authProvider: serializer.fromJson<String>(json['authProvider']),
+      role: serializer.fromJson<String>(json['role']),
+      plan: serializer.fromJson<String>(json['plan']),
+      trialEndsAt: serializer.fromJson<DateTime?>(json['trialEndsAt']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      lastSignInAt: serializer.fromJson<DateTime?>(json['lastSignInAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'email': serializer.toJson<String>(email),
+      'displayName': serializer.toJson<String>(displayName),
+      'passwordHash': serializer.toJson<String?>(passwordHash),
+      'authProvider': serializer.toJson<String>(authProvider),
+      'role': serializer.toJson<String>(role),
+      'plan': serializer.toJson<String>(plan),
+      'trialEndsAt': serializer.toJson<DateTime?>(trialEndsAt),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'lastSignInAt': serializer.toJson<DateTime?>(lastSignInAt),
+    };
+  }
+
+  LocalUser copyWith({
+    int? id,
+    String? email,
+    String? displayName,
+    Value<String?> passwordHash = const Value.absent(),
+    String? authProvider,
+    String? role,
+    String? plan,
+    Value<DateTime?> trialEndsAt = const Value.absent(),
+    DateTime? createdAt,
+    Value<DateTime?> lastSignInAt = const Value.absent(),
+  }) => LocalUser(
+    id: id ?? this.id,
+    email: email ?? this.email,
+    displayName: displayName ?? this.displayName,
+    passwordHash: passwordHash.present ? passwordHash.value : this.passwordHash,
+    authProvider: authProvider ?? this.authProvider,
+    role: role ?? this.role,
+    plan: plan ?? this.plan,
+    trialEndsAt: trialEndsAt.present ? trialEndsAt.value : this.trialEndsAt,
+    createdAt: createdAt ?? this.createdAt,
+    lastSignInAt: lastSignInAt.present ? lastSignInAt.value : this.lastSignInAt,
+  );
+  LocalUser copyWithCompanion(LocalUsersCompanion data) {
+    return LocalUser(
+      id: data.id.present ? data.id.value : this.id,
+      email: data.email.present ? data.email.value : this.email,
+      displayName: data.displayName.present
+          ? data.displayName.value
+          : this.displayName,
+      passwordHash: data.passwordHash.present
+          ? data.passwordHash.value
+          : this.passwordHash,
+      authProvider: data.authProvider.present
+          ? data.authProvider.value
+          : this.authProvider,
+      role: data.role.present ? data.role.value : this.role,
+      plan: data.plan.present ? data.plan.value : this.plan,
+      trialEndsAt: data.trialEndsAt.present
+          ? data.trialEndsAt.value
+          : this.trialEndsAt,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      lastSignInAt: data.lastSignInAt.present
+          ? data.lastSignInAt.value
+          : this.lastSignInAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LocalUser(')
+          ..write('id: $id, ')
+          ..write('email: $email, ')
+          ..write('displayName: $displayName, ')
+          ..write('passwordHash: $passwordHash, ')
+          ..write('authProvider: $authProvider, ')
+          ..write('role: $role, ')
+          ..write('plan: $plan, ')
+          ..write('trialEndsAt: $trialEndsAt, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('lastSignInAt: $lastSignInAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    email,
+    displayName,
+    passwordHash,
+    authProvider,
+    role,
+    plan,
+    trialEndsAt,
+    createdAt,
+    lastSignInAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is LocalUser &&
+          other.id == this.id &&
+          other.email == this.email &&
+          other.displayName == this.displayName &&
+          other.passwordHash == this.passwordHash &&
+          other.authProvider == this.authProvider &&
+          other.role == this.role &&
+          other.plan == this.plan &&
+          other.trialEndsAt == this.trialEndsAt &&
+          other.createdAt == this.createdAt &&
+          other.lastSignInAt == this.lastSignInAt);
+}
+
+class LocalUsersCompanion extends UpdateCompanion<LocalUser> {
+  final Value<int> id;
+  final Value<String> email;
+  final Value<String> displayName;
+  final Value<String?> passwordHash;
+  final Value<String> authProvider;
+  final Value<String> role;
+  final Value<String> plan;
+  final Value<DateTime?> trialEndsAt;
+  final Value<DateTime> createdAt;
+  final Value<DateTime?> lastSignInAt;
+  const LocalUsersCompanion({
+    this.id = const Value.absent(),
+    this.email = const Value.absent(),
+    this.displayName = const Value.absent(),
+    this.passwordHash = const Value.absent(),
+    this.authProvider = const Value.absent(),
+    this.role = const Value.absent(),
+    this.plan = const Value.absent(),
+    this.trialEndsAt = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.lastSignInAt = const Value.absent(),
+  });
+  LocalUsersCompanion.insert({
+    this.id = const Value.absent(),
+    required String email,
+    required String displayName,
+    this.passwordHash = const Value.absent(),
+    this.authProvider = const Value.absent(),
+    this.role = const Value.absent(),
+    this.plan = const Value.absent(),
+    this.trialEndsAt = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.lastSignInAt = const Value.absent(),
+  }) : email = Value(email),
+       displayName = Value(displayName);
+  static Insertable<LocalUser> custom({
+    Expression<int>? id,
+    Expression<String>? email,
+    Expression<String>? displayName,
+    Expression<String>? passwordHash,
+    Expression<String>? authProvider,
+    Expression<String>? role,
+    Expression<String>? plan,
+    Expression<DateTime>? trialEndsAt,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? lastSignInAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (email != null) 'email': email,
+      if (displayName != null) 'display_name': displayName,
+      if (passwordHash != null) 'password_hash': passwordHash,
+      if (authProvider != null) 'auth_provider': authProvider,
+      if (role != null) 'role': role,
+      if (plan != null) 'plan': plan,
+      if (trialEndsAt != null) 'trial_ends_at': trialEndsAt,
+      if (createdAt != null) 'created_at': createdAt,
+      if (lastSignInAt != null) 'last_sign_in_at': lastSignInAt,
+    });
+  }
+
+  LocalUsersCompanion copyWith({
+    Value<int>? id,
+    Value<String>? email,
+    Value<String>? displayName,
+    Value<String?>? passwordHash,
+    Value<String>? authProvider,
+    Value<String>? role,
+    Value<String>? plan,
+    Value<DateTime?>? trialEndsAt,
+    Value<DateTime>? createdAt,
+    Value<DateTime?>? lastSignInAt,
+  }) {
+    return LocalUsersCompanion(
+      id: id ?? this.id,
+      email: email ?? this.email,
+      displayName: displayName ?? this.displayName,
+      passwordHash: passwordHash ?? this.passwordHash,
+      authProvider: authProvider ?? this.authProvider,
+      role: role ?? this.role,
+      plan: plan ?? this.plan,
+      trialEndsAt: trialEndsAt ?? this.trialEndsAt,
+      createdAt: createdAt ?? this.createdAt,
+      lastSignInAt: lastSignInAt ?? this.lastSignInAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (email.present) {
+      map['email'] = Variable<String>(email.value);
+    }
+    if (displayName.present) {
+      map['display_name'] = Variable<String>(displayName.value);
+    }
+    if (passwordHash.present) {
+      map['password_hash'] = Variable<String>(passwordHash.value);
+    }
+    if (authProvider.present) {
+      map['auth_provider'] = Variable<String>(authProvider.value);
+    }
+    if (role.present) {
+      map['role'] = Variable<String>(role.value);
+    }
+    if (plan.present) {
+      map['plan'] = Variable<String>(plan.value);
+    }
+    if (trialEndsAt.present) {
+      map['trial_ends_at'] = Variable<DateTime>(trialEndsAt.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (lastSignInAt.present) {
+      map['last_sign_in_at'] = Variable<DateTime>(lastSignInAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LocalUsersCompanion(')
+          ..write('id: $id, ')
+          ..write('email: $email, ')
+          ..write('displayName: $displayName, ')
+          ..write('passwordHash: $passwordHash, ')
+          ..write('authProvider: $authProvider, ')
+          ..write('role: $role, ')
+          ..write('plan: $plan, ')
+          ..write('trialEndsAt: $trialEndsAt, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('lastSignInAt: $lastSignInAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -2784,6 +3412,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $RecurringRulesTable recurringRules = $RecurringRulesTable(this);
   late final $SpendsTable spends = $SpendsTable(this);
   late final $TransfersTable transfers = $TransfersTable(this);
+  late final $LocalUsersTable localUsers = $LocalUsersTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -2794,6 +3423,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     recurringRules,
     spends,
     transfers,
+    localUsers,
   ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
@@ -5210,6 +5840,309 @@ typedef $$TransfersTableProcessedTableManager =
       Transfer,
       PrefetchHooks Function({bool fromAccountId, bool toAccountId})
     >;
+typedef $$LocalUsersTableCreateCompanionBuilder = LocalUsersCompanion Function({
+  Value<int> id,
+  required String email,
+  required String displayName,
+  Value<String?> passwordHash,
+  Value<String> authProvider,
+  Value<String> role,
+  Value<String> plan,
+  Value<DateTime?> trialEndsAt,
+  Value<DateTime> createdAt,
+  Value<DateTime?> lastSignInAt,
+});
+typedef $$LocalUsersTableUpdateCompanionBuilder = LocalUsersCompanion Function({
+  Value<int> id,
+  Value<String> email,
+  Value<String> displayName,
+  Value<String?> passwordHash,
+  Value<String> authProvider,
+  Value<String> role,
+  Value<String> plan,
+  Value<DateTime?> trialEndsAt,
+  Value<DateTime> createdAt,
+  Value<DateTime?> lastSignInAt,
+});
+
+class $$LocalUsersTableFilterComposer
+    extends Composer<_$AppDatabase, $LocalUsersTable> {
+  $$LocalUsersTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get email => $composableBuilder(
+    column: $table.email,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get displayName => $composableBuilder(
+    column: $table.displayName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get passwordHash => $composableBuilder(
+    column: $table.passwordHash,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get authProvider => $composableBuilder(
+    column: $table.authProvider,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get role => $composableBuilder(
+    column: $table.role,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get plan => $composableBuilder(
+    column: $table.plan,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get trialEndsAt => $composableBuilder(
+    column: $table.trialEndsAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get lastSignInAt => $composableBuilder(
+    column: $table.lastSignInAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$LocalUsersTableOrderingComposer
+    extends Composer<_$AppDatabase, $LocalUsersTable> {
+  $$LocalUsersTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get email => $composableBuilder(
+    column: $table.email,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get displayName => $composableBuilder(
+    column: $table.displayName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get passwordHash => $composableBuilder(
+    column: $table.passwordHash,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get authProvider => $composableBuilder(
+    column: $table.authProvider,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get role => $composableBuilder(
+    column: $table.role,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get plan => $composableBuilder(
+    column: $table.plan,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get trialEndsAt => $composableBuilder(
+    column: $table.trialEndsAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get lastSignInAt => $composableBuilder(
+    column: $table.lastSignInAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$LocalUsersTableAnnotationComposer
+    extends Composer<_$AppDatabase, $LocalUsersTable> {
+  $$LocalUsersTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get email =>
+      $composableBuilder(column: $table.email, builder: (column) => column);
+
+  GeneratedColumn<String> get displayName => $composableBuilder(
+    column: $table.displayName,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get passwordHash => $composableBuilder(
+    column: $table.passwordHash,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get authProvider => $composableBuilder(
+    column: $table.authProvider,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get role =>
+      $composableBuilder(column: $table.role, builder: (column) => column);
+
+  GeneratedColumn<String> get plan =>
+      $composableBuilder(column: $table.plan, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get trialEndsAt => $composableBuilder(
+    column: $table.trialEndsAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get lastSignInAt => $composableBuilder(
+    column: $table.lastSignInAt,
+    builder: (column) => column,
+  );
+}
+
+class $$LocalUsersTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $LocalUsersTable,
+          LocalUser,
+          $$LocalUsersTableFilterComposer,
+          $$LocalUsersTableOrderingComposer,
+          $$LocalUsersTableAnnotationComposer,
+          $$LocalUsersTableCreateCompanionBuilder,
+          $$LocalUsersTableUpdateCompanionBuilder,
+          (
+            LocalUser,
+            BaseReferences<_$AppDatabase, $LocalUsersTable, LocalUser>,
+          ),
+          LocalUser,
+          PrefetchHooks Function()
+        > {
+  $$LocalUsersTableTableManager(_$AppDatabase db, $LocalUsersTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$LocalUsersTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$LocalUsersTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$LocalUsersTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> email = const Value.absent(),
+                Value<String> displayName = const Value.absent(),
+                Value<String?> passwordHash = const Value.absent(),
+                Value<String> authProvider = const Value.absent(),
+                Value<String> role = const Value.absent(),
+                Value<String> plan = const Value.absent(),
+                Value<DateTime?> trialEndsAt = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime?> lastSignInAt = const Value.absent(),
+              }) => LocalUsersCompanion(
+                id: id,
+                email: email,
+                displayName: displayName,
+                passwordHash: passwordHash,
+                authProvider: authProvider,
+                role: role,
+                plan: plan,
+                trialEndsAt: trialEndsAt,
+                createdAt: createdAt,
+                lastSignInAt: lastSignInAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String email,
+                required String displayName,
+                Value<String?> passwordHash = const Value.absent(),
+                Value<String> authProvider = const Value.absent(),
+                Value<String> role = const Value.absent(),
+                Value<String> plan = const Value.absent(),
+                Value<DateTime?> trialEndsAt = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime?> lastSignInAt = const Value.absent(),
+              }) => LocalUsersCompanion.insert(
+                id: id,
+                email: email,
+                displayName: displayName,
+                passwordHash: passwordHash,
+                authProvider: authProvider,
+                role: role,
+                plan: plan,
+                trialEndsAt: trialEndsAt,
+                createdAt: createdAt,
+                lastSignInAt: lastSignInAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$LocalUsersTable, LocalUser>(table),
+                  BaseReferences<_$AppDatabase, $LocalUsersTable, LocalUser>(
+                    db,
+                    table,
+                    e,
+                  ),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$LocalUsersTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $LocalUsersTable,
+      LocalUser,
+      $$LocalUsersTableFilterComposer,
+      $$LocalUsersTableOrderingComposer,
+      $$LocalUsersTableAnnotationComposer,
+      $$LocalUsersTableCreateCompanionBuilder,
+      $$LocalUsersTableUpdateCompanionBuilder,
+      (LocalUser, BaseReferences<_$AppDatabase, $LocalUsersTable, LocalUser>),
+      LocalUser,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -5224,4 +6157,6 @@ class $AppDatabaseManager {
       $$SpendsTableTableManager(_db, _db.spends);
   $$TransfersTableTableManager get transfers =>
       $$TransfersTableTableManager(_db, _db.transfers);
+  $$LocalUsersTableTableManager get localUsers =>
+      $$LocalUsersTableTableManager(_db, _db.localUsers);
 }

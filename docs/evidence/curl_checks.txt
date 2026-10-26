@@ -1,0 +1,130 @@
+# Live advisor proxy checks
+# Date: 2026-10-25T23:36:59Z
+# Host redacted in this file; the live Worker was a temporary Cloudflare deployment.
+
+## GET (expect 405)
+HTTP/2 405 
+date: Sun, 25 Oct 2026 23:37:00 GMT
+content-type: application/json; charset=utf-8
+content-length: 30
+access-control-allow-origin: *
+cache-control: no-store
+vary: Origin
+access-control-allow-headers: Content-Type, X-Install-Token
+access-control-allow-methods: POST, OPTIONS
+access-control-max-age: 86400
+report-to: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=GM0xYroljL9Z6Is96MqJcOeUicM8LBypCSACEPa2yZKUwOs77sLv01JXOmCN0sYLwejZrg0Qi36NyaZfGZmKdM%2FPy7YD7ehAAHWqcxZPfFd1GI%2BP8WemnuBe6bmui%2BLojddPZbmWkobCeh5Yo8zWSxRQNDTk6mwmt223QCw%3D"}]}
+nel: {"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}
+server: cloudflare
+cf-ray: a5050bf46d6bf67c-JNB
+alt-svc: h3=":443"; ma=86400
+
+{"error":"Method not allowed"}
+## Valid POST, missing token (expect 401)
+HTTP/2 401 
+date: Sun, 25 Oct 2026 23:37:01 GMT
+content-type: application/json; charset=utf-8
+content-length: 44
+access-control-allow-origin: *
+cache-control: no-store
+vary: Origin
+access-control-allow-headers: Content-Type, X-Install-Token
+access-control-allow-methods: POST, OPTIONS
+access-control-max-age: 86400
+report-to: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=PB6EObqo4AznTJfYbHy0nfb%2BHYItxR45y8eKgCjXWc7aFGN%2BdXjbI8KQEhiXRJpchn1Cye1vjzr%2Bz%2BK1EmfBFFBKevPG%2FWnpUcUtOWXcQvFonDFc7WEhjJbB%2FmeGCA3AA%2F7ccmnyvSP%2F6%2BFSCBtm58PGnJTvaEoWm4UC7nw%3D"}]}
+nel: {"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}
+server: cloudflare
+cf-ray: a5050bf60a055f95-JNB
+alt-svc: h3=":443"; ma=86400
+
+{"error":"Missing or invalid install token"}
+## Extra field (expect 400)
+HTTP/2 400 
+date: Sun, 25 Oct 2026 23:37:01 GMT
+content-type: application/json; charset=utf-8
+content-length: 52
+access-control-allow-origin: *
+cache-control: no-store
+vary: Origin
+access-control-allow-headers: Content-Type, X-Install-Token
+access-control-allow-methods: POST, OPTIONS
+access-control-max-age: 86400
+report-to: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=fh%2BPbEOo2CeVtCek3baTeb%2Bovpaurhze1pT4peZytIYu29EBtBXKqksMrlv0DBUmc91VJANjpBxDaMLccEPOTj21E7ONCIrsW2yY74yke14HUwcZeySeB0Y3DhfZGbPzbLyufGgL%2BPi1gjMqCveejsSAuOK2zyjBY3yNeKo%3D"}]}
+nel: {"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}
+server: cloudflare
+cf-ray: a5050bf779b0fdcd-JNB
+alt-svc: h3=":443"; ma=86400
+
+{"error":"Only the four summary fields are allowed"}
+## Unknown category (expect 400)
+HTTP/2 400 
+date: Sun, 25 Oct 2026 23:37:01 GMT
+content-type: application/json; charset=utf-8
+content-length: 56
+access-control-allow-origin: *
+cache-control: no-store
+vary: Origin
+access-control-allow-headers: Content-Type, X-Install-Token
+access-control-allow-methods: POST, OPTIONS
+access-control-max-age: 86400
+report-to: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=jxm5Jp0SBlm%2BZupEQ9CFGsum4rLRTlJGWESg0G8veVGSUwqtxHyydf4UZvdwnrVKBbDtd6R%2F5Og%2FRZbF6smEoY0fmn%2B8FGekvo0wqRg41Op5uQ0EOyERZRIrvZ%2FxVFh%2BO2f2clQS20aCtcHdD8z8MSKOxUFNkNFpNLcci24%3D"}]}
+nel: {"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}
+server: cloudflare
+cf-ray: a5050bf8de1d1636-JNB
+alt-svc: h3=":443"; ma=86400
+
+{"error":"categoryPercent contains an unknown category"}
+## Wrong content type (expect 415)
+HTTP/2 415 
+date: Sun, 25 Oct 2026 23:37:01 GMT
+content-type: application/json; charset=utf-8
+content-length: 49
+access-control-allow-origin: *
+cache-control: no-store
+vary: Origin
+access-control-allow-headers: Content-Type, X-Install-Token
+access-control-allow-methods: POST, OPTIONS
+access-control-max-age: 86400
+report-to: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=lA6frKSAf2bbLoRw%2Fr2Q6I5dO8%2FWX4vyATLG%2BM2eNB0T5371Ql%2BwWv4v8QtnnLEUO4K4%2B85DkbjlPRjX0FqZC7a%2B%2BNwz8VomNr264SEXXFX9XsBs%2BJcaWvNqDpoT5%2FPmBhnyJIJ8XV%2Fd7Vy%2FyI8IwaCgC8R4%2FqD05o6ec%2B4%3D"}]}
+nel: {"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}
+server: cloudflare
+cf-ray: a5050bfa3d7373d6-JNB
+alt-svc: h3=":443"; ma=86400
+
+{"error":"Content-Type must be application/json"}
+## Oversized body (expect 413)
+HTTP/2 413 
+date: Sun, 25 Oct 2026 23:37:02 GMT
+content-type: application/json; charset=utf-8
+content-length: 37
+access-control-allow-origin: *
+cache-control: no-store
+vary: Origin
+access-control-allow-headers: Content-Type, X-Install-Token
+access-control-allow-methods: POST, OPTIONS
+access-control-max-age: 86400
+report-to: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=Jks%2BASd0ISGxtE0rNrvXWOBXOwDLnibT6Z0JqXlgVDesFiYGCFHx51%2FMOv0bmoFjC4hiHHfobwHpqOm1%2FStyRHQtPARkudv35DfflHUKoITlUY2h4wF%2BJFz3IuLqquECYzKAI5zJ8wbVQfqQ5nAYXZLRFhfp8ji%2BCpx7Ht8%3D"}]}
+nel: {"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}
+server: cloudflare
+cf-ray: a5050bfd3d1e197c-JNB
+alt-svc: h3=":443"; ma=86400
+
+{"error":"Request body is too large"}
+## Valid POST with token (expect 500 in this build: no Gemini secret on the temporary Worker)
+HTTP/2 500 
+date: Sun, 25 Oct 2026 23:37:02 GMT
+content-type: application/json; charset=utf-8
+content-length: 37
+access-control-allow-origin: *
+cache-control: no-store
+vary: Origin
+access-control-allow-headers: Content-Type, X-Install-Token
+access-control-allow-methods: POST, OPTIONS
+access-control-max-age: 86400
+report-to: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=LfkycEASHMgqDz2CI8bHElR%2BFf4SO%2BMCEdSoIyoEHivi9fXZmjxXfa70fNF8%2BFKyyxpDO33JEKVYAawj%2FHfOOA9gS4HkVkarM0gA%2BakGJU2ojvFMQzAhgMOS5IsRM%2B36s6%2BdEx1ofXdB98JSN1oMFohfQNfqmRStMnuYqoE%3D"}]}
+nel: {"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}
+server: cloudflare
+cf-ray: a5050bfeaf9eaeca-JNB
+alt-svc: h3=":443"; ma=86400
+
+{"error":"Advisor is not configured"}
