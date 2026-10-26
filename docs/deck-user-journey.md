@@ -6,9 +6,9 @@ product path. Use these six beats, in this order.
 
 ## Slide: one user, six taps
 
-1. **Install and open.** Download the APK from the repository release link,
-   sideload it on Android 7.0+, and open Zaka. On the first screen tap **Try
-   with sample data**.
+1. **Install and open.** Download the APK from `release/zaka-0.1.0.apk`
+   in the repository, sideload it on Android 7.0+, and open Zaka. On the first
+   screen tap **Try with sample data**.
 2. **See the runway.** The sample creates an FNB cheque account and shows **R125
    in the bank + R500 cash = R625**, with a **5-day** runway. The ATM row became
    a cash transfer, not a spend.
